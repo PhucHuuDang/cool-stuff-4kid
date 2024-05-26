@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/hooks/use-cart-store";
 import { Product } from "@/interface";
 import Image from "next/image";
 
@@ -9,10 +10,18 @@ interface CardProductProps {
 }
 
 export const CardProduct = ({ product }: CardProductProps) => {
+  const addToCart = useCartStore((state) => state.addToCart);
+
   const description =
     "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
   const MAX_LENGTH = 54;
+
+  const handleAddToCart = (e: any, product: Product) => {
+    e.stopPropagation();
+    addToCart(product);
+  };
+
   return (
     <div
       className="
@@ -110,7 +119,9 @@ export const CardProduct = ({ product }: CardProductProps) => {
             <span>₫</span>
           </div>
         </div>
-        <Button variant="book">Add to cart</Button>
+        <Button onClick={(e) => handleAddToCart(e, product)} variant="book">
+          Add to cart
+        </Button>
       </div>
     </div>
   );

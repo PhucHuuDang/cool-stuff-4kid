@@ -1,6 +1,7 @@
-import { DataProducts } from "@/config";
+import { DataProducts } from "@/db";
 import { CardProduct } from "./_components/card-product";
 import Sidebar from "./_components/sidebar";
+import { Cart } from "./_components/cart/cart";
 
 const HomePage = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -24,9 +25,11 @@ const HomePage = ({ children }: { children: React.ReactNode }) => {
              gap-8
              "
           >
-            {DataProducts.map((product) => (
+            {/* {DataProducts.map((product) => (
               <CardProduct key={product.id} product={product} />
-            ))}
+            ))} */}
+
+            <Cart product={DataProducts} />
           </div>
           {/* {children} */}
         </div>

@@ -4,9 +4,15 @@ import { FormInput } from "@/components/form/form-input";
 import { SearchIcon } from "@/components/search-icon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useCartStore } from "@/hooks/use-cart-store";
+import { useDrawerCart } from "@/hooks/use-drawer-cart";
+import useFromStore from "@/store/use-from-store";
 import { ShoppingCart } from "lucide-react";
 
 const NavbarHome = () => {
+  const drawerCart = useDrawerCart();
+  const cart = useFromStore(useCartStore, (state) => state.cart);
+
   return (
     <div className="fixed top-0 h-14 pt-8 w-full px-8 flex items-center justify-between">
       <div className="flex items-center justify-between gap-x-10 w-full p-2 bg-gradient-to-r from-slate-300 to-slate-500 rounded-xl">
@@ -33,8 +39,14 @@ const NavbarHome = () => {
             New Post
           </Button>
 
-          <div className="group bg-slate-700 rounded-xl hover:cursor-pointer p-3 hover:bg-slate-600 transition">
+          <div
+            onClick={drawerCart.onOpen}
+            className="group bg-slate-700 rounded-xl hover:cursor-pointer p-3 hover:bg-slate-600 transition relative"
+          >
             <ShoppingCart className=" text-slate-400 group-hover:text-slate-100" />
+            <div className="absolute rounded-full w-6 h-6 text-center text-white left-7 top-6 text-sm">
+              {cart?.length}
+            </div>
           </div>
 
           <Skeleton className="rounded-full h-8 w-8" />
