@@ -19,6 +19,7 @@ interface FormInputProps {
   searchIcon?: React.ReactNode;
   defaultValue?: string;
   label?: string;
+  labelClassName?: string;
 }
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
@@ -35,6 +36,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       icon: Icon,
       defaultValue = "",
       label,
+      labelClassName,
     },
     ref
   ) => {
@@ -45,7 +47,10 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
         <div className="space-y-1">
           {label ? (
             <Label
-              className="text-lg font-semibold text-neutral-200"
+              className={cn(
+                "text-lg font-semibold text-neutral-200",
+                labelClassName
+              )}
               htmlFor={id}
             >
               {label}
