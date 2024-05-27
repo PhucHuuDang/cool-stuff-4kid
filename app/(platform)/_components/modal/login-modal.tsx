@@ -32,8 +32,6 @@ export const LoginModal = () => {
   const onSubmit = (formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-
-    console.log({ email, password });
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
