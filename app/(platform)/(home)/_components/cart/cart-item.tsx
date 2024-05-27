@@ -50,7 +50,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2">
-        <form className="flex items-center">
+        <form className="flex items-center 2xl:gap-2">
           <label htmlFor="Line1Qty" className="sr-only">
             {" "}
             Quantity{" "}
@@ -62,7 +62,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
             //   }
             // }}
             onClick={() => handleDecreaseQuantity(product)}
-            className="h-5 w-5 cursor-pointer"
+            className="size-5 2xl:size-6 cursor-pointer"
           />
 
           <input
@@ -75,15 +75,15 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
 
           <Plus
             onClick={() => increaseQuantity(product)}
-            className="h-5 w-5 cursor-pointer"
+            className="size-5 2xl:size-6 cursor-pointer"
           />
         </form>
 
-        <div className="text-slate-400 text-xl">|</div>
+        <div className="text-slate-400 text-xl 2xl:mx-2">|</div>
 
         <Button
           variant="destructive"
-          className="h-8"
+          className="h-8 2xl:h-9"
           onClick={() => removeFromCart(product)}
         >
           <span className="sr-only">Remove item</span>

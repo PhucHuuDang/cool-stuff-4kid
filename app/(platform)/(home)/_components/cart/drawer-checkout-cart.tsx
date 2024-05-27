@@ -8,11 +8,13 @@ import useFromStore from "@/store/use-from-store";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { CreditCard, ShoppingCart } from "lucide-react";
 import { useState } from "react";
+import { useLoginModal } from "@/hooks/use-login-modal";
 
 export const DrawerCheckoutCart = () => {
   const drawerCart = useDrawerCart();
+  const openLoginModal = useLoginModal((state) => state.onOpen);
 
   const cart = useFromStore(useCartStore, (state) => state.cart);
 
@@ -91,11 +93,14 @@ export const DrawerCheckoutCart = () => {
           {cartCondition && (
             <div className="my-6 flex flex-col items-center gap-y-5">
               <Button
-                onClick={() => console.log("payment")}
+                onClick={() => {
+                  console.log("payment");
+                  openLoginModal();
+                }}
                 variant="book"
-                className="w-full text-base hover:text-lg hover:scale-105 transition duration-300"
+                className="w-full text-base hover:text-lg hover:scale-105 gap-x-1 transition duration-300"
               >
-                Checkout
+                <CreditCard className="h-6 w-6" /> Checkout
               </Button>
 
               <Drawer.Close asChild>
