@@ -1,8 +1,8 @@
 import React from 'react';
-import Header from '@/components/Header';
-import SideBar from '@/components/SideBar';
-import Footer from '@/components/Footer';
-import BarChart from '@/components/BarChart';
+import { Header } from '@/components/Header';
+import { SideBar } from '@/components/SideBar';
+import { Footer } from '@/components/Footer';
+import { BarChart } from '@/components/BarChart';
 
 const Revenue = () => {
   return (

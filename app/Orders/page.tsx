@@ -1,7 +1,7 @@
 import React from 'react';
-import Header from '@/components/Header';
-import SideBar from '@/components/SideBar';
-import Footer from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { SideBar } from '@/components/SideBar';
+import { Footer } from '@/components/Footer';
 
 const Orders: React.FC = () => {
   return (

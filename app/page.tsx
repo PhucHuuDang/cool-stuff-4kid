@@ -1,6 +1,6 @@
-import SideBar from "@/components/SideBar";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Header } from '@/components/Header';
+import { SideBar } from '@/components/SideBar';
+import { Footer } from '@/components/Footer';
 const AdminPage: React.FC = () => {
   return (
     <div className="flex min-h-screen">

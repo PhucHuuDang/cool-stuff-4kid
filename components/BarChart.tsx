@@ -10,12 +10,14 @@ import {
   Title,
   Tooltip,
   Legend,
+  ChartOptions,
+  ChartData,
 } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const BarChart = () => {
-  const data = {
+  const data: ChartData<'bar'> = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     datasets: [
       {
@@ -31,11 +33,11 @@ const BarChart = () => {
     ],
   };
 
-  const options = {
+  const options: ChartOptions<'bar'> = {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top',
+        position: 'top', // Ensure this matches the allowed values
       },
       title: {
         display: true,
@@ -55,4 +57,4 @@ const BarChart = () => {
   return <Bar data={data} options={options} />;
 };
 
-export default BarChart;
+export { BarChart };
