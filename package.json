@@ -9,24 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< HEAD
     "chart.js": "^4.4.3",
-=======
-    "@radix-ui/react-avatar": "^1.0.4",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-label": "^2.0.2",
-    "@radix-ui/react-separator": "^1.0.3",
-    "@radix-ui/react-slot": "^1.0.2",
->>>>>>> 4159f16721875c27d2a3f94a0da251b6bffdcda9
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.2.6",
     "lucide": "^0.379.0",
     "lucide-react": "^0.379.0",
     "next": "14.2.3",
+    "radix-ui": "^1.0.1",
     "react": "^18",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18",
+    "react-icons": "^5.2.1",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "usehooks-ts": "^3.1.0",

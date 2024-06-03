@@ -18,7 +18,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           <Image 
             src="https://via.placeholder.com/40" 
             alt="User Avatar"
-             
+            width={300}
+            height={300}
             className="w-10 h-10 rounded-full"
           />
           <div className="ml-2">
