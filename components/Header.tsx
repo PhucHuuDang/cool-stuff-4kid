@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface HeaderProps {
   title: string;
 }
@@ -13,9 +15,10 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
           className="px-4 py-2 border rounded-lg"
         />
         <div className="ml-4 flex items-center">
-          <img 
+          <Image 
             src="https://via.placeholder.com/40" 
-            alt="User Avatar" 
+            alt="User Avatar"
+             
             className="w-10 h-10 rounded-full"
           />
           <div className="ml-2">

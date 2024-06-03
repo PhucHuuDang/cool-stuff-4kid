@@ -8,7 +8,7 @@ const SideBar = () => {
         <a href="/Orders" className="block p-4 hover:bg-pink-500">Orders</a>
         <a href="/StaffManagement" className="block p-4 hover:bg-pink-500">Staff Management</a>
         <a href="/Revenue" className="block p-4 hover:bg-pink-500">Revenue</a>
-        <a href="/Accounts" className="block p-4 hover:bg-pink-500">Accounts</a>
+        <a href="/Account" className="block p-4 hover:bg-pink-500">Accounts</a>
       </nav>
     </aside>
   );
