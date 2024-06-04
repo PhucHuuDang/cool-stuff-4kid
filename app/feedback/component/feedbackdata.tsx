@@ -1,5 +1,5 @@
 
-const feedbackData = [
+export const feedbackData = [
     { Username: "user1", Comments: "Great product! ", Rate: 3, Time: "2024-06-01" },
     { Username: "user2", Comments: "I love it!", Rate: 2, Time: "2024-06-01" },
     { Username: "user3", Comments: "Could be better", Rate: 1, Time: "2024-06-02" },
@@ -32,5 +32,5 @@ const feedbackData = [
     { Username: "user30", Comments: "Not great.", Rate: 1, Time: "2024-06-15" },
   ];
   
-  export default feedbackData;
+  // export default feedbackData;
   

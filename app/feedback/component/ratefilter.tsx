@@ -5,7 +5,7 @@ interface RateFilterProps {
   handleRateChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
-const RateFilter: React.FC<RateFilterProps> = ({ selectedRate, handleRateChange }) => {
+export const RateFilter: React.FC<RateFilterProps> = ({ selectedRate, handleRateChange }) => {
   return (
     <div className='flex items-center'>
       <span>Rate</span>
@@ -24,4 +24,4 @@ const RateFilter: React.FC<RateFilterProps> = ({ selectedRate, handleRateChange 
   );
 };
 
-export default RateFilter;
+// export default RateFilter;

@@ -1,8 +1,9 @@
 "use client";
 
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-const Profile = () => {
+export const Profile  = () => {
   const [firstName, setFirstName] = useState("John");
   const [lastName, setLastName] = useState("Doe");
   const [role, setRole] = useState("Staff");
@@ -11,39 +12,39 @@ const Profile = () => {
   const [address, setAddress] = useState("123 Main St, City, Country");
   const [angency, setAgency] = useState("Thủ Đức");
 
-  const handleEdit = (field) => {
-    let newValue = prompt(`Enter new value for ${field}:`);
-    if (newValue !== null && newValue !== "") {
-      switch (field) {
-        case "firstName":
-          setFirstName(newValue);
-          break;
-        case "lastName":
-          setLastName(newValue);
-          break;
-        case "role":
-          setRole(newValue);
-          break;
-        case "email":
-          setEmail(newValue);
-          break;
-        case "phone":
-          setPhone(newValue);
-          break;
-        case "address":
-          setAddress(newValue);
-          break;
-        case "angency":
-          setAgency(newValue);
-          break;
-        default:
-          break;
-      }
-    }
-  };
+  // const handleEdit = (field) => {
+  //   let newValue = prompt(`Enter new value for ${field}:`);
+  //   if (newValue !== null && newValue !== "") {
+  //     switch (field) {
+  //       case "firstName":
+  //         setFirstName(newValue);
+  //         break;
+  //       case "lastName":
+  //         setLastName(newValue);
+  //         break;
+  //       case "role":
+  //         setRole(newValue);
+  //         break;
+  //       case "email":
+  //         setEmail(newValue);
+  //         break;
+  //       case "phone":
+  //         setPhone(newValue);
+  //         break;
+  //       case "address":
+  //         setAddress(newValue);
+  //         break;
+  //       case "angency":
+  //         setAgency(newValue);
+  //         break;
+  //       default:
+  //         break;
+  //     }
+  //   }
+  // };
 
   return (
-    <div className="flex justify-start items-center ">
+    <div className="flex justify-center items-center ">
       <div className="max-w-3xl w-full bg-white shadow-md rounded px-8 pt-6 pb-8 ">
         <div className="text-center">
           <img
@@ -57,7 +58,7 @@ const Profile = () => {
             First Name:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={firstName}
@@ -76,7 +77,7 @@ const Profile = () => {
             Last Name:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={lastName}
@@ -95,7 +96,7 @@ const Profile = () => {
             Role:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={role}
@@ -114,7 +115,7 @@ const Profile = () => {
             Email:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="email"
               value={email}
@@ -133,7 +134,7 @@ const Profile = () => {
             Phone:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={phone}
@@ -152,7 +153,7 @@ const Profile = () => {
             Address:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={address}
@@ -171,7 +172,7 @@ const Profile = () => {
             Agency:
           </label>
           <div className="flex">
-            <input
+            <Input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               type="text"
               value={angency}
@@ -190,4 +191,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+// export default Profile;

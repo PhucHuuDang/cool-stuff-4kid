@@ -5,8 +5,8 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import SideBar from '@/components/SideBar';
 import { AngryIcon, AnnoyedIcon, SmileIcon } from 'lucide-react';
-import feedbackData from './component/feedbackdata'; 
-import RateFilter from './component/ratefilter'; 
+import {feedbackData} from './component/feedbackdata'; 
+import {RateFilter} from './component/ratefilter'; 
 
 const Feedback = () => {
   const [selectedRate, setSelectedRate] = useState('All');

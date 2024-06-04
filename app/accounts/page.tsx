@@ -1,7 +1,7 @@
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import SideBar from '@/components/SideBar';
-import Profile from './component/profile';
+import {Profile} from './component/profile';
 
 const Accounts = () => {
   return (
@@ -9,7 +9,7 @@ const Accounts = () => {
       <SideBar />
       <div className='flex flex-col flex-grow'>
         <Header title='Accounts'/>
-        <main className='flex-grow bg-gray-100 p-6 overflow-auto mt-16 ml-64'>
+        <main className='flex-grow bg-gray-100 p-6 pb-20 overflow-auto mt-16 ml-64'>
           <Profile/>
         </main>
         <Footer />
