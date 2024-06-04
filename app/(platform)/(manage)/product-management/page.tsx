@@ -28,7 +28,7 @@ const products = [
   { id: 20, image: 'image20.jpg', name: 'Product 20', quantity: 200, purchasePrice: 2000, salePrice: 2050, link: 'https://example.com/product20' },
 ];
 
-const ProductManagement: React.FC = () => {
+const ProductManagementPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -129,4 +129,4 @@ const ProductManagement: React.FC = () => {
   );
 }
 
-export default ProductManagement;
+export default ProductManagementPage;

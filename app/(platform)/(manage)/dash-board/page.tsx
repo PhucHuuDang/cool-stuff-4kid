@@ -1,7 +1,7 @@
 import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
-const AdminPage: React.FC = () => {
+const DashboardPage: React.FC = () => {
   return (
     <div className="flex min-h-screen">
       {/*Side Bar*/}
@@ -125,4 +125,4 @@ const AdminPage: React.FC = () => {
   );
 }
 
-export default AdminPage;
+export default DashboardPage;

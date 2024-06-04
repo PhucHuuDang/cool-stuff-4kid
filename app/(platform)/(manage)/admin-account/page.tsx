@@ -2,7 +2,7 @@ import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
 
-const AdminProfile: React.FC = () => {
+const AdminAccountPage: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
@@ -77,4 +77,4 @@ const AdminProfile: React.FC = () => {
   );
 }
 
-export default AdminProfile;
+export default AdminAccountPage;

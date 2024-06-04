@@ -123,7 +123,7 @@ const getStatusClass = (status: string): string => {
   }
 };
 
-const Orders: React.FC = () => {
+const OrdersPage: React.FC = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
@@ -177,4 +177,4 @@ const Orders: React.FC = () => {
   );
 }
 
-export default Orders;
+export default OrdersPage;

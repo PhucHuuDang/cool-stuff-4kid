@@ -4,7 +4,7 @@ import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
 import { BarChart } from '@/components/BarChart';
 
-const Revenue = () => {
+const RevenuePage = () => {
   return (
     <div className="flex min-h-screen overflow-x-hidden">
       {/* Side Bar */}
@@ -50,4 +50,4 @@ const Revenue = () => {
   );
 };
 
-export default Revenue;
+export default RevenuePage;
