@@ -5,7 +5,6 @@ import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
 
-// Mock product data
 const products = [
   { id: 1, image: 'image1.jpg', name: 'Product 1', quantity: 10, purchasePrice: 100, salePrice: 150, link: 'https://example.com/product1' },
   { id: 2, image: 'image2.jpg', name: 'Product 2', quantity: 20, purchasePrice: 200, salePrice: 250, link: 'https://example.com/product2' },
@@ -44,7 +43,7 @@ const ProductManagement: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen bg-gray-100">
       <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
         <SideBar />
       </div>
@@ -100,18 +99,21 @@ const ProductManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-              <div className="mt-4">
+              <div className="mt-4 flex justify-between items-center">
                 <button 
                   onClick={() => handleClick(currentPage - 1)} 
                   disabled={currentPage === 1} 
-                  className={`px-4 py-2 mr-2 bg-blue-500 text-white rounded ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
                 >
                   Previous
                 </button>
+                <div className="text-sm text-gray-700">
+                  Page {currentPage} of {totalPages}
+                </div>
                 <button 
                   onClick={() => handleClick(currentPage + 1)} 
                   disabled={currentPage === totalPages} 
-                  className={`px-4 py-2 bg-blue-500 text-white rounded ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
                 >
                   Next
                 </button>
