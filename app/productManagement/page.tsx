@@ -10,7 +10,7 @@ const ProductManagement = () => {
       <div className='flex flex-col flex-grow'>
         <Header title='ProductManagement'/>
         <main className='flex-grow bg-gray-100 p-3 overflow-auto mt-16 ml-64'>
-          <Details/>
+          <Details />
         </main>
         <Footer />
       </div>
