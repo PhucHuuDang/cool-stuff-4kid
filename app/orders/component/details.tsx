@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { data } from "./data";
-import { Label } from "@/components/ui/label";
+import Filter from "./filter";  
 
 const statusColors = {
   Canceled: "text-red-500",
@@ -21,40 +21,9 @@ const statusColors = {
   Delivered: "text-blue-500",
 };
 
-const Filter = ({ onFilterChange }) => {
-  const [selectedStatus, setSelectedStatus] = useState("");
-
-  const handleFilterChange = (event) => {
-    const value = event.target.value;
-    setSelectedStatus(value);
-    onFilterChange(value);
-  };
-
-  return (
-    <div className="mb-4">
-      <Label htmlFor="status-filter" className="mr-2">
-        Filter by Status:
-      </Label>
-      <select
-        id="status-filter"
-        value={selectedStatus}
-        onChange={handleFilterChange}
-        className="p-2 border border-gray-300 rounded"
-      >
-        <option value="">All</option>
-        <option value="Delivered">Delivered</option>
-        <option value="Processing">Processing</option>
-        <option value="Delivering">Delivering</option>
-        <option value="Refunded">Refunded</option>
-        <option value="Canceled">Canceled</option>
-      </select>
-    </div>
-  );
-};
-
-export const Details = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filterStatus, setFilterStatus] = useState("");
+export const Details: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [filterStatus, setFilterStatus] = useState<string>("");
   const itemsPerPage = 8;
 
   const filteredData = filterStatus
@@ -65,11 +34,11 @@ export const Details = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfFirstItem + itemsPerPage);
 
-  const onPageChange = (page) => {
+  const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  const handleFilterChange = (status) => {
+  const handleFilterChange = (status: string) => {
     setFilterStatus(status);
     setCurrentPage(1);
   };
@@ -97,7 +66,7 @@ export const Details = () => {
               <TableCell>{item["Product Name"]}</TableCell>
               <TableCell className="w-[150px] pl-10">{item.Quantity}</TableCell>
               <TableCell>{item.Prices}</TableCell>
-              <TableCell className={`font-bold ${statusColors[item.Status]}`}>{item.Status}</TableCell>
+              <TableCell className={`font-bold w-[180px] ${statusColors[item.Status]}`}>{item.Status}</TableCell>
               <TableCell>{item.Date}</TableCell>
             </TableRow>
           ))}

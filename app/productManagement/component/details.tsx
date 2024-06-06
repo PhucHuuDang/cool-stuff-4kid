@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -7,8 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React, { useState } from "react";
-import { data } from "./data";
 import Pagination from "./pagination";
 import {
   DropdownMenu,
@@ -20,31 +19,41 @@ import {
 import { Button } from "@/components/ui/button";
 import { Pencil, PencilLineIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { data } from "./data";
 
 const ITEMS_PER_PAGE = 8;
 
-export const Details = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState([
+interface Item {
+  ID: number;
+  "Product Name": string;
+  Status: string;
+  Quantity: number;
+  Price: string;
+  "Import Date": string;
+}
+
+export const Details: React.FC = () => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [statusFilter, setStatusFilter] = useState<string[]>([
     "In Stock",
     "Out of Stock",
   ]);
   const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
   };
 
-  const handleStatusChange = (status) => {
-    setStatusFilter((prev) =>
+  const handleStatusChange = (status: string) => {
+    setStatusFilter((prev: string[]) =>
       prev.includes(status)
-        ? prev.filter((item) => item !== status)
+        ? prev.filter((item: string) => item !== status)
         : [...prev, status]
     );
   };
 
-  const filteredData = data.filter((item) =>
+  const filteredData = data.filter((item: Item) =>
     statusFilter.includes(item.Status)
   );
 
@@ -54,7 +63,7 @@ export const Details = () => {
     startIndex + ITEMS_PER_PAGE
   );
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     return status === "In Stock" ? "text-green-500" : "text-red-500";
   };
 
@@ -62,10 +71,10 @@ export const Details = () => {
     <div>
       <div className="p-3 flex justify-between">
         <div className="relative w-[500px]">
-          <Input className="pl-10" placeholder="ProductName" />
+          <Input className="pl-10" placeholder="Product Name" />
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
         </div>
-        <div className="">
+        <div>
           <Button className="mr-3 bg-blue-400">
             <PencilLineIcon />
             Update
@@ -78,10 +87,8 @@ export const Details = () => {
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="">
-            <TableHead className="font-bold">
-              ID
-            </TableHead>
+          <TableRow>
+            <TableHead className="font-bold">ID</TableHead>
             <TableHead className="w-[500px] font-bold text-base">
               Product Name
             </TableHead>
@@ -116,7 +123,7 @@ export const Details = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {selectedData.map((item, index) => (
+          {selectedData.map((item: Item, index: number) => (
             <TableRow key={index}>
               <TableCell className="font-bold">{item.ID}</TableCell>
               <TableCell className="font-medium w-[500px]">

@@ -1,21 +1,28 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import SideBar from '@/components/SideBar';
 import { AngryIcon, AnnoyedIcon, SmileIcon } from 'lucide-react';
-import {feedbackData} from './component/feedbackdata'; 
-import {RateFilter} from './component/ratefilter'; 
+import { feedbackData } from './component/feedbackdata'; 
+import { RateFilter } from './component/ratefilter'; 
 
-const Feedback = () => {
-  const [selectedRate, setSelectedRate] = useState('All');
-  const [filteredData, setFilteredData] = useState(feedbackData);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [dataPerPage] = useState(8);
+interface FeedbackData {
+  Username: string;
+  Comments: string;
+  Rate: number;
+  Time: string;
+}
+
+const Feedback: React.FC = () => {
+  const [selectedRate, setSelectedRate] = useState<string>('All');
+  const [filteredData, setFilteredData] = useState<FeedbackData[]>(feedbackData);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [dataPerPage] = useState<number>(8);
 
   useEffect(() => {
-    const filterData = (rate) => {
+    const filterData = (rate: string) => {
       if (rate === 'All') {
         setFilteredData(feedbackData);
       } else {
@@ -24,14 +31,14 @@ const Feedback = () => {
     };
 
     filterData(selectedRate);
-    setCurrentPage(1); // Reset to first page when filter changes
+    setCurrentPage(1); 
   }, [selectedRate]);
 
   const handleRateChange = (event) => {
     setSelectedRate(event.target.value);
   };
 
-  const mapRateToIcon = (rate) => {
+  const mapRateToIcon = (rate: number) => {
     switch(rate) {
       case 3:
         return <SmileIcon className='text-orange-400'/>;
@@ -100,7 +107,7 @@ const Feedback = () => {
         <Footer/>
       </div>
     </div>
-  )
+  );
 }
 
 export default Feedback;

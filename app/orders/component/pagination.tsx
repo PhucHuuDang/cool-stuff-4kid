@@ -1,9 +1,14 @@
-// PaginationButton.js
-
 import { Button } from '@/components/ui/button';
 import React from 'react';
 
-const PaginationButton = ({ data, itemsPerPage, currentPage, onPageChange }) => {
+interface PaginationButtonProps {
+  data: any[];
+  itemsPerPage: number; 
+  currentPage: number; 
+  onPageChange: (page: number) => void;
+}
+
+const PaginationButton: React.FC<PaginationButtonProps> = ({ data, itemsPerPage, currentPage, onPageChange }) => {
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const handlePreviousClick = () => {
