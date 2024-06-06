@@ -79,23 +79,25 @@ export const Details = () => {
       <Filter onFilterChange={handleFilterChange} />
       <Table>
         <TableHeader>
-          <TableRow className="">
-            <TableHead className="w-[200px] font-bold text-base">Customers</TableHead>
-            <TableHead className="font-bold text-base">Product Name</TableHead>
-            <TableHead className="font-bold text-base">Quantity</TableHead>
-            <TableHead className="font-bold text-base">Prices</TableHead>
-            <TableHead className="font-bold text-base">Status</TableHead>
-            <TableHead className="font-bold text-base">Date</TableHead>
+          <TableRow className="bg-pink-400 ">
+            <TableHead className="font-bold text-base text-white">ID</TableHead>
+            <TableHead className="w-[200px] font-bold text-base text-white">Customers</TableHead>
+            <TableHead className="font-bold text-base text-white">Product Name</TableHead>
+            <TableHead className="font-bold text-base text-white">Quantity</TableHead>
+            <TableHead className="font-bold text-base text-white">Prices</TableHead>
+            <TableHead className="font-bold text-base text-white">Status</TableHead>
+            <TableHead className="font-bold text-base text-white">Date</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentItems.map((item, index) => (
             <TableRow key={index}>
+              <TableCell>{item.ID}</TableCell>
               <TableCell className="font-bold">{item.Customers}</TableCell>
               <TableCell>{item["Product Name"]}</TableCell>
-              <TableCell>{item.Quantity}</TableCell>
+              <TableCell className="w-[150px] pl-10">{item.Quantity}</TableCell>
               <TableCell>{item.Prices}</TableCell>
-              <TableCell className={statusColors[item.Status]}>{item.Status}</TableCell>
+              <TableCell className={`font-bold ${statusColors[item.Status]}`}>{item.Status}</TableCell>
               <TableCell>{item.Date}</TableCell>
             </TableRow>
           ))}

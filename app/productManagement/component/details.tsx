@@ -17,6 +17,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Pencil, PencilLineIcon, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const ITEMS_PER_PAGE = 8;
 
@@ -57,10 +60,29 @@ export const Details = () => {
 
   return (
     <div>
+      <div className="p-3 flex justify-between">
+        <div className="relative w-[500px]">
+          <Input className="pl-10" placeholder="ProductName" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+        </div>
+        <div className="">
+          <Button className="mr-3 bg-blue-400">
+            <PencilLineIcon />
+            Update
+          </Button>
+          <Button className="bg-blue-400">
+            <Pencil />
+            Edit
+          </Button>
+        </div>
+      </div>
       <Table>
         <TableHeader>
           <TableRow className="">
-            <TableHead className="w-[200px] font-bold text-base">
+            <TableHead className="font-bold">
+              ID
+            </TableHead>
+            <TableHead className="w-[500px] font-bold text-base">
               Product Name
             </TableHead>
             <TableHead className="font-bold text-base flex items-center">
@@ -86,7 +108,7 @@ export const Details = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableHead>
-            <TableHead className="font-bold text-base">Quantity</TableHead>
+            <TableHead className="font-bold text-base w-[140px]">Quantity</TableHead>
             <TableHead className="font-bold text-base">Price</TableHead>
             <TableHead className="text-right font-bold text-base">
               Import Date
@@ -96,15 +118,16 @@ export const Details = () => {
         <TableBody>
           {selectedData.map((item, index) => (
             <TableRow key={index}>
-              <TableCell className="font-medium">
+              <TableCell className="font-bold">{item.ID}</TableCell>
+              <TableCell className="font-medium w-[500px]">
                 {item["Product Name"]}
               </TableCell>
-              <TableCell className={getStatusColor(item.Status)}>
+              <TableCell className={`w-[200px] ${getStatusColor(item.Status)}`}>
                 {item.Status}
               </TableCell>
-              <TableCell>{item.Quantity}</TableCell>
-              <TableCell>{item.Price}</TableCell>
-              <TableCell className="text-right">
+              <TableCell className="pl-10 w-[140px]">{item.Quantity}</TableCell>
+              <TableCell className="w-[180px]">{item.Price}</TableCell>
+              <TableCell className="text-right w-[180px]">
                 {item["Import Date"]}
               </TableCell>
             </TableRow>
