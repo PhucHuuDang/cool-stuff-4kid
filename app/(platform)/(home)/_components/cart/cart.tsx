@@ -13,7 +13,12 @@ export const Cart: React.FC<CartProps> = ({ product }) => {
   return (
     <>
       {product.map((item) => (
-        <CardProduct key={item.id} product={item} />
+        <>
+          <CardProduct key={item.id} product={item} />
+          <CardProduct key={item.id} product={item} />
+          <CardProduct key={item.id} product={item} />
+          <CardProduct key={item.id} product={item} />
+        </>
       ))}
     </>
   );
