@@ -14,8 +14,8 @@ const NavbarHome = () => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
 
   return (
-    <div className="fixed top-0 h-14 pt-8 w-full px-8 flex items-center justify-between">
-      <div className="flex items-center justify-between gap-x-10 w-full p-2 bg-gradient-to-r from-slate-300 to-slate-500 rounded-xl">
+    <div className="fixed top-0 z-40 flex h-14 w-full items-center justify-between px-8 pt-8">
+      <div className="to-slate-500p-2 flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-slate-300">
         {/* Mobile side bar */}
         {/* <Logo height={30} width={30} className="md:text-lg" /> */}
 
@@ -26,7 +26,7 @@ const NavbarHome = () => {
             searchIcon={<SearchIcon fillColor="#a8b3cf" />}
             placeholder="Search posts"
             id="search"
-            className="p-5 border-[1px] border-slate-600 text-slate-400 rounded-xl caret-sky-600 focus:ring-0 focus:ring-offset-0 focus:ring-offset-slate-400 focus:ring-slate-300 focus:ring-opacity-50"
+            className="rounded-xl border-[1px] border-slate-600 p-5 text-slate-400 caret-sky-600 focus:ring-0 focus:ring-slate-300 focus:ring-opacity-50 focus:ring-offset-0 focus:ring-offset-slate-400"
           />
         </div>
 
@@ -34,22 +34,22 @@ const NavbarHome = () => {
           <Button
             onClick={() => {}}
             variant="default"
-            className="h-10 font-semibold px-7 rounded-xl border border-slate-300"
+            className="h-10 rounded-xl border border-slate-300 px-7 font-semibold"
           >
             New Post
           </Button>
 
           <div
             onClick={drawerCart.onOpen}
-            className="group bg-slate-700 rounded-xl hover:cursor-pointer p-3 hover:bg-slate-600 transition relative"
+            className="group relative rounded-xl bg-slate-700 p-3 transition hover:cursor-pointer hover:bg-slate-600"
           >
-            <ShoppingCart className=" text-slate-400 group-hover:text-slate-100" />
-            <div className="absolute rounded-full w-6 h-6 text-center text-white left-7 top-6 text-sm">
+            <ShoppingCart className="text-slate-400 group-hover:text-slate-100" />
+            <div className="absolute left-7 top-6 h-6 w-6 rounded-full text-center text-sm text-white">
               {cart?.length}
             </div>
           </div>
 
-          <Skeleton className="rounded-full h-8 w-8" />
+          <Skeleton className="h-8 w-8 rounded-full" />
         </div>
       </div>
     </div>

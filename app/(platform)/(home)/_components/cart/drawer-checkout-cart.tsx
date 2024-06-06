@@ -24,7 +24,7 @@ export const DrawerCheckoutCart = () => {
     total = cart.reduce(
       (acc, product) =>
         acc + product.discountPrice * (product.quantity as number),
-      0
+      0,
     );
   }
 
@@ -43,23 +43,23 @@ export const DrawerCheckoutCart = () => {
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-        <Drawer.Content className="bg-white flex flex-col rounded-t-[10px] h-full w-[400px] 2xl:w-[600px] mt-24 fixed bottom-0 right-0 z-20 overflow-y-auto overflow-x-hidden">
-          <div className="p-4 bg-slate-300/10 flex-1 h-full border-0 border-s-transparent ">
+        <Drawer.Content className="fixed bottom-0 right-0 z-50 mt-24 flex h-full w-[400px] flex-col overflow-y-auto overflow-x-hidden rounded-t-[10px] bg-white 2xl:w-[600px]">
+          <div className="h-full flex-1 border-0 border-s-transparent bg-slate-300/10 p-4">
             <Drawer.Close asChild>
-              <div className=" mt-4 h-[100px] w-2 rounded-full bg-sky-600/40 transform rotate-180 absolute top-[40%] left-0 hover:bg-sky-700/50 cursor-pointer duration-200" />
+              <div className="absolute left-0 top-[40%] mt-4 h-[100px] w-2 rotate-180 transform cursor-pointer rounded-full bg-sky-600/40 duration-200 hover:bg-sky-700/50" />
             </Drawer.Close>
-            <div className="max-w-md mx-auto">
-              <Drawer.Title className="font-medium mb-4 text-lg">
+            <div className="mx-auto max-w-md">
+              <Drawer.Title className="mb-4 text-lg font-medium">
                 Your cart
               </Drawer.Title>
               {cartCondition ? (
-                <Drawer.Description className="text-zinc-600 mb-2">
+                <Drawer.Description className="mb-2 text-zinc-600">
                   Thanks for your interest in our products! 🎉
                 </Drawer.Description>
               ) : (
                 <>
-                  <div className="flex flex-col justify-center items-center gap-3">
-                    <ShoppingCart className="h-16 w-16 text-sky-400 " />
+                  <div className="flex flex-col items-center justify-center gap-3">
+                    <ShoppingCart className="h-16 w-16 text-sky-400" />
 
                     <div className="my-4">
                       Look like your cart is empty. Start shopping now!
@@ -67,7 +67,7 @@ export const DrawerCheckoutCart = () => {
                   </div>
 
                   <Drawer.Close asChild>
-                    <div className="hover:underline text-slate-400 animate-bounce hover:text-slate-600 cursor-pointer duration-70000 text-center">
+                    <div className="duration-70000 animate-bounce cursor-pointer text-center text-slate-400 hover:text-slate-600 hover:underline">
                       Continue shopping
                     </div>
                   </Drawer.Close>
@@ -82,7 +82,7 @@ export const DrawerCheckoutCart = () => {
             <Separator className="my-6" />
             {cartCondition && (
               <div className="my-5">
-                <div className="flex item-center gap-1">
+                <div className="item-center flex gap-1">
                   <p className="text-lg text-zinc-600">Total:</p>
                   <p className="text-lg text-sky-500">{total.toFixed(2)}đ</p>
                 </div>
@@ -98,13 +98,13 @@ export const DrawerCheckoutCart = () => {
                   openLoginModal();
                 }}
                 variant="book"
-                className="w-full text-base hover:text-lg hover:scale-105 gap-x-1 transition duration-300"
+                className="w-full gap-x-1 text-base transition duration-300 hover:scale-105 hover:text-lg"
               >
                 <CreditCard className="h-6 w-6" /> Checkout
               </Button>
 
               <Drawer.Close asChild>
-                <div className="hover:underline text-slate-400 hover:text-slate-600 cursor-pointer duration-200 text-center">
+                <div className="cursor-pointer text-center text-slate-400 duration-200 hover:text-slate-600 hover:underline">
                   Continue shopping
                 </div>
               </Drawer.Close>
