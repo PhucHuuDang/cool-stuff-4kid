@@ -8,6 +8,7 @@ import { useCartStore } from "@/hooks/use-cart-store";
 import { useDrawerCart } from "@/hooks/use-drawer-cart";
 import useFromStore from "@/store/use-from-store";
 import { ShoppingCart } from "lucide-react";
+import { Logo } from "./logo";
 
 const NavbarHome = () => {
   const drawerCart = useDrawerCart();
@@ -15,11 +16,12 @@ const NavbarHome = () => {
 
   return (
     <div className="fixed top-0 z-40 flex h-14 w-full items-center justify-between px-8 pt-8">
-      <div className="to-slate-500p-2 flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-slate-300">
+      <div className="flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-white to-slate-200 p-2 shadow-lg duration-200 hover:shadow-xl">
         {/* Mobile side bar */}
-        {/* <Logo height={30} width={30} className="md:text-lg" /> */}
+        <Logo height={150} width={150} className="md:text-lg" />
 
-        <h1 className="font-xl font-bold">Children Stuff</h1>
+        {/* <h1 className="font-xl font-bold">Children Stuff</h1> */}
+
         <div className="w-1/3">
           <FormInput
             // icon={Search as IconType}

@@ -11,8 +11,8 @@ const HomePage = ({ children }: { children: React.ReactNode }) => {
           <Sidebar />
         </div>
 
-        <div className="h-full w-full overflow-y-auto pt-14 2xl:h-screen">
-          <div className="grid grid-cols-1 gap-8 pt-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        <div className="mb-4 h-full w-full pt-14 2xl:h-screen">
+          <div className="grid grid-cols-1 gap-8 py-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {/* {DataProducts.map((product) => (
               <CardProduct key={product.id} product={product} />
             ))} */}

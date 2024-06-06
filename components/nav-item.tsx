@@ -17,7 +17,7 @@ export const NavItem = ({ label, href, childNode }: NavProps) => {
   return (
     <>
       <HoverCardTrigger asChild>
-        <div className="group/nav flex h-9 cursor-pointer items-center justify-between bg-slate-700/10 px-4 transition duration-200 hover:rounded-sm hover:bg-slate-300">
+        <div className="group/nav flex h-10 cursor-pointer items-center justify-between px-4 transition duration-200 hover:rounded-sm hover:bg-slate-500/10">
           {label}{" "}
           <ArrowRight className="text-slate-400 duration-300 group-hover/nav:scale-x-150" />
         </div>
