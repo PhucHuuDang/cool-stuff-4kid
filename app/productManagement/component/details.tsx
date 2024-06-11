@@ -21,7 +21,7 @@ import { Pencil, PencilLineIcon, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { data } from "./data";
 
-const ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE = 7;
 
 interface Item {
   ID: number;
@@ -87,15 +87,15 @@ export const Details: React.FC = () => {
       </div>
       <Table>
         <TableHeader>
-          <TableRow>
-            <TableHead className="font-bold">ID</TableHead>
-            <TableHead className="w-[500px] font-bold text-base">
+          <TableRow className="bg-pink-500">
+            <TableHead className="font-bold text-white">ID</TableHead>
+            <TableHead className="w-[500px] font-bold text-base text-white">
               Product Name
             </TableHead>
-            <TableHead className="font-bold text-base flex items-center">
+            <TableHead className="font-bold text-base flex items-center text-white">
               Status
               <DropdownMenu>
-                <DropdownMenuTrigger className="ml-2 bg-gray-200 p-1 rounded">
+                <DropdownMenuTrigger className="ml-2 bg-gray-200 p-1 rounded text-white">
                   Filter
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -115,9 +115,9 @@ export const Details: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableHead>
-            <TableHead className="font-bold text-base w-[140px]">Quantity</TableHead>
-            <TableHead className="font-bold text-base">Price</TableHead>
-            <TableHead className="text-right font-bold text-base">
+            <TableHead className="font-bold text-base w-[140px] text-white">Quantity</TableHead>
+            <TableHead className="font-bold text-base text-white">Price</TableHead>
+            <TableHead className="text-right font-bold text-base text-white">
               Import Date
             </TableHead>
           </TableRow>
@@ -129,7 +129,7 @@ export const Details: React.FC = () => {
               <TableCell className="font-medium w-[500px]">
                 {item["Product Name"]}
               </TableCell>
-              <TableCell className={`w-[200px] ${getStatusColor(item.Status)}`}>
+              <TableCell className={`w-[200px] font-bold ${getStatusColor(item.Status)}`}>
                 {item.Status}
               </TableCell>
               <TableCell className="pl-10 w-[140px]">{item.Quantity}</TableCell>

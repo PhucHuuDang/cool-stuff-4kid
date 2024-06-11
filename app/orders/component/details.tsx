@@ -24,7 +24,7 @@ const statusColors = {
 export const Details: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filterStatus, setFilterStatus] = useState<string>("");
-  const itemsPerPage = 8;
+  const itemsPerPage = 7;
 
   const filteredData = filterStatus
     ? data.filter((item) => item.Status === filterStatus)
@@ -48,7 +48,7 @@ export const Details: React.FC = () => {
       <Filter onFilterChange={handleFilterChange} />
       <Table>
         <TableHeader>
-          <TableRow className="bg-pink-400 ">
+          <TableRow className="bg-pink-500 ">
             <TableHead className="font-bold text-base text-white">ID</TableHead>
             <TableHead className="w-[200px] font-bold text-base text-white">Customers</TableHead>
             <TableHead className="font-bold text-base text-white">Product Name</TableHead>

@@ -1,27 +1,28 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 
 interface RateFilterProps {
-  selectedRate: string;
-  handleRateChange: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  selectedRate: string | null;
+  onChange: (value: string) => void;
 }
 
-export const RateFilter: React.FC<RateFilterProps> = ({ selectedRate, handleRateChange }) => {
+export const RateFilter: React.FC<RateFilterProps> = ({ selectedRate, onChange }) => {
+  const handleRateChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    onChange(e.target.value);
+  };
+
   return (
-    <div className='flex items-center'>
-      <span>Rate</span>
+    <div className="mb-4 flex justify-end">
       <select
-        id='rate-filter'
-        value={selectedRate}
         onChange={handleRateChange}
-        className='border border-gray-300 rounded-md p-1 ml-2'
+        className="p-2 border outline-none rounded-full bg-blue-400 text-white"
+        value={selectedRate || 'All'}
       >
-        <option value='All'>All</option>
-        <option value='3'>Very Happy</option>
-        <option value='2'>Happy</option>
-        <option value='1'>Unhappy</option>
+        <option className='' value="All">All</option>
+        <option className='text-red-500 bg-white' value="1">Unhappy</option>
+        <option className='text-yellow-500 bg-white' value="2">Normal</option>
+        <option className='text-green-500 bg-white' value="3">Happy</option>
+        <option className='text-blue-500 bg-white' value="4">Very Happy</option>
       </select>
     </div>
   );
 };
-
-// export default RateFilter;
