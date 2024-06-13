@@ -1,6 +1,5 @@
 import { Header } from '@/components/Header';
-import { SideBar } from '@/components/SideBar';
-import { Footer } from '@/components/Footer';
+import { SideBar } from '@/components/side-bar';
 import Image from 'next/image';
 
 const DashboardPage: React.FC = () => {
@@ -151,7 +150,7 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
         </main>
-        <Footer />
+        {/* <Footer /> */}
       </div>
     </div>
   );

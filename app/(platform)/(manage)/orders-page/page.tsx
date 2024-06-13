@@ -1,7 +1,6 @@
 import React from 'react';
 import { Header } from '@/components/Header';
-import { SideBar } from '@/components/SideBar';
-import { Footer } from '@/components/Footer';
+import { SideBar } from '@/components/side-bar';
 
 interface Order {
   order: string;
@@ -169,9 +168,9 @@ const OrdersPage: React.FC = () => {
             <button className="bg-gray-200 py-2 px-4 rounded">Next</button>
           </div>
         </main>
-        <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
+        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
           <Footer />
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Header } from '@/components/Header';
-import { SideBar } from '@/components/SideBar';
-import { Footer } from '@/components/Footer';
-import { BarChart } from '@/components/BarChart';
+import { SideBar } from '@/components/side-bar';
+import { BarChart } from '@/components/bar-chart';
 
 const RevenuePage = () => {
   return (
@@ -42,9 +41,9 @@ const RevenuePage = () => {
           </div>
         </main>
         {/* Footer */}
-        <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
+        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
           <Footer />
-        </div>
+        </div> */}
       </div>
     </div>
   );

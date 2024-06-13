@@ -1,6 +1,5 @@
 import { Header } from '@/components/Header';
-import { SideBar } from '@/components/SideBar';
-import { Footer } from '@/components/Footer';
+import { SideBar } from '@/components/side-bar';
 import Image from 'next/image';
 
 const AdminAccountPage: React.FC = () => {
@@ -75,9 +74,9 @@ const AdminAccountPage: React.FC = () => {
             </div>
           </div>
         </main>
-        <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
+        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
           <Footer />
-        </div>
+        </div> */}
       </div>
     </div>
   );
