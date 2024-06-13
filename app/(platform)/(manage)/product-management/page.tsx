@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { SideBar } from '@/components/side-bar';
 import { Search } from 'lucide-react';
+import AddProductModal from './_components/add-product';  
 
 const products = [
   { id: 1, image: 'image1.jpg', name: 'Product 1', quantity: 10, purchasePrice: 100, salePrice: 150, link: 'https://example.com/product1', status: 'Active' },
@@ -31,6 +32,7 @@ const products = [
 const ProductManagementPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false);  // Modal visibility state
   const itemsPerPage = 7;
 
   const indexOfLastProduct = currentPage * itemsPerPage;
@@ -78,7 +80,12 @@ const ProductManagementPage: React.FC = () => {
                   <option>In Active</option>
                 </select>
                 <button className="bg-black text-white p-2 rounded">Search</button>
-                <button className="ml-auto bg-white text-black border p-2 rounded">Add Product</button>
+                <button 
+                  className="ml-auto bg-white text-black border p-2 rounded"
+                  onClick={() => setIsOpen(true)}  // Set the modal visibility state to true
+                >
+                  Add Product
+                </button>
               </div>
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -172,6 +179,7 @@ const ProductManagementPage: React.FC = () => {
           <Footer />
         </div> */}
       </div>
+      <AddProductModal setIsOpen={setIsOpen} isOpen={isOpen} />  {/* Add the modal component */}
     </div>
   );
 }

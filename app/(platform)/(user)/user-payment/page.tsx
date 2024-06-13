@@ -266,7 +266,7 @@ const PaymentPage: React.FC = () => {
             <label>Cash on Delivery (COD)</label>
           </div>
           <Image
-            src="https://via.placeholder.com/50"
+            src="https://via.placeholder.com/30x25"
             alt="COD"
             width={30}
             height={25}
