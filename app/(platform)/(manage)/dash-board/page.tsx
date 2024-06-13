@@ -1,6 +1,8 @@
 import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
+import Image from 'next/image';
+
 const DashboardPage: React.FC = () => {
   return (
     <div className="flex min-h-screen">
@@ -81,35 +83,65 @@ const DashboardPage: React.FC = () => {
               </div>
               <ul>
                 <li className="flex items-center mb-4">
-                  <img src="https://via.placeholder.com/40" alt="Avatar" className="w-10 h-10 rounded-full"/>
+                  <Image 
+                  src="https://via.placeholder.com/40" 
+                  alt="Avatar" 
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full"
+                  />
                   <div className="ml-4">
                     <div className="font-bold">Đặng Hữu Phúc</div>
                     <div className="text-gray-500">Full-Stack</div>
                   </div>
                 </li>
                 <li className="flex items-center mb-4">
-                  <img src="https://via.placeholder.com/40" alt="Avatar" className="w-10 h-10 rounded-full"/>
+                  <Image 
+                  src="https://via.placeholder.com/40" 
+                  alt="Avatar" 
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full"
+                  />
                   <div className="ml-4">
                     <div className="font-bold">Vũ Minh Quân</div>
                     <div className="text-gray-500">FE</div>
                   </div>
                 </li>
                 <li className="flex items-center mb-4">
-                  <img src="https://via.placeholder.com/40" alt="Avatar" className="w-10 h-10 rounded-full"/>
+                  <Image
+                    src="https://via.placeholder.com/40" 
+                    alt="Avatar" 
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 rounded-full"
+                    />
                   <div className="ml-4">
                     <div className="font-bold">Lê Ngọc Phú</div>
                     <div className="text-gray-500">FE</div>
                   </div>
                 </li>
                 <li className="flex items-center mb-4">
-                  <img src="https://via.placeholder.com/40" alt="Avatar" className="w-10 h-10 rounded-full"/>
+                  <Image
+                   src="https://via.placeholder.com/40" 
+                   alt="Avatar" 
+                   width={40}
+                   height={40}
+                   className="w-10 h-10 rounded-full"
+                   />
                   <div className="ml-4">
                     <div className="font-bold">Lê Bá Trung</div>
                     <div className="text-gray-500">BE</div>
                   </div>
                 </li>
                 <li className="flex items-center mb-4">
-                  <img src="https://via.placeholder.com/40" alt="Avatar" className="w-10 h-10 rounded-full"/>
+                  <Image 
+                  src="https://via.placeholder.com/40" 
+                  alt="Avatar" 
+                  width={40}
+                  height={40}
+                  className="w-10 h-10 rounded-full"
+                  />
                   <div className="ml-4">
                     <div className="font-bold">Nguyễn Hoàng Nam</div>
                     <div className="text-gray-500">BE</div>

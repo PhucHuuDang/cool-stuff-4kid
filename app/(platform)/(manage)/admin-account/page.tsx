@@ -1,6 +1,7 @@
 import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
+import Image from 'next/image';
 
 const AdminAccountPage: React.FC = () => {
   return (
@@ -16,7 +17,12 @@ const AdminAccountPage: React.FC = () => {
           <div className="max-w-4xl mx-auto bg-white rounded shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <img src="https://placehold.co/100x100" alt="User Avatar" className="w-20 h-20 rounded-full border-4 border-white shadow-lg mr-4" />
+                <Image 
+                src="https://via.placeholder.com/100x100" 
+                alt="User Avatar"
+                height={100}
+                width={100} 
+                className="w-20 h-20 rounded-full border-4 border-white shadow-lg mr-4" />
                 <div>
                   <h1 className="text-xl font-bold mb-1">M10-Warthog</h1>
                   <div className="text-gray-600">Gò Vấp, Hồ Chí Minh City, VN</div>

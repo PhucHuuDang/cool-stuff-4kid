@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 
 const PaymentPage: React.FC = () => {
   const [selectedAddress, setSelectedAddress] = useState<string>("");
@@ -16,11 +17,12 @@ const PaymentPage: React.FC = () => {
   });
   const [selectedPaymentMethod, setSelectedPaymentMethod] =
     useState<string>("");
+  const [expireDate, setExpireDate] = useState<string>("");
 
   const products = [
     { name: "Dielac Mama Gold", price: 75.0 },
     { name: "Optimum Mama Gold", price: 98.86 },
-    { name: "mperial XO Mom", price: 267.5 },
+    { name: "Imperial XO Mom", price: 267.5 },
     { name: "Meiji Mama Milk", price: 291.07 },
     { name: "Enfamama A+", price: 226.2 },
   ];
@@ -58,6 +60,21 @@ const PaymentPage: React.FC = () => {
 
   const handleUseNewAddress = () => {
     // Logic to use new address
+  };
+
+  const handleExpireDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+    // Check if value has '/'
+    if (!value.includes("/")) {
+      // Automatically insert '/' after 2 characters
+      if (value.length === 2) {
+        value += "/";
+      }
+    }
+    // Limit input to 5 characters (MM/YY format)
+    if (value.length <= 5) {
+      setExpireDate(value);
+    }
   };
 
   return (
@@ -219,6 +236,8 @@ const PaymentPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="00/00"
+                    value={expireDate}
+                    onChange={handleExpireDateChange}
                     className="border p-2 w-full mb-2"
                   />
                 </div>
@@ -246,9 +265,11 @@ const PaymentPage: React.FC = () => {
             />
             <label>Cash on Delivery (COD)</label>
           </div>
-          <img
-            src="https://via.placeholder.com/30x25"
+          <Image
+            src="https://via.placeholder.com/50"
             alt="COD"
+            width={30}
+            height={25}
             className="ml-2"
           />
         </div>
@@ -264,9 +285,11 @@ const PaymentPage: React.FC = () => {
             />
             <label>VN Pay</label>
           </div>
-          <img
+          <Image
             src="https://via.placeholder.com/30x25"
             alt="VNPay"
+            width={30}
+            height={25}
             className="ml-2"
           />
         </div>
@@ -282,9 +305,11 @@ const PaymentPage: React.FC = () => {
             />
             <label>MoMo</label>
           </div>
-          <img
+          <Image
             src="https://via.placeholder.com/30x25"
             alt="MoMo"
+            width={30}
+            height={25}
             className="ml-2"
           />
         </div>
@@ -328,45 +353,55 @@ const PaymentPage: React.FC = () => {
           </div>
           <ul className="mb-4">
             <li className="flex justify-between mb-2">
-              <img
+              <Image
                 src="https://via.placeholder.com/50"
                 alt="MamaMilk"
+                width={50}
+                height={50}
                 className="mr-2"
               />
               <span className="flex-grow">Dielac Mama Gold</span>
               <span>75,00 $</span>
             </li>
             <li className="flex justify-between mb-2">
-              <img
+              <Image
                 src="https://via.placeholder.com/50"
                 alt="MamaMilk"
+                width={50}
+                height={50}
                 className="mr-2"
               />
               <span className="flex-grow">Optimum Mama Gold</span>
               <span>98,86 $</span>
             </li>
             <li className="flex justify-between mb-2">
-              <img
+              <Image
                 src="https://via.placeholder.com/50"
                 alt="MamaMilk"
+                width={50}
+                height={50}
                 className="mr-2"
               />
               <span className="flex-grow">Imperial XO Mom</span>
               <span>267,50 $</span>
             </li>
             <li className="flex justify-between mb-2">
-              <img
+              <Image
                 src="https://via.placeholder.com/50"
                 alt="MamaMilk"
+                width={50}
+                height={50}
                 className="mr-2"
               />
               <span className="flex-grow">Meiji Mama Milk</span>
               <span>291,07 $</span>
             </li>
             <li className="flex justify-between mb-2">
-              <img
+              <Image
                 src="https://via.placeholder.com/50"
                 alt="MamaMilk"
+                width={50}
+                height={50}
                 className="mr-2"
               />
               <span className="flex-grow">Enfamama A+</span>

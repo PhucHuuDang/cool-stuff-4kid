@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Header } from '@/components/Header';
 import { SideBar } from '@/components/SideBar';
 import { Footer } from '@/components/Footer';
+import Image from 'next/image';
 
 const StaffManagementPage: React.FC = () => {
   const staffMembers = [
@@ -126,7 +127,13 @@ const StaffManagementPage: React.FC = () => {
 const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
   return (
     <div className="bg-white p-4 rounded shadow flex flex-col items-center">
-      <img src="https://via.placeholder.com/100" alt="avatar" className="rounded-full w-24 h-24 mb-4" />
+      <Image 
+      src="https://via.placeholder.com/100" 
+      alt="avatar" 
+      height={100}
+      width={100}
+      className="rounded-full w-24 h-24 mb-4" 
+      />
       <div className="text-center">
         <h4 className="text-lg font-semibold mb-2">{staff.name}</h4>
         <p className="text-gray-600 mb-4">{staff.role}</p>
