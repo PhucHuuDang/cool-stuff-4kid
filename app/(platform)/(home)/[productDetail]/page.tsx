@@ -2,6 +2,7 @@ import { carouselItems } from "@/db";
 import { CardCarousel } from "@/components/card-carousel";
 import { ProductInformationDetail } from "../_components/product-infomation-detail";
 import { DescribeProduct } from "../_components/describe-product";
+import { EvaluateProduct } from "../_components/evaluate-product";
 
 const ProductDetailPage = ({
   params,
@@ -26,6 +27,8 @@ const ProductDetailPage = ({
         />
 
         <DescribeProduct />
+
+        <EvaluateProduct />
       </div>
     </div>
   );

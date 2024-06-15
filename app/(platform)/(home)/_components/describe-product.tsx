@@ -30,7 +30,7 @@ export const DescribeProduct = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Miêu tả sản phẩm</CardTitle>
+        <CardTitle>Chi tiết sản phẩm</CardTitle>
 
         <Collapsible className="space-y-2">
           <CardDescription>
