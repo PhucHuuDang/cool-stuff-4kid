@@ -20,7 +20,7 @@ const getBase64 = (file: FileType): Promise<string> =>
 
 const UploadImageProduct: React.FC<UploadImageProductProps> = (props) => {
   const { onFileChange, initialImage } = props;
-  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);  
   const [previewImage, setPreviewImage] = useState("");
   const [file, setFile] = useState<UploadFile | null>(null);
   const [fileChange, setFileChange] = useState<string>("");

@@ -1,187 +1,275 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Header } from '@/components/Header';
-import { SideBar } from '@/components/side-bar';
-import { Search } from 'lucide-react';
-import AddProductModal from './_components/add-product';  
+import React, { useReducer, useEffect, useCallback } from "react";
+import { Header } from "@/components/Header";
+import { SideBar } from "@/components/side-bar";
+import { Search } from "lucide-react";
+import { AddProductModal } from "./_components/add-product";
 
-const products = [
-  { id: 1, image: 'image1.jpg', name: 'Product 1', quantity: 10, purchasePrice: 100, salePrice: 150, link: 'https://example.com/product1', status: 'Active' },
-  { id: 2, image: 'image2.jpg', name: 'Product 2', quantity: 20, purchasePrice: 200, salePrice: 250, link: 'https://example.com/product2', status: 'Active' },
-  { id: 3, image: 'image3.jpg', name: 'Product 3', quantity: 30, purchasePrice: 300, salePrice: 350, link: 'https://example.com/product3', status: 'Active' },
-  { id: 4, image: 'image4.jpg', name: 'Product 4', quantity: 40, purchasePrice: 400, salePrice: 450, link: 'https://example.com/product4', status: 'Active' },
-  { id: 5, image: 'image5.jpg', name: 'Product 5', quantity: 50, purchasePrice: 500, salePrice: 550, link: 'https://example.com/product5', status: 'Active' },
-  { id: 6, image: 'image6.jpg', name: 'Product 6', quantity: 60, purchasePrice: 600, salePrice: 650, link: 'https://example.com/product6', status: 'Active' },
-  { id: 7, image: 'image7.jpg', name: 'Product 7', quantity: 70, purchasePrice: 700, salePrice: 750, link: 'https://example.com/product7', status: 'Active' },
-  { id: 8, image: 'image8.jpg', name: 'Product 8', quantity: 80, purchasePrice: 800, salePrice: 850, link: 'https://example.com/product8', status: 'Active' },
-  { id: 9, image: 'image9.jpg', name: 'Product 9', quantity: 90, purchasePrice: 900, salePrice: 950, link: 'https://example.com/product9', status: 'Active' },
-  { id: 10, image: 'image10.jpg', name: 'Product 10', quantity: 100, purchasePrice: 1000, salePrice: 1050, link: 'https://example.com/product10', status: 'Active' },
-  { id: 11, image: 'image11.jpg', name: 'Product 11', quantity: 110, purchasePrice: 1100, salePrice: 1150, link: 'https://example.com/product11', status: 'Active' },
-  { id: 12, image: 'image12.jpg', name: 'Product 12', quantity: 120, purchasePrice: 1200, salePrice: 1250, link: 'https://example.com/product12', status: 'Active' },
-  { id: 13, image: 'image13.jpg', name: 'Product 13', quantity: 130, purchasePrice: 1300, salePrice: 1350, link: 'https://example.com/product13', status: 'Active' },
-  { id: 14, image: 'image14.jpg', name: 'Product 14', quantity: 140, purchasePrice: 1400, salePrice: 1450, link: 'https://example.com/product14', status: 'Active' },
-  { id: 15, image: 'image15.jpg', name: 'Product 15', quantity: 150, purchasePrice: 1500, salePrice: 1550, link: 'https://example.com/product15', status: 'Active' },
-  { id: 16, image: 'image16.jpg', name: 'Product 16', quantity: 160, purchasePrice: 1600, salePrice: 1650, link: 'https://example.com/product16', status: 'Active' },
-  { id: 17, image: 'image17.jpg', name: 'Product 17', quantity: 170, purchasePrice: 1700, salePrice: 1750, link: 'https://example.com/product17', status: 'Active' },
-  { id: 18, image: 'image18.jpg', name: 'Product 18', quantity: 180, purchasePrice: 1800, salePrice: 1850, link: 'https://example.com/product18', status: 'Active' },
-  { id: 19, image: 'image19.jpg', name: 'Product 19', quantity: 190, purchasePrice: 1900, salePrice: 1950, link: 'https://example.com/product19', status: 'Active' },
-  { id: 20, image: 'image20.jpg', name: 'Product 20', quantity: 200, purchasePrice: 2000, salePrice: 2050, link: 'https://example.com/product20', status: 'Active' },
-];
+interface Product {
+  productId: number;
+  productName: string;
+  price: number;
+  productDescription: string;
+  image: string;
+  categoryId: number;
+  originId: number;
+}
+
+interface State {
+  products: Product[];
+  currentPage: number;
+  dropdownVisible: number | null;
+  isOpen: boolean;
+}
+
+const initialState: State = {
+  products: [],
+  currentPage: 1,
+  dropdownVisible: null,
+  isOpen: false,
+};
+
+type Action =
+  | { type: "SET_PRODUCTS"; payload: Product[] }
+  | { type: "SET_CURRENT_PAGE"; payload: number }
+  | { type: "TOGGLE_DROPDOWN"; payload: number }
+  | { type: "TOGGLE_MODAL" };
+
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case "SET_PRODUCTS":
+      return { ...state, products: action.payload };
+    case "SET_CURRENT_PAGE":
+      return { ...state, currentPage: action.payload };
+    case "TOGGLE_DROPDOWN":
+      return {
+        ...state,
+        dropdownVisible:
+          state.dropdownVisible === action.payload ? null : action.payload,
+      };
+    case "TOGGLE_MODAL":
+      return { ...state, isOpen: !state.isOpen };
+    default:
+      return state;
+  }
+};
 
 const ProductManagementPage: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [dropdownVisible, setDropdownVisible] = useState<number | null>(null);
-  const [isOpen, setIsOpen] = useState<boolean>(false);  // Modal visibility state
+  const [state, dispatch] = useReducer(reducer, initialState);
   const itemsPerPage = 7;
 
-  const indexOfLastProduct = currentPage * itemsPerPage;
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await fetch(
+        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts",
+      );
+      const data = await response.json();
+      dispatch({ type: "SET_PRODUCTS", payload: data });
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const currentProducts = state.products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct,
+  );
+  const totalPages = Math.ceil(state.products.length / itemsPerPage);
 
-  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const handleClick = useCallback((pageNumber: number) => {
+    dispatch({ type: "SET_CURRENT_PAGE", payload: pageNumber });
+  }, []);
 
-  const handleClick = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
+  const toggleDropdown = useCallback((productId: number) => {
+    dispatch({ type: "TOGGLE_DROPDOWN", payload: productId });
+  }, []);
 
-  const toggleDropdown = (productId: number) => {
-    setDropdownVisible(dropdownVisible === productId ? null : productId);
-  };
+  const handleAddProduct = useCallback(() => {
+    dispatch({ type: "TOGGLE_MODAL" });
+  }, []);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
+      <div className="fixed left-0 top-0 h-full w-64 bg-pink-600 text-white">
         <SideBar />
       </div>
-      <div className="flex flex-col flex-grow ml-64">
-        <div className="fixed top-0 left-64 right-0 bg-white shadow-md z-10">
+      <div className="ml-64 flex flex-grow flex-col">
+        <div className="fixed left-64 right-0 top-0 z-10 bg-white shadow-md">
           <Header title="Product Management" />
         </div>
-
-        <main className="flex-grow p-6 mt-16 mb-16 bg-gray-100 overflow-y-auto">
+        <main className="mb-16 mt-16 flex-grow overflow-y-auto bg-gray-100 p-6">
           <div className="flex flex-col">
             <div className="overflow-x-auto">
-              <div className="flex mb-6 items-center">
-                <div className="relative flex items-center mr-4 flex-grow">
+              <div className="mb-6 flex items-center">
+                <div className="relative mr-4 flex flex-grow items-center">
                   <Search className="absolute left-3 text-gray-400" />
-                  <input type="text" placeholder="Product Name" className="border pl-10 p-2 rounded w-full" />
+                  <input
+                    type="text"
+                    placeholder="Product Name"
+                    className="w-full rounded border p-2 pl-10"
+                  />
                 </div>
-                <select className="border p-2 rounded mr-4">
+                <select className="mr-4 rounded border p-2">
                   <option>Select Category</option>
                   <option>Tã</option>
                   <option>Sữa</option>
                   <option>Quần Áo</option>
                   <option>Ăn Dặm</option>
                 </select>
-                <select className="border p-2 rounded mr-4">
+                <select className="mr-4 rounded border p-2">
                   <option>Select Status</option>
                   <option>Active</option>
-                  <option>In Active</option>
+                  <option>Inactive</option>
                 </select>
-                <button className="bg-black text-white p-2 rounded">Search</button>
-                <button 
-                  className="ml-auto bg-white text-black border p-2 rounded"
-                  onClick={() => setIsOpen(true)}  // Set the modal visibility state to true
+                <button className="rounded bg-black p-2 text-white">
+                  Search
+                </button>
+                <button
+                  className="ml-auto rounded border bg-white p-2 text-black"
+                  onClick={handleAddProduct}
                 >
                   Add Product
                 </button>
               </div>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      ID
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Hình ảnh sản phẩm
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tên sản phẩm
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Số lượng
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Giá Nhập
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Giá bán
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Link
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {currentProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center">
-                        <img src={product.image} className="h-10 w-10 object-cover" />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.quantity}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.purchasePrice}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.salePrice}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">{product.status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-500 text-center">
-                        <a href={product.link} target="_blank" rel="noopener noreferrer">View</a>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center relative">
-                        <button onClick={() => toggleDropdown(product.id)} className="focus:outline-none">
-                          ...
-                        </button>
-                        {dropdownVisible === product.id && (
-                          <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg z-10">
-                            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                              Product Details
-                            </button>
-                            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">
-                              Ngừng Kinh Doanh
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              <div className="mt-4 flex justify-between items-center">
-                <button 
-                  onClick={() => handleClick(currentPage - 1)} 
-                  disabled={currentPage === 1} 
-                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                >
-                  Previous
-                </button>
-                <div className="text-sm text-gray-700">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <button 
-                  onClick={() => handleClick(currentPage + 1)} 
-                  disabled={currentPage === totalPages} 
-                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                >
-                  Next
-                </button>
-              </div>
+              <ProductTable
+                currentProducts={currentProducts}
+                dropdownVisible={state.dropdownVisible}
+                toggleDropdown={toggleDropdown}
+              />
+              <Pagination
+                currentPage={state.currentPage}
+                totalPages={totalPages}
+                handleClick={handleClick}
+              />
             </div>
           </div>
         </main>
-        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
-          <Footer />
-        </div> */}
       </div>
-      <AddProductModal setIsOpen={setIsOpen} isOpen={isOpen} />  {/* Add the modal component */}
+      <AddProductModal setIsOpen={handleAddProduct} isOpen={state.isOpen} />
     </div>
   );
-}
+};
+
+const ProductTable: React.FC<{
+  currentProducts: Product[];
+  dropdownVisible: number | null;
+  toggleDropdown: (productId: number) => void;
+}> = ({ currentProducts, dropdownVisible, toggleDropdown }) => (
+  <table className="min-w-full divide-y divide-gray-200">
+    <thead className="bg-gray-50">
+      <tr>
+        <TableHeader text="ID" />
+        <TableHeader text="Product Image" />
+        <TableHeader text="Product Name" />
+        <TableHeader text="Quantity" />
+        <TableHeader text="Sale Price" />
+        <TableHeader text="Status" />
+        <TableHeader text="Link" />
+        <TableHeader text="Action" />
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-gray-200 bg-white">
+      {currentProducts.map((product) => (
+        <tr key={product.productId}>
+          <TableCell text={product.productId.toString()} />
+          <td className="flex justify-center whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+            <img
+              src={product.image}
+              className="h-10 w-10 object-cover"
+              alt="Product"
+            />
+          </td>
+          <TableCell text={product.productName} />
+          <TableCell text="N/A" />
+          <TableCell text={product.price.toString()} />
+          <TableCell text="Active" />
+          <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
+            <a href="#" target="_blank" rel="noopener noreferrer">
+              View
+            </a>
+          </td>
+          <td className="relative whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+            <button
+              onClick={() => toggleDropdown(product.productId)}
+              className="focus:outline-none"
+            >
+              ...
+            </button>
+            {dropdownVisible === product.productId && (
+              <div className="absolute right-0 z-10 mt-2 w-48 rounded border border-gray-300 bg-white shadow-lg">
+                <DropdownItem text="Product Details" />
+                <DropdownItem text="Stop Selling" />
+              </div>
+            )}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
+const Pagination: React.FC<{
+  currentPage: number;
+  totalPages: number;
+  handleClick: (pageNumber: number) => void;
+}> = ({ currentPage, totalPages, handleClick }) => (
+  <div className="mt-4 flex items-center justify-between">
+    <PaginationButton
+      onClick={() => handleClick(currentPage - 1)}
+      disabled={currentPage === 1}
+      text="Previous"
+    />
+    <div className="text-sm text-gray-700">
+      Page {currentPage} of {totalPages}
+    </div>
+    <PaginationButton
+      onClick={() => handleClick(currentPage + 1)}
+      disabled={currentPage === totalPages}
+      text="Next"
+    />
+  </div>
+);
+
+const TableHeader: React.FC<{ text: string }> = ({ text }) => (
+  <th
+    scope="col"
+    className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"
+  >
+    {text}
+  </th>
+);
+
+const TableCell: React.FC<{ text: string }> = ({ text }) => (
+  <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+    {text}
+  </td>
+);
+
+const DropdownItem: React.FC<{ text: string }> = ({ text }) => (
+  <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+    {text}
+  </button>
+);
+
+const PaginationButton: React.FC<{
+  onClick: () => void;
+  disabled: boolean;
+  text: string;
+}> = ({ onClick, disabled, text }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`rounded bg-gray-200 px-4 py-2 ${disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"}`}
+  >
+    {text}
+  </button>
+);
 
 export default ProductManagementPage;
