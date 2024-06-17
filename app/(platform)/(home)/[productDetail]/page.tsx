@@ -3,6 +3,7 @@ import { CardCarousel } from "@/components/card-carousel";
 import { ProductInformationDetail } from "../_components/product-infomation-detail";
 import { DescribeProduct } from "../_components/describe-product";
 import { EvaluateProduct } from "../_components/evaluate-product";
+import { Review } from "../_components/review";
 
 const ProductDetailPage = ({
   params,
@@ -29,6 +30,8 @@ const ProductDetailPage = ({
         <DescribeProduct />
 
         <EvaluateProduct />
+
+        <Review />
       </div>
     </div>
   );
