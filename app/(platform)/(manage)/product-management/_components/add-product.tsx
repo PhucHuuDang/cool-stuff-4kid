@@ -1,23 +1,21 @@
 import React, { useReducer } from 'react';
 import { Modal, Form, Input, Row, Col, InputNumber, message } from 'antd';
-import { User, Star, DollarSign, List, PlusCircle } from 'lucide-react';
+import { User, DollarSign, List, PlusCircle } from 'lucide-react';
 import axios from 'axios';
 import { UploadImageProduct } from './upload-image-product';
 
 export interface AddModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
+  onProductAdd: (newProduct: any) => void;
 }
 
 interface State {
   isConfirmLoading: boolean;
   formValues: {
-    name: string;
-    typeOfProduct: string;
-    rating: number;
-    quantity: number;
-    description: string;
+    productName: string;
     price: number;
+    productDescription: string;
     image: string;
   };
 }
@@ -30,12 +28,9 @@ interface Action {
 const initialState: State = {
   isConfirmLoading: false,
   formValues: {
-    name: '',
-    typeOfProduct: '',
-    rating: 1,
-    quantity: 1,
-    description: '',
+    productName: '',
     price: 0,
+    productDescription: '',
     image: '',
   },
 };
@@ -51,7 +46,7 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen }) => {
+const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProductAdd }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [form] = Form.useForm();
 
@@ -72,15 +67,18 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen }) => {
     dispatch({ type: 'SET_CONFIRM_LOADING', payload: true });
 
     try {
-      await axios.post('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
-        productName: state.formValues.name,
+      const response = await axios.post('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
+        productName: state.formValues.productName,
         price: state.formValues.price,
-        productDescription: state.formValues.description,
+        productDescription: state.formValues.productDescription,
         image: state.formValues.image,
         categoryId: 1,
         originId: 1,
+        locationId: 1,
       });
 
+      const newProduct = response.data;
+      onProductAdd(newProduct);
       message.success('Product created successfully');
       setIsOpen(false);
       form.resetFields();
@@ -112,64 +110,25 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen }) => {
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              name="name"
+              name="productName"
               rules={[
-                { required: true, message: 'Please input name' },
-                { min: 5, message: 'Name must be at least 5 characters' },
+                { required: true, message: 'Please input product name' },
+                { min: 5, message: 'Product name must be at least 5 characters' },
               ]}
               label="Product Name"
             >
-              <Input prefix={<User className="site-form-item-icon mr-1" />} placeholder="Name" autoFocus />
+              <Input prefix={<User className="site-form-item-icon mr-1" />} placeholder="Product Name" autoFocus />
             </Form.Item>
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={24}>
             <Form.Item
-              name="typeOfProduct"
-              rules={[{ required: true, message: 'Please input type of product' }]}
-              label="Type Of Product"
-            >
-              <Input prefix={<PlusCircle className="site-form-item-icon mr-1 rotate-90" />} placeholder="Type Of Product" />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="rating"
-              rules={[
-                { required: true, message: 'Please input rating' },
-                { type: 'number', min: 1, max: 5, message: 'Rating must be between 1 and 5' },
-              ]}
-              label="Rating"
-            >
-              <InputNumber className="w-full" placeholder="Rating" min={1} max={5} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="quantity"
-              rules={[
-                { required: true, message: 'Please input quantity' },
-                { type: 'number', min: 1, message: 'Quantity must be at least 1' },
-              ]}
-              label="Quantity"
-            >
-              <InputNumber className="w-full" placeholder="Quantity" min={1} />
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              name="description"
-              rules={[{ required: true, message: 'Please input description' }]}
+              name="productDescription"
+              rules={[{ required: true, message: 'Please input product description' }]}
               label="Product Description"
             >
-              <Input prefix={<List className="site-form-item-icon mr-1" />} placeholder="Description" />
+              <Input prefix={<List className="site-form-item-icon mr-1" />} placeholder="Product Description" />
             </Form.Item>
           </Col>
         </Row>

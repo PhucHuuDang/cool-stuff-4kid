@@ -1,10 +1,12 @@
+// Ensure that this component runs on the client-side by wrapping it in `use client`
 "use client";
 
 import React, { useReducer, useEffect, useCallback } from "react";
 import { Header } from "@/components/Header";
-import { SideBar } from "@/components/side-bar";
+import { SideBar } from "@/components/Sidebar";
 import { Search } from "lucide-react";
 import { AddProductModal } from "./_components/add-product";
+import axios from "axios";
 
 interface Product {
   productId: number;
@@ -21,6 +23,7 @@ interface State {
   currentPage: number;
   dropdownVisible: number | null;
   isOpen: boolean;
+  isSubmitting: boolean;
 }
 
 const initialState: State = {
@@ -28,18 +31,23 @@ const initialState: State = {
   currentPage: 1,
   dropdownVisible: null,
   isOpen: false,
+  isSubmitting: false,
 };
 
 type Action =
   | { type: "SET_PRODUCTS"; payload: Product[] }
+  | { type: "ADD_PRODUCT"; payload: Product }
   | { type: "SET_CURRENT_PAGE"; payload: number }
   | { type: "TOGGLE_DROPDOWN"; payload: number }
-  | { type: "TOGGLE_MODAL" };
+  | { type: "TOGGLE_MODAL" }
+  | { type: "SET_SUBMITTING"; payload: boolean };
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case "SET_PRODUCTS":
       return { ...state, products: action.payload };
+    case "ADD_PRODUCT":
+      return { ...state, products: [action.payload, ...state.products] };
     case "SET_CURRENT_PAGE":
       return { ...state, currentPage: action.payload };
     case "TOGGLE_DROPDOWN":
@@ -50,6 +58,8 @@ const reducer = (state: State, action: Action): State => {
       };
     case "TOGGLE_MODAL":
       return { ...state, isOpen: !state.isOpen };
+    case "SET_SUBMITTING":
+      return { ...state, isSubmitting: action.payload };
     default:
       return state;
   }
@@ -59,27 +69,56 @@ const ProductManagementPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const itemsPerPage = 7;
 
-  const fetchProducts = useCallback(async () => {
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
     try {
-      const response = await fetch(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts",
+      const response = await axios.get(
+        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts"
       );
-      const data = await response.json();
-      dispatch({ type: "SET_PRODUCTS", payload: data });
+      dispatch({ type: "SET_PRODUCTS", payload: response.data });
     } catch (error) {
       console.error("Error fetching products:", error);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  const handleAddProduct = () => {
+    dispatch({ type: "TOGGLE_MODAL" });
+  };
+
+  const handleProductAdd = async (product: Product) => {
+    dispatch({ type: "SET_SUBMITTING", payload: true });
+
+    try {
+      const response = await axios.post(
+        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
+        {
+          productName: product.productName,
+          price: product.price,
+          productDescription: product.productDescription,
+          image: product.image,
+          categoryId: 1, // Example categoryId based on your API structure
+          originId: 1, // Example originId based on your API structure
+          locationId: 1, // Example locationId based on your API structure
+        }
+      );
+
+      const newProduct = response.data;
+      dispatch({ type: "ADD_PRODUCT", payload: newProduct });
+    } catch (error) {
+      console.error("Error adding product:", error);
+    } finally {
+      dispatch({ type: "SET_SUBMITTING", payload: false });
+    }
+  };
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
   const currentProducts = state.products.slice(
     indexOfFirstProduct,
-    indexOfLastProduct,
+    indexOfLastProduct
   );
   const totalPages = Math.ceil(state.products.length / itemsPerPage);
 
@@ -91,20 +130,10 @@ const ProductManagementPage: React.FC = () => {
     dispatch({ type: "TOGGLE_DROPDOWN", payload: productId });
   }, []);
 
-  const handleAddProduct = useCallback(() => {
-    dispatch({ type: "TOGGLE_MODAL" });
-  }, []);
-
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="fixed left-0 top-0 h-full w-64 bg-pink-600 text-white">
-        <SideBar />
-      </div>
-      <div className="ml-64 flex flex-grow flex-col">
-        <div className="fixed left-64 right-0 top-0 z-10 bg-white shadow-md">
-          <Header title="Product Management" />
-        </div>
-        <main className="mb-16 mt-16 flex-grow overflow-y-auto bg-gray-100 p-6">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex flex-grow">
+        <main className="flex-grow overflow-y-auto bg-gray-100 p-6">
           <div className="flex flex-col">
             <div className="overflow-x-auto">
               <div className="mb-6 flex items-center">
@@ -152,7 +181,13 @@ const ProductManagementPage: React.FC = () => {
           </div>
         </main>
       </div>
-      <AddProductModal setIsOpen={handleAddProduct} isOpen={state.isOpen} />
+      {state.isOpen && (
+        <AddProductModal
+          setIsOpen={handleAddProduct}
+          isOpen={state.isOpen}
+          onProductAdd={handleProductAdd}
+        />
+      )}
     </div>
   );
 };
@@ -266,10 +301,13 @@ const PaginationButton: React.FC<{
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`rounded bg-gray-200 px-4 py-2 ${disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"}`}
+    className={`rounded bg-gray-200 px-4 py-2 ${
+      disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
+    }`}
   >
     {text}
   </button>
 );
 
 export default ProductManagementPage;
+

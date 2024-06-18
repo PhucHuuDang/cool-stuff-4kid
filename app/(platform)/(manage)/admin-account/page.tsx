@@ -1,27 +1,20 @@
-import { Header } from '@/components/Header';
-import { SideBar } from '@/components/side-bar';
 import Image from 'next/image';
 
 const AdminAccountPage: React.FC = () => {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
-        <SideBar />
-      </div>
-      <div className="flex-grow">
-      <div className="fixed top-0 left-64 right-0 bg-white shadow-md z-10">
-          <Header title="Product Management" />
-        </div>
-        <main className="flex-grow p-6 mt-16 mb-16 bg-gray-100 overflow-y-auto ml-52">
+    <div className="min-h-screen flex flex-col">
+      <div className="flex flex-grow">
+        <main className="flex-grow bg-gray-100 overflow-y-auto">
           <div className="max-w-4xl mx-auto bg-white rounded shadow-lg p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center">
-                <Image 
-                src="https://via.placeholder.com/100x100" 
-                alt="User Avatar"
-                height={100}
-                width={100} 
-                className="w-20 h-20 rounded-full border-4 border-white shadow-lg mr-4" />
+                <Image
+                  src="https://via.placeholder.com/100x100"
+                  alt="User Avatar"
+                  height={100}
+                  width={100}
+                  className="w-20 h-20 rounded-full border-4 border-white shadow-lg mr-4"
+                />
                 <div>
                   <h1 className="text-xl font-bold mb-1">M10-Warthog</h1>
                   <div className="text-gray-600">Gò Vấp, Hồ Chí Minh City, VN</div>
@@ -57,9 +50,9 @@ const AdminAccountPage: React.FC = () => {
                 <div className="text-xs text-gray-500 mb-4">12/02/2024 09:40:55 AM</div>
                 <div className="text-sm text-gray-600 mb-2">You assigned task 'Check inventory at District 1 branch on February 19, 2024' to a role 'Warehouse-Staff - District 1'</div>
                 <div className="text-xs text-gray-500 mb-4">19/02/2024 10:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You Fired sales staff at Go Vap branch February 19, 2024(reason: Lack of respect among customers)</div>
+                <div className="text-sm text-gray-600 mb-2">You fired sales staff at Go Vap branch February 19, 2024 (reason: Lack of respect among customers)</div>
                 <div className="text-xs text-gray-500 mb-4">19/02/2024 09:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You revoke the Fox 2 Saler role February 19, 2024(reason: Lack of respect among customers)</div>
+                <div className="text-sm text-gray-600 mb-2">You revoked the Fox 2 Saler role February 19, 2024 (reason: Lack of respect among customers)</div>
                 <div className="text-xs text-gray-500 mb-4">19/02/2024 09:40:55 AM</div>
               </div>
               <div className="w-1/2 bg-white p-4 rounded shadow overflow-y-auto" style={{ maxHeight: '300px' }}>
