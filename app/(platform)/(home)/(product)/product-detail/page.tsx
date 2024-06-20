@@ -5,7 +5,7 @@ import { ProductsInfor } from "./component/productsInfor";
 
 const ProductPage = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="pt-20 bg-gray-200">
+    <div className="bg-gray-200 pt-20">
       <ProductsInfor />
       <Descriptions />
       <Comment />

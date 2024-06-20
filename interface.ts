@@ -8,3 +8,12 @@ export interface Product {
   discountPercent: number;
   quantity?: number;
 }
+
+export type UserInformation = {
+  name: string;
+  mail: string;
+  role: string;
+  status: string;
+  date: string;
+  price: string;
+};

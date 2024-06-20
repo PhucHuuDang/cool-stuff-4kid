@@ -17,15 +17,12 @@ export const Navigation = () => {
   };
   return (
     <div>
-      <aside className="w-64 bg-[#FCFBF4]  text-white fixed left-0 top-0 bottom-0">
-        <div className="p-4 text-2xl font-bold border border-black h-[65px] bg-[#F5F7FD] text-black shadow-lg">
+      <aside className="fixed bottom-0 left-0 top-0 w-64 bg-[#FCFBF4] text-white">
+        <div className="h-[65px] border border-black bg-[#F5F7FD] p-4 text-2xl font-bold text-black shadow-lg">
           CucCung
         </div>
         <nav className="mt-6">
-          <Link
-            href="/"
-            className={`p-4 text-black flex  ${getLinkClass("/")}`}
-          >
+          <Link href="/" className={`flex p-4 text-black ${getLinkClass("/")}`}>
             <SquareGanttChart className="mr-1" />
             Dashboard
           </Link>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Navigation } from "./Navigation";
@@ -9,6 +8,6 @@ const SideBar = () => {
       <Navigation />
     </div>
   );
-}
+};
 
 export default SideBar;
