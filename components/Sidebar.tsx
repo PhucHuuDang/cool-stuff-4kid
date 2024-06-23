@@ -17,7 +17,7 @@ const SideBar: React.FC = () => {
       <nav>
         <Link
           href={routes.dashboard}
-           className={`flex p-4 text-slate-700 items-center ${currentPage === "dashboard" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+           className={`flex p-4 text-slate-700 items-center ${currentPage === "dashboard" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("dashboard")}
         >
           <LayoutDashboard />
@@ -25,7 +25,7 @@ const SideBar: React.FC = () => {
         </Link>
         <Link
           href={routes.staffManagement}
-          className={`flex p-4 text-slate-700 ${currentPage === "staffManagement" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={`flex p-4 text-slate-700 ${currentPage === "staffManagement" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("staffManagement")}
         >
            <Users />
@@ -33,7 +33,7 @@ const SideBar: React.FC = () => {
         </Link>
         <Link
           href={routes.orders}
-          className={`flex p-4 text-slate-700 ${currentPage === "orders" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={`flex p-4 text-slate-700 ${currentPage === "orders" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("orders")}
         >
           <ListOrdered />
@@ -41,7 +41,7 @@ const SideBar: React.FC = () => {
         </Link>
         <Link
           href={routes.revenue}
-          className={`flex p-4 text-slate-700 ${currentPage === "revenue" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={`flex p-4 text-slate-700 ${currentPage === "revenue" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("revenue")}
         >
           <Activity />
@@ -49,7 +49,7 @@ const SideBar: React.FC = () => {
         </Link>
         <Link
           href={routes.productManagement}
-          className={`flex p-4 text-slate-700 ${currentPage === "productManagement" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={`flex p-4 text-slate-700 ${currentPage === "productManagement" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("productManagement")}
         >
            <PackageSearch />
@@ -57,7 +57,7 @@ const SideBar: React.FC = () => {
         </Link>
         <Link
           href={routes.adminAccount}
-          className={`flex p-4 text-slate-700 ${currentPage === "adminAccount" ? "bg-pink-600 text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={`flex p-4 text-slate-700 ${currentPage === "adminAccount" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
           onClick={() => handlePageChange("adminAccount")}
         >
            <Settings />

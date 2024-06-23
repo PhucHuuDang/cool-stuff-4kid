@@ -184,40 +184,40 @@ const StaffManagementPage: React.FC = () => {
       <div className="flex flex-grow">
         <main className="flex-grow overflow-y-auto p-6">
           <div className="mb-6 grid grid-cols-4 gap-4">
-            <div className="rounded bg-purple-200 p-4">
+            <div className="rounded-lg bg-purple-200 p-4">
               <p>Total Staff</p>
               <h3>{totalStaff}</h3>
             </div>
-            <div className="rounded bg-yellow-200 p-4">
+            <div className="rounded-lg bg-yellow-200 p-4">
               <p>New Staff</p>
               <h3>{newStaff}</h3>
             </div>
-            <div className="rounded bg-blue-200 p-4">
+            <div className="rounded-lg bg-blue-200 p-4">
               <p>Male</p>
               <h3>{maleStaff}</h3>
             </div>
-            <div className="rounded bg-green-200 p-4">
+            <div className="rounded-lg bg-green-200 p-4">
               <p>Female</p>
               <h3>{femaleStaff}</h3>
             </div>
           </div>
 
-          <div className="mb-6 flex">
+          <div className="mb-6 flex rounded-lg">
             <input
               type="text"
-              placeholder="Staff Name"
-              className="mr-4 flex-grow rounded border p-2"
+              placeholder="Search Name Of Staff"
+              className="mr-4 flex-grow rounded-lg border p-2"
             />
-            <select className="mr-4 rounded border p-2">
+            <select className="mr-4 rounded-lg border p-2">
               <option>Select Status</option>
               {/* Add more options as needed */}
             </select>
-            <select className="mr-4 rounded border p-2">
+            <select className="mr-4 rounded-lg border p-2">
               <option>Select Priority</option>
               {/* Add more options as needed */}
             </select>
-            <button className="rounded bg-black p-2 text-white">Search</button>
-            <button className="ml-auto rounded border bg-white p-2 text-black">
+            <button className="rounded-l-lg bg-black p-2 text-white">Search</button>
+            <button className="ml-auto rounded-r-lg border bg-white p-2 text-black">
               Add Staff
             </button>
           </div>
@@ -255,7 +255,7 @@ const StaffManagementPage: React.FC = () => {
 
 const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
   return (
-    <div className="flex flex-col items-center rounded bg-white p-4 shadow">
+    <div className="flex flex-col items-center rounded-lg bg-white p-4 shadow">
       <Image
         src="https://via.placeholder.com/100"
         alt="avatar"
@@ -263,11 +263,11 @@ const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
         width={100}
         className="mb-4 h-24 w-24 rounded-full"
       />
-      <div className="text-center">
-        <h4 className="mb-2 text-lg font-semibold">{staff.name}</h4>
-        <p className="mb-4 text-gray-600">{staff.role}</p>
-        <p className="mb-1 text-gray-600">Staff ID: {staff.staffId}</p>
-        <p className="mb-4 text-gray-600">Join Date: {staff.joinDate}</p>
+      <div>
+        <h4 className="mb-2 text-center text-lg font-semibold">{staff.name}</h4>
+        <p className="mb-4 text-center text-gray-600">{staff.role}</p>
+        <p className="text-gray-600">Staff ID: {staff.staffId}</p>
+        <p className="text-gray-600">Join Date: {staff.joinDate}</p>
       </div>
       <div className="mt-auto flex justify-center">
         <button className="mx-2 text-blue-500">

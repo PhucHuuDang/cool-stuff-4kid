@@ -131,28 +131,28 @@ const OrdersPage: React.FC = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     ORDER
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
                     CUSTOMER
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     STATUS
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     QUANTITY
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     LOCATION
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     DATE
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     TOTAL
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                  <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black ">
                     ACTION
                   </th>
                 </tr>

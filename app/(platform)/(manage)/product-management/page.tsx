@@ -1,9 +1,6 @@
-// Ensure that this component runs on the client-side by wrapping it in `use client`
 "use client";
 
 import React, { useReducer, useEffect, useCallback } from "react";
-import { Header } from "@/components/Header";
-import { SideBar } from "@/components/Sidebar";
 import { Search } from "lucide-react";
 import { AddProductModal } from "./_components/add-product";
 import axios from "axios";

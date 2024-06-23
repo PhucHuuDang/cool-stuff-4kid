@@ -1,3 +1,4 @@
+"use client"
 import React, { useReducer } from 'react';
 import { Modal, Form, Input, Row, Col, InputNumber, message } from 'antd';
 import { User, DollarSign, List, PlusCircle } from 'lucide-react';
