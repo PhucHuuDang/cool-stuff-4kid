@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 
 interface Order {
   orderId: number;
@@ -40,6 +40,7 @@ const reducer = (state: State, action: Action): State => {
 
 const OrdersPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -65,8 +66,21 @@ const OrdersPage: React.FC = () => {
 
   const { orders, loading, error } = state;
 
+  const filteredOrders = orders.filter(order =>
+    order.id.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div>
+      <div className="mb-6 flex rounded-lg ml-6">
+        <input
+          type="text"
+          placeholder="Search Customer ID"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          className="mr-4 flex-grow rounded-lg border p-2"
+        />
+      </div>
       <div className="flex flex-grow">
         <main className="flex-grow overflow-y-auto bg-gray-100 p-6">
           <div className="overflow-hidden bg-white shadow sm:rounded-lg">
@@ -96,7 +110,7 @@ const OrdersPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {orders.map((order) => (
+                  {filteredOrders.map((order) => (
                     <tr key={order.orderId}>
                       <td className="whitespace-nowrap px-4 py-4 text-center">
                         {order.orderId}
