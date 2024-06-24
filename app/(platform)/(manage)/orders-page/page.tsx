@@ -72,7 +72,7 @@ const OrdersPage: React.FC = () => {
 
   return (
     <div>
-      <div className="mb-6 flex rounded-lg ml-6">
+      <div className="flex rounded-lg mx-6 mr-2">
         <input
           type="text"
           placeholder="Search Customer ID"

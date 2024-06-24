@@ -164,7 +164,7 @@ const ProductManagementPage: React.FC = () => {
                   <option>Active</option>
                   <option>Inactive</option>
                 </select>
-                <button className="rounded bg-black p-2 text-white">
+                <button className="rounded-l-lg bg-black p-2 text-white">
                   Search
                 </button>
                 <button
