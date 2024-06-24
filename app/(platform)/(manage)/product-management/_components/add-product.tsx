@@ -1,7 +1,7 @@
 "use client"
 import React, { useReducer } from 'react';
 import { Modal, Form, Input, Row, Col, InputNumber, message } from 'antd';
-import { User, DollarSign, List, PlusCircle } from 'lucide-react';
+import { User, DollarSign, List, PlusCircle, SquarePlus } from 'lucide-react';
 import axios from 'axios';
 import { UploadImageProduct } from './upload-image-product';
 
@@ -16,6 +16,7 @@ interface State {
   formValues: {
     productName: string;
     price: number;
+    quantity: number;
     productDescription: string;
     image: string;
   };
@@ -32,6 +33,7 @@ const initialState: State = {
     productName: '',
     price: 0,
     productDescription: '',
+    quantity: 0,
     image: '',
   },
 };
@@ -69,17 +71,13 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
 
     try {
       const response = await axios.post('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
-        productName: state.formValues.productName,
-        price: state.formValues.price,
-        productDescription: state.formValues.productDescription,
-        image: state.formValues.image,
+        ...state.formValues,
         categoryId: 1,
         originId: 1,
         locationId: 1,
       });
 
-      const newProduct = response.data;
-      onProductAdd(newProduct);
+      onProductAdd(response.data);
       message.success('Product created successfully');
       setIsOpen(false);
       form.resetFields();
@@ -130,6 +128,17 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
               label="Product Description"
             >
               <Input prefix={<List className="site-form-item-icon mr-1" />} placeholder="Product Description" />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              name="quantity"
+              rules={[{ required: true, message: 'Please input quantity' }]}
+              label="Quantity"
+            >
+              <InputNumber className="w-full" prefix={<SquarePlus className="site-form-item-icon mr-1" />} placeholder="Quantity" min={0} />
             </Form.Item>
           </Col>
         </Row>

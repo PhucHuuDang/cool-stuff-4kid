@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useReducer, useEffect, useCallback } from "react";
+import React, { useReducer, useEffect, useCallback, useState } from "react";
 import { Search } from "lucide-react";
 import { AddProductModal } from "./_components/add-product";
 import axios from "axios";
@@ -9,10 +9,13 @@ interface Product {
   productId: number;
   productName: string;
   price: number;
+  quantity: number;
   productDescription: string;
   image: string;
+  status: number;
   categoryId: number;
   originId: number;
+  locationId: number;
 }
 
 interface State {
@@ -64,6 +67,7 @@ const reducer = (state: State, action: Action): State => {
 
 const ProductManagementPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [searchQuery, setSearchQuery] = useState("");
   const itemsPerPage = 7;
 
   useEffect(() => {
@@ -94,11 +98,12 @@ const ProductManagementPage: React.FC = () => {
         {
           productName: product.productName,
           price: product.price,
+          quantity: product.quantity,
           productDescription: product.productDescription,
           image: product.image,
-          categoryId: 1, // Example categoryId based on your API structure
-          originId: 1, // Example originId based on your API structure
-          locationId: 1, // Example locationId based on your API structure
+          categoryId: product.categoryId,
+          originId: product.originId,
+          locationId: product.locationId,
         }
       );
 
@@ -113,11 +118,14 @@ const ProductManagementPage: React.FC = () => {
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = state.products.slice(
+  const filteredProducts = state.products.filter(product =>
+    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
-  const totalPages = Math.ceil(state.products.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   const handleClick = useCallback((pageNumber: number) => {
     dispatch({ type: "SET_CURRENT_PAGE", payload: pageNumber });
@@ -140,6 +148,8 @@ const ProductManagementPage: React.FC = () => {
                     type="text"
                     placeholder="Product Name"
                     className="w-full rounded border p-2 pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
                 <select className="mr-4 rounded border p-2">
@@ -219,9 +229,9 @@ const ProductTable: React.FC<{
             />
           </td>
           <TableCell text={product.productName} />
-          <TableCell text="N/A" />
+          <TableCell text={product.quantity.toString()} />
           <TableCell text={product.price.toString()} />
-          <TableCell text="Active" />
+          <TableCell text={product.status.toString()} />
           <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
             <a href="#" target="_blank" rel="noopener noreferrer">
               View
@@ -308,3 +318,4 @@ const PaginationButton: React.FC<{
 
 export default ProductManagementPage;
 
+ 
