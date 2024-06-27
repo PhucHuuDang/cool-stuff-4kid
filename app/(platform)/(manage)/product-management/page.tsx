@@ -37,6 +37,7 @@ const initialState: State = {
 type Action =
   | { type: "SET_PRODUCTS"; payload: Product[] }
   | { type: "ADD_PRODUCT"; payload: Product }
+  | { type: "DELETE_PRODUCT"; payload: number }
   | { type: "SET_CURRENT_PAGE"; payload: number }
   | { type: "TOGGLE_DROPDOWN"; payload: number }
   | { type: "TOGGLE_MODAL" }
@@ -48,6 +49,13 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, products: action.payload };
     case "ADD_PRODUCT":
       return { ...state, products: [action.payload, ...state.products] };
+    case "DELETE_PRODUCT":
+      return {
+        ...state,
+        products: state.products.filter(
+          (product) => product.productId !== action.payload
+        ),
+      };
     case "SET_CURRENT_PAGE":
       return { ...state, currentPage: action.payload };
     case "TOGGLE_DROPDOWN":
@@ -116,9 +124,20 @@ const ProductManagementPage: React.FC = () => {
     }
   };
 
+  const handleProductDelete = async (productId: number) => {
+    try {
+      await axios.delete(
+        `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`
+      );
+      dispatch({ type: "DELETE_PRODUCT", payload: productId });
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const filteredProducts = state.products.filter(product =>
+  const filteredProducts = state.products.filter((product) =>
     product.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
   const currentProducts = filteredProducts.slice(
@@ -178,6 +197,7 @@ const ProductManagementPage: React.FC = () => {
                 currentProducts={currentProducts}
                 dropdownVisible={state.dropdownVisible}
                 toggleDropdown={toggleDropdown}
+                handleProductDelete={handleProductDelete}
               />
               <Pagination
                 currentPage={state.currentPage}
@@ -203,7 +223,8 @@ const ProductTable: React.FC<{
   currentProducts: Product[];
   dropdownVisible: number | null;
   toggleDropdown: (productId: number) => void;
-}> = ({ currentProducts, dropdownVisible, toggleDropdown }) => (
+  handleProductDelete: (productId: number) => void;
+}> = ({ currentProducts, dropdownVisible, toggleDropdown, handleProductDelete }) => (
   <table className="min-w-full divide-y divide-gray-200">
     <thead className="bg-gray-50">
       <tr>
@@ -231,7 +252,7 @@ const ProductTable: React.FC<{
           <TableCell text={product.productName} />
           <TableCell text={product.quantity.toString()} />
           <TableCell text={product.price.toString()} />
-          <TableCell text={product.status.toString()} />
+          <TableCell text={product.status === 1 ? 'Active' : 'Inactive'} />
           <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
             <a href="#" target="_blank" rel="noopener noreferrer">
               View
@@ -247,7 +268,10 @@ const ProductTable: React.FC<{
             {dropdownVisible === product.productId && (
               <div className="absolute right-0 z-10 mt-2 w-48 rounded border border-gray-300 bg-white shadow-lg">
                 <DropdownItem text="Product Details" />
-                <DropdownItem text="Stop Selling" />
+                <DropdownItem
+                  text="Stop Selling"
+                  onClick={() => handleProductDelete(product.productId)}
+                />
               </div>
             )}
           </td>
@@ -294,8 +318,14 @@ const TableCell: React.FC<{ text: string }> = ({ text }) => (
   </td>
 );
 
-const DropdownItem: React.FC<{ text: string }> = ({ text }) => (
-  <button className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+const DropdownItem: React.FC<{ text: string; onClick?: () => void }> = ({
+  text,
+  onClick,
+}) => (
+  <button
+    onClick={onClick}
+    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+  >
     {text}
   </button>
 );
@@ -318,4 +348,3 @@ const PaginationButton: React.FC<{
 
 export default ProductManagementPage;
 
- 

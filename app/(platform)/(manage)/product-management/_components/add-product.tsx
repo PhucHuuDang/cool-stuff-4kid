@@ -16,6 +16,7 @@ interface State {
   formValues: {
     productName: string;
     price: number;
+    discountPercent: number;
     quantity: number;
     productDescription: string;
     image: string;
@@ -32,6 +33,7 @@ const initialState: State = {
   formValues: {
     productName: '',
     price: 0,
+    discountPercent: 0,
     productDescription: '',
     quantity: 0,
     image: '',
@@ -150,6 +152,17 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
               label="Price"
             >
               <InputNumber className="w-full" prefix={<DollarSign className="site-form-item-icon mr-1" />} placeholder="Price" min={0} />
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row gutter={16}>
+          <Col span={24}>
+            <Form.Item
+              name="discountPercent"
+              rules={[{ required: true, message: 'Please input discount Percent' }]}
+              label="Discount Percent"
+            >
+              <Input prefix={<List className="site-form-item-icon mr-1" />} placeholder="ex: 10" />
             </Form.Item>
           </Col>
         </Row>
