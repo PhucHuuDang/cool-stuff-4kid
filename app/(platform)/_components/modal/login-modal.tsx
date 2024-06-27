@@ -47,6 +47,30 @@ export const LoginModal = () => {
       <Heading title="Welcome back" subtitle="Login to your account!" center />
 
       <FormInput
+        id="fullName"
+        label="Full Name"
+        disabled={pending}
+        ref={inputRef}
+        placeholder="Email address"
+        className="h-12"
+        labelClassName="text-neutral-700"
+        // register={register}
+        // errors={errors}
+        required
+      />
+      <FormInput
+        id="userName"
+        label="User Name"
+        disabled={pending}
+        ref={inputRef}
+        placeholder="Email address"
+        className="h-12"
+        labelClassName="text-neutral-700"
+        // register={register}
+        // errors={errors}
+        required
+      />
+      <FormInput
         id="email"
         label="Email"
         disabled={pending}
@@ -70,14 +94,14 @@ export const LoginModal = () => {
         required
       />
 
-      <FormSubmit variant="book" className="h-12 " disabled={pending}>
+      <FormSubmit variant="book" className="h-12" disabled={pending}>
         Login
       </FormSubmit>
     </form>
   );
   // the footer body of form register
   const footerContent = (
-    <div className="flex flex-col gap-4 mt-1">
+    <div className="mt-1 flex flex-col gap-4">
       <hr />
       <Button
         // onClick={() => signIn("google")}
@@ -91,19 +115,12 @@ export const LoginModal = () => {
       >
         <AiFillGithub size={22} /> Continue with GitHub
       </Button>
-      <div
-        className="
-            text-neutral-500
-            text-center
-            mt-4
-            font-light
-          "
-      >
-        <div className="justify-center flex flex-row items-center gap-2">
+      <div className="mt-4 text-center font-light text-neutral-500">
+        <div className="flex flex-row items-center justify-center gap-2">
           <div>Are you have account?</div>
           <div
             //?  onClick={toggle} toggle for register form
-            className="text-neutral-500 cursor-pointer hover:underline"
+            className="cursor-pointer text-neutral-500 hover:underline"
           >
             Create an account
           </div>
