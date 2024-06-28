@@ -26,6 +26,13 @@ export type UserInformation = {
   price: string;
 };
 
+export interface Order {
+  orderId: number;
+  orderDate: string;
+  totalPrice: number;
+  id: string;
+}
+
 export interface State {
   isConfirmLoading: boolean;
   formValues: {
@@ -81,6 +88,14 @@ export type ProductManagementAction =
   | { type: "SET_SUBMITTING"; payload: boolean }
   | { type: "SET_CONFIRM_LOADING"; payload: boolean }
   | { type: "SET_FORM_VALUES"; payload: Partial<State['formValues']> };
+
+export type OrderManagementAction =
+  | { type: "FETCH_INIT" }
+  | { type: "FETCH_SUCCESS"; payload: Order[] }
+  | { type: "FETCH_FAILURE"; payload: string }
+  | { type: "DELETE_ORDER"; payload: string }
+  | { type: "SET_ORDER_TO_DELETE"; payload: Order }
+  | { type: "CLOSE_DELETE_MODAL" };
 
 export interface ProductTableProps {
   currentProducts: Product[];
