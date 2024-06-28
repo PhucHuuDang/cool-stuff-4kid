@@ -2,13 +2,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Upload, Image, message } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import { Plus } from "lucide-react";
+import { UploadImageProductProps } from "@/interface";
 
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 
-interface UploadImageProductProps {
-  onFileChange: (fileChange: string) => void;
-  initialImage?: string;
-}
+
 
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {

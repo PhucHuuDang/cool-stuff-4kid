@@ -1,32 +1,9 @@
-"use client"
 import React, { useReducer } from 'react';
 import { Modal, Form, Input, Row, Col, InputNumber, message } from 'antd';
-import { User, DollarSign, List, PlusCircle, SquarePlus } from 'lucide-react';
+import { User, DollarSign, List, SquarePlus } from 'lucide-react';
 import axios from 'axios';
 import { UploadImageProduct } from './upload-image-product';
-
-export interface AddModalProps {
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isOpen: boolean;
-  onProductAdd: (newProduct: any) => void;
-}
-
-interface State {
-  isConfirmLoading: boolean;
-  formValues: {
-    productName: string;
-    price: number;
-    discountPercent: number;
-    quantity: number;
-    productDescription: string;
-    image: string;
-  };
-}
-
-interface Action {
-  type: 'SET_CONFIRM_LOADING' | 'SET_FORM_VALUES';
-  payload?: any;
-}
+import { State, AddModalProps, Product, ProductManagementAction } from '@/interface';
 
 const initialState: State = {
   isConfirmLoading: false,
@@ -40,7 +17,7 @@ const initialState: State = {
   },
 };
 
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: State, action: ProductManagementAction): State => {
   switch (action.type) {
     case 'SET_CONFIRM_LOADING':
       return { ...state, isConfirmLoading: action.payload };
@@ -64,7 +41,7 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
     dispatch({ type: 'SET_FORM_VALUES', payload: { image: newFileChange } });
   };
 
-  const handleFormChange = (changedValues: { [key: string]: any }) => {
+  const handleFormChange = (changedValues: Partial<State['formValues']>) => {
     dispatch({ type: 'SET_FORM_VALUES', payload: changedValues });
   };
 
@@ -72,14 +49,14 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
     dispatch({ type: 'SET_CONFIRM_LOADING', payload: true });
 
     try {
-      const response = await axios.post('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
+      const response = await axios.post<Product>('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
         ...state.formValues,
         categoryId: 1,
         originId: 1,
         locationId: 1,
       });
 
-      onProductAdd(response.data);
+      await onProductAdd(response.data);
       message.success('Product created successfully');
       setIsOpen(false);
       form.resetFields();
@@ -97,7 +74,7 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
   return (
     <Modal
       title={<p className="text-lg text-red-600">Add new product</p>}
-      visible={isOpen}
+      open={isOpen}
       confirmLoading={state.isConfirmLoading}
       onCancel={handleCancel}
       onOk={handleOk}

@@ -2,21 +2,11 @@
 
 import React, { useReducer, useEffect, useCallback, useState } from "react";
 import { Search } from "lucide-react";
-import { AddProductModal } from "./_components/add-product";
 import axios from "axios";
-
-interface Product {
-  productId: number;
-  productName: string;
-  price: number;
-  quantity: number;
-  productDescription: string;
-  image: string;
-  status: number;
-  categoryId: number;
-  originId: number;
-  locationId: number;
-}
+import { AddProductModal } from "./_components/add-product";
+import { EditProductModal } from "./_components/edit-product-modal";
+import { ProductDetailsModal } from "./_components/product-details-modal";
+import { Product, ProductManagementAction } from "@/interface";
 
 interface State {
   products: Product[];
@@ -34,21 +24,19 @@ const initialState: State = {
   isSubmitting: false,
 };
 
-type Action =
-  | { type: "SET_PRODUCTS"; payload: Product[] }
-  | { type: "ADD_PRODUCT"; payload: Product }
-  | { type: "DELETE_PRODUCT"; payload: number }
-  | { type: "SET_CURRENT_PAGE"; payload: number }
-  | { type: "TOGGLE_DROPDOWN"; payload: number }
-  | { type: "TOGGLE_MODAL" }
-  | { type: "SET_SUBMITTING"; payload: boolean };
-
-const reducer = (state: State, action: Action): State => {
+const reducer = (state: State, action: ProductManagementAction): State => {
   switch (action.type) {
     case "SET_PRODUCTS":
       return { ...state, products: action.payload };
     case "ADD_PRODUCT":
       return { ...state, products: [action.payload, ...state.products] };
+    case "UPDATE_PRODUCT":
+      return {
+        ...state,
+        products: state.products.map((product) =>
+          product.productId === action.payload.productId ? action.payload : product
+        ),
+      };
     case "DELETE_PRODUCT":
       return {
         ...state,
@@ -76,13 +64,11 @@ const reducer = (state: State, action: Action): State => {
 const ProductManagementPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [viewingProductId, setViewingProductId] = useState<number | null>(null);
   const itemsPerPage = 7;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(
         "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts"
@@ -91,7 +77,11 @@ const ProductManagementPage: React.FC = () => {
     } catch (error) {
       console.error("Error fetching products:", error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
 
   const handleAddProduct = () => {
     dispatch({ type: "TOGGLE_MODAL" });
@@ -99,7 +89,6 @@ const ProductManagementPage: React.FC = () => {
 
   const handleProductAdd = async (product: Product) => {
     dispatch({ type: "SET_SUBMITTING", payload: true });
-
     try {
       const response = await axios.post(
         "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
@@ -112,15 +101,18 @@ const ProductManagementPage: React.FC = () => {
           categoryId: product.categoryId,
           originId: product.originId,
           locationId: product.locationId,
+          discountPrice: product.discountPrice,
         }
       );
 
       const newProduct = response.data;
       dispatch({ type: "ADD_PRODUCT", payload: newProduct });
+      await fetchProducts();
     } catch (error) {
       console.error("Error adding product:", error);
     } finally {
       dispatch({ type: "SET_SUBMITTING", payload: false });
+      dispatch({ type: "TOGGLE_MODAL" });
     }
   };
 
@@ -130,9 +122,32 @@ const ProductManagementPage: React.FC = () => {
         `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`
       );
       dispatch({ type: "DELETE_PRODUCT", payload: productId });
+      fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
     }
+  };
+
+  const handleEditClick = (product: Product) => {
+    setEditingProduct(product);
+  };
+
+  const handleEditClose = () => {
+    setEditingProduct(null);
+  };
+
+  const handleProductUpdate = useCallback(async (updatedProduct: Product) => {
+    dispatch({ type: "UPDATE_PRODUCT", payload: updatedProduct });
+    await fetchProducts();
+    setEditingProduct(null);
+  }, [fetchProducts]);
+
+  const handleViewDetails = (productId: number) => {
+    setViewingProductId(productId);
+  };
+
+  const handleCloseDetails = () => {
+    setViewingProductId(null);
   };
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
@@ -198,6 +213,8 @@ const ProductManagementPage: React.FC = () => {
                 dropdownVisible={state.dropdownVisible}
                 toggleDropdown={toggleDropdown}
                 handleProductDelete={handleProductDelete}
+                handleEditClick={handleEditClick}
+                handleViewDetails={handleViewDetails}
               />
               <Pagination
                 currentPage={state.currentPage}
@@ -215,6 +232,19 @@ const ProductManagementPage: React.FC = () => {
           onProductAdd={handleProductAdd}
         />
       )}
+      {editingProduct && (
+        <EditProductModal
+          isOpen={!!editingProduct}
+          onClose={handleEditClose}
+          product={editingProduct}
+          onProductUpdate={handleProductUpdate}
+        />
+      )}
+      <ProductDetailsModal
+        isOpen={viewingProductId !== null}
+        onClose={handleCloseDetails}
+        productId={viewingProductId}
+      />
     </div>
   );
 };
@@ -224,7 +254,16 @@ const ProductTable: React.FC<{
   dropdownVisible: number | null;
   toggleDropdown: (productId: number) => void;
   handleProductDelete: (productId: number) => void;
-}> = ({ currentProducts, dropdownVisible, toggleDropdown, handleProductDelete }) => (
+  handleEditClick: (product: Product) => void;
+  handleViewDetails: (productId: number) => void;
+}> = ({
+  currentProducts,
+  dropdownVisible,
+  toggleDropdown,
+  handleProductDelete,
+  handleEditClick,
+  handleViewDetails,
+}) => (
   <table className="min-w-full divide-y divide-gray-200">
     <thead className="bg-gray-50">
       <tr>
@@ -232,7 +271,9 @@ const ProductTable: React.FC<{
         <TableHeader text="Product Image" />
         <TableHeader text="Product Name" />
         <TableHeader text="Quantity" />
-        <TableHeader text="Sale Price" />
+        <TableHeader text="Normal Price" />
+        <TableHeader text="Discount Price" />
+        <TableHeader text="Discount Percent" />
         <TableHeader text="Status" />
         <TableHeader text="Link" />
         <TableHeader text="Action" />
@@ -252,6 +293,8 @@ const ProductTable: React.FC<{
           <TableCell text={product.productName} />
           <TableCell text={product.quantity.toString()} />
           <TableCell text={product.price.toString()} />
+          <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
+          <TableCell text={product.discountPercent !== null ? `${product.discountPercent}%` : 'N/A'} />
           <TableCell text={product.status === 1 ? 'Active' : 'Inactive'} />
           <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
             <a href="#" target="_blank" rel="noopener noreferrer">
@@ -267,7 +310,14 @@ const ProductTable: React.FC<{
             </button>
             {dropdownVisible === product.productId && (
               <div className="absolute right-0 z-10 mt-2 w-48 rounded border border-gray-300 bg-white shadow-lg">
-                <DropdownItem text="Product Details" />
+                <DropdownItem
+                  text="Product Details"
+                  onClick={() => handleViewDetails(product.productId)}
+                />
+                <DropdownItem
+                  text="Edit Product"
+                  onClick={() => handleEditClick(product)}
+                />
                 <DropdownItem
                   text="Stop Selling"
                   onClick={() => handleProductDelete(product.productId)}
@@ -347,4 +397,3 @@ const PaginationButton: React.FC<{
 );
 
 export default ProductManagementPage;
-
