@@ -19,11 +19,9 @@ import { FormError } from "@/components/form/form-error";
 import { useAction } from "@/hooks/use-action";
 import { registerAccount } from "@/actions/register";
 import { toast } from "sonner";
-import { loginAccount } from "@/actions/login";
-import { createCookie } from "@/store/actions";
 import { useRegisterModal } from "@/hooks/use-register-modal";
 
-export const LoginModal = () => {
+export const RegisterModal = () => {
   const { pending } = useFormStatus();
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
@@ -37,29 +35,29 @@ export const LoginModal = () => {
     }
   }, [loginModal.isOpen]);
 
-  const { execute, fieldErrors } = useAction(loginAccount, {
-    onSuccess: async (data) => {
+  const { execute, fieldErrors } = useAction(registerAccount, {
+    onSuccess: (data) => {
       toast.success("Register successfully");
-
-      await createCookie(data);
-      loginModal.onClose()
-      
+      registerModal.onClose();
+      loginModal.onOpen();
     },
     onError: (error) => {
-      toast.error("Login failed");
+      toast.error("Register failed, please try again!");
     },
   });
 
   const onSubmit = (formData: FormData) => {
     const userName = formData.get("userName") as string;
+    const fullName = formData.get("fullName") as string;
+    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    execute({ userName, password });
+    execute({ userName, fullName, email, password });
   };
 
   const toggle = () => {
-    loginModal.onClose();
-    registerModal.onOpen();
+    loginModal.onOpen();
+    registerModal.onClose();
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -72,7 +70,21 @@ export const LoginModal = () => {
 
   const bodyContent = (
     <form ref={formInputRef} action={onSubmit} className="flex flex-col gap-4">
-      <Heading title="Welcome back" subtitle="Login to your account!" center />
+      <Heading title="Welcome!" subtitle="Register your account!" center />
+
+      <FormInput
+        id="fullName"
+        label="Full Name"
+        disabled={pending}
+        ref={inputRef}
+        placeholder="Nguyen Van Loc"
+        className="h-12"
+        labelClassName="text-neutral-700"
+        // register={register}
+        // errors={errors}
+        required
+      />
+      <FormError id="fullName" errors={fieldErrors} />
 
       <FormInput
         id="userName"
@@ -90,6 +102,21 @@ export const LoginModal = () => {
       <FormError id="userName" errors={fieldErrors} />
 
       <FormInput
+        id="email"
+        label="Email"
+        disabled={pending}
+        ref={inputRef}
+        placeholder="Email address"
+        className="h-12"
+        labelClassName="text-neutral-700"
+        // register={register}
+        // errors={errors}
+        required
+      />
+
+      <FormError id="email" errors={fieldErrors} />
+
+      <FormInput
         id="password"
         label="Password"
         className="h-12"
@@ -103,15 +130,14 @@ export const LoginModal = () => {
       <FormError id="password" errors={fieldErrors} />
 
       <FormSubmit variant="book" className="h-12" disabled={pending}>
-        Login
+        Register
       </FormSubmit>
     </form>
   );
   // the footer body of form register
   const footerContent = (
     <div className="mt-1 flex flex-col gap-4">
-      <hr />
-      <Button
+      {/* <Button
         // onClick={() => signIn("google")}
         className="flex items-center gap-1"
       >
@@ -122,15 +148,15 @@ export const LoginModal = () => {
         className="flex items-center gap-1"
       >
         <AiFillGithub size={22} /> Continue with GitHub
-      </Button>
-      <div className="mt-4 text-center font-light text-neutral-500">
+      </Button> */}
+      <div className="text-center font-light text-neutral-500">
         <div className="flex flex-row items-center justify-center gap-2">
           <div>Are you have account?</div>
           <div
             onClick={toggle}
             className="cursor-pointer text-neutral-500 hover:underline"
           >
-            Create an account
+            Already have an account
           </div>
         </div>
       </div>
@@ -140,11 +166,11 @@ export const LoginModal = () => {
   return (
     <Modal
       disabled={pending}
-      isOpen={loginModal.isOpen}
-      title="Login"
+      isOpen={registerModal.isOpen}
+      title="Register"
       body={bodyContent}
       footer={footerContent}
-      onClose={loginModal.onClose}
+      onClose={registerModal.onClose}
       onSubmit={() => onSubmit}
     />
   );

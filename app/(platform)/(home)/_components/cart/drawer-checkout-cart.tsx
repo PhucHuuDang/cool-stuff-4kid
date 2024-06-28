@@ -12,12 +12,15 @@ import { CreditCard, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useLoginModal } from "@/hooks/use-login-modal";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
+import { checkAuthenticate } from "@/app/auth/check-authenticate";
+import { useRouter } from "next/navigation";
 
 export const DrawerCheckoutCart = () => {
   const drawerCart = useDrawerCart();
   const openLoginModal = useLoginModal((state) => state.onOpen);
 
   const cart = useFromStore(useCartStore, (state) => state.cart);
+  const router = useRouter();
 
   let total = 0;
 
@@ -34,6 +37,18 @@ export const DrawerCheckoutCart = () => {
   const cartCondition = cart?.length! >= 1;
 
   const onOpenChange = (e: boolean) => !e && drawerCart.onClose();
+
+  const handleCheckout = async () => {
+    const isLogin = await checkAuthenticate();
+
+    if (isLogin) {
+      console.log("payment");
+      router.push("/user-payment");
+      return;
+    }
+
+    openLoginModal();
+  };
 
   //? when we use space-y-4 the children will be affected
 
@@ -98,10 +113,7 @@ export const DrawerCheckoutCart = () => {
           {cartCondition && (
             <div className="my-6 flex flex-col items-center gap-y-5">
               <Button
-                onClick={() => {
-                  console.log("payment");
-                  openLoginModal();
-                }}
+                onClick={handleCheckout}
                 variant="book"
                 className="w-full gap-x-1 text-base transition duration-300 hover:scale-105 hover:text-lg"
               >
