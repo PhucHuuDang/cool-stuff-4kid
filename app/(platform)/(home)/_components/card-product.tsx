@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { removeMarks } from "@/handle-transform/remove-marks";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { Product } from "@/interface";
@@ -65,24 +66,20 @@ export const CardProduct = ({ product }: CardProductProps) => {
             ? description.slice(0, MAX_LENGTH) + "..."
             : description}
         </div>
-        <div className="text-md mt-3 flex flex-row items-center gap-3">
+        <div className="text-md mt-3 flex flex-row items-center gap-1">
           <div className="flex flex-row items-center gap-2">
             <del className="font-light text-[#ed9080]">
               {/* {formattedPrice(data?.originalPrice as number)} */}
-              {product.originalPrice}
+              {formatCurrency(product.originalPrice)}
             </del>{" "}
-            <span>₫</span>
           </div>
 
-          <h1 className="ml-1 mr-1 text-xl font-semibold text-neutral-500">
-            |
-          </h1>
+          <h1 className="text-xl font-semibold text-neutral-500">|</h1>
 
           <div className="flex flex-row items-center gap-2">
-            <span className="font-light text-[#ff6347]">
-              {product.discountPrice}
-            </span>{" "}
-            <span>₫</span>
+            <span className="font-bold text-[#ff6347]">
+              {formatCurrency(product.discountPrice)}
+            </span>
           </div>
         </div>
         <Button onClick={(e) => handleAddToCart(e, product)} variant="book">
