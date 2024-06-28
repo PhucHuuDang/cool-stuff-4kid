@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useLoginModal } from "@/hooks/use-login-modal";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 
 export const DrawerCheckoutCart = () => {
   const drawerCart = useDrawerCart();
@@ -27,6 +28,8 @@ export const DrawerCheckoutCart = () => {
       0,
     );
   }
+
+  // console.log({ cart });
 
   const cartCondition = cart?.length! >= 1;
 
@@ -84,7 +87,9 @@ export const DrawerCheckoutCart = () => {
               <div className="my-5">
                 <div className="item-center flex gap-1">
                   <p className="text-lg text-zinc-600">Total:</p>
-                  <p className="text-lg text-sky-500">{total.toFixed(2)}đ</p>
+                  <p className="text-lg text-sky-500">
+                    {formatCurrency(total)}
+                  </p>
                 </div>
               </div>
             )}
