@@ -30,13 +30,13 @@ const reducer = (state: State, action: ProductManagementAction): State => {
       return { ...state, products: action.payload };
     case "ADD_PRODUCT":
       return { ...state, products: [action.payload, ...state.products] };
-    case "UPDATE_PRODUCT":
-      return {
-        ...state,
-        products: state.products.map((product) =>
-          product.productId === action.payload.productId ? action.payload : product
-        ),
-      };
+      case "UPDATE_PRODUCT":
+        return {
+          ...state,
+          products: state.products.map((product) =>
+            product.productId === action.payload.productId ? { ...action.payload } : product
+          ),
+        };
     case "DELETE_PRODUCT":
       return {
         ...state,
@@ -87,7 +87,7 @@ const ProductManagementPage: React.FC = () => {
     dispatch({ type: "TOGGLE_MODAL" });
   };
 
-  const handleProductAdd = async (product: Product) => {
+  const handleProductAdd = useCallback(async (product: Product) => {
     dispatch({ type: "SET_SUBMITTING", payload: true });
     try {
       const response = await axios.post(
@@ -104,17 +104,21 @@ const ProductManagementPage: React.FC = () => {
           discountPrice: product.discountPrice,
         }
       );
-
+  
       const newProduct = response.data;
       dispatch({ type: "ADD_PRODUCT", payload: newProduct });
-      await fetchProducts();
+      // Remove the fetchProducts call from here
     } catch (error) {
       console.error("Error adding product:", error);
     } finally {
       dispatch({ type: "SET_SUBMITTING", payload: false });
       dispatch({ type: "TOGGLE_MODAL" });
     }
-  };
+  }, []);
+  
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, state.products]);
 
   const handleProductDelete = async (productId: number) => {
     try {
@@ -138,9 +142,11 @@ const ProductManagementPage: React.FC = () => {
 
   const handleProductUpdate = useCallback(async (updatedProduct: Product) => {
     dispatch({ type: "UPDATE_PRODUCT", payload: updatedProduct });
-    await fetchProducts();
     setEditingProduct(null);
-  }, [fetchProducts]);
+  }, []);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, state.products]);
 
   const handleViewDetails = (productId: number) => {
     setViewingProductId(productId);
@@ -198,9 +204,6 @@ const ProductManagementPage: React.FC = () => {
                   <option>Active</option>
                   <option>Inactive</option>
                 </select>
-                <button className="rounded-l-lg bg-black p-2 text-white">
-                  Search
-                </button>
                 <button
                   className="ml-auto rounded border bg-white p-2 text-black"
                   onClick={handleAddProduct}

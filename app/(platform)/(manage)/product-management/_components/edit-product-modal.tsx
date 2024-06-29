@@ -37,7 +37,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     setEditedProduct((prev) => ({
       ...prev,
       [name]: ['price', 'discountPrice', 'discountPercent', 'quantity'].includes(name) 
-        ? parseFloat(value) || 0
+        ? parseFloat(value)
         : value,
     }));
   }, []);
@@ -60,7 +60,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       );
 
       if (response.status === 200 || response.status === 204) {
-        await onProductUpdate(response.data);
+        await onProductUpdate(response.data || editedProduct);
         onClose();
         toast({
           title: "Success",
