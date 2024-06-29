@@ -43,7 +43,8 @@ export const DrawerCheckoutCart = () => {
 
     if (isLogin) {
       console.log("payment");
-      router.push("/user-payment");
+      drawerCart.onClose();
+      router.push("/checkout");
       return;
     }
 

@@ -21,8 +21,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MapPin } from "lucide-react";
+import { useCartStore } from "@/hooks/use-cart-store";
+import useFromStore from "@/store/use-from-store";
+import { CreditCard, MapPin } from "lucide-react";
 import Image from "next/image";
+import { ProductCheckout } from "./_checkout-infor-components/product-checkout";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
+import { PaymentMethodOnline } from "./_checkout-infor-components/payments-online";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
 
 const tabsProps = [
   {
@@ -36,6 +49,21 @@ const tabsProps = [
 ];
 
 export const CheckoutInformation = () => {
+  const cart = useFromStore(useCartStore, (state) => state.cart);
+  const [addMoreAddress, setAddMoreAddress] = useState<boolean>(false);
+
+  let total = 0;
+
+  if (cart) {
+    total = cart.reduce(
+      (acc, product) =>
+        acc + product.discountPrice * (product.quantity as number),
+      0,
+    );
+  }
+
+  const currencyTransformed = formatCurrency(total);
+
   return (
     <div className="px-10 pb-20">
       <Card className="my-4">
@@ -54,25 +82,66 @@ export const CheckoutInformation = () => {
               Thủ Đức, TP. Hồ Chí Minh
             </div>
 
-            <div>Mặc Định</div>
+            <div className="border border-[#ff6347] p-2 px-4 text-[#ff6347]">
+              Mặc Định
+            </div>
 
-            <Button
-              variant="outline"
-              className="border-[2px] transition duration-150 hover:underline hover:shadow-lg"
-            >
-              Thay Đổi
-            </Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-[2px] transition duration-150 hover:underline hover:shadow-lg"
+                >
+                  Thay Đổi
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                {!addMoreAddress ? (
+                  <form action={() => {}} className="flex gap-x-2">
+                    <Checkbox id="address" className="size-5" />
+                    <label
+                      htmlFor="address"
+                      className="flex cursor-pointer flex-col gap-y-2"
+                    >
+                      <div className="flex items-center gap-1">
+                        <h2 className="text-xl font-bold">Dang Huu Phuc</h2>
+                        <h2>|</h2>
+                        <h2 className="font-semibold text-slate-700">
+                          0500229934456
+                        </h2>
+                      </div>
+                      <p className="text-slate-500">
+                        S901 Vinhomes Grand Park, Nguyễn Xiển, Phường Long Bình,
+                        Thành Phố Thủ Đức, TP. Hồ Chí Minh
+                      </p>
+                    </label>
+                  </form>
+                ) : (
+                  <div className="px-10">Add more address</div>
+                )}
+
+                {!addMoreAddress ? (
+                  <Button
+                    onClick={() => setAddMoreAddress(true)}
+                    variant="book"
+                  >
+                    Them dia chi moi
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setAddMoreAddress(false)}
+                    variant="book"
+                  >
+                    Back
+                  </Button>
+                )}
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>
 
       <Card className="my-4">
-        {/* <CardHeader>
-          <CardTitle>
-            <MapPin className="size-6" />
-            Sản Phẩm
-          </CardTitle>
-        </CardHeader> */}
         <CardContent className="rounded-lg p-5">
           <Table>
             <TableCaption className="flex items-center justify-between">
@@ -89,36 +158,9 @@ export const CheckoutInformation = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <TableRow>
-                <TableCell>
-                  <div className="flex items-center gap-x-4">
-                    <div className="relative aspect-square size-14 overflow-hidden rounded-xl">
-                      {/* <GlareCard className="flex flex-col items-center justify-center"> */}
-                      <Image
-                        fill
-                        src="/images/tiny-home.webp"
-                        alt="product"
-                        className="size-full object-cover transition group-hover:scale-110"
-                        // className="absolute size-full object-cover transition group-hover:scale-110"
-                      />
-
-                      {/* can add here the icon cart or not */}
-                      {/* </GlareCard> */}
-                    </div>
-
-                    <div>
-                      <h1 className="text-lg font-bold">
-                        Thực phẩm bảo vệ sức khoẻ Herbs of Gold Herbs of Gold
-                        Breastfeeding Support
-                      </h1>
-                      <div>SKU: 123456789</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>96.000d</TableCell>
-                <TableCell>1</TableCell>
-                <TableCell>96.000d</TableCell>
-              </TableRow>
+              {cart?.map((product) => (
+                <ProductCheckout key={product.id} product={product} />
+              ))}
             </TableBody>
             <TableFooter>
               <TableRow>
@@ -213,7 +255,32 @@ export const CheckoutInformation = () => {
               </div>
             </TabsContent>
             <TabsContent value="credit-card">
-              <div>Credit Card</div>
+              <div className="px-10 pt-5">
+                <HoverCard openDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <div
+                      style={{
+                        backgroundImage: "url(/images/credit-card.jpg)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat",
+                        height: "100px",
+                        width: "100px",
+                        borderRadius: "10px",
+                      }}
+                      className="relative rounded-lg selection:cursor-pointer"
+                    >
+                      <div className="absolute size-full cursor-pointer rounded-lg duration-200 hover:bg-slate-500/20" />
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent side="top" sideOffset={10} align="center">
+                    <div className="flex items-center gap-x-2">
+                      <CreditCard className="size-8" /> <span>Credit card</span>
+                    </div>
+                  </HoverCardContent>
+                  <PaymentMethodOnline image="/images/credit-card.jpg" />
+                </HoverCard>
+              </div>
             </TabsContent>
           </Tabs>
 
@@ -221,7 +288,9 @@ export const CheckoutInformation = () => {
             <div className="flex flex-col space-y-4 rounded-lg p-4 duration-200 hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-lg font-medium">Tổng số tiền:</span>
-                <span className="text-lg font-medium">500.000</span>
+                <span className="text-lg font-medium">
+                  {currencyTransformed}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-medium">Phí vận chuyển:</span>
@@ -239,7 +308,9 @@ export const CheckoutInformation = () => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-medium">Tổng thanh toán:</span>
-                <h1 className="text-2xl font-bold text-[#ff6347]">518.500đ</h1>
+                <h1 className="text-2xl font-bold text-[#ff6347]">
+                  {currencyTransformed}
+                </h1>
               </div>
             </div>
           </CardFooter>
