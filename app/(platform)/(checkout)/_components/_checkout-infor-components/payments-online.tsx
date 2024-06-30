@@ -1,17 +1,30 @@
-import { HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { CreditCard } from "lucide-react";
 
 interface PaymentMethodOnlineProps {
   onClick?: () => void;
+
+  // TODO: Add type for HoverCardContent
+  hoverCardContent?: string;
+
+  // TODO: Add icon for HoverCardTrigger
+  Icon?: React.ReactNode;
+
   image: string;
 }
 
 export const PaymentMethodOnline = ({
   onClick,
   image,
+  hoverCardContent,
+  Icon,
 }: PaymentMethodOnlineProps) => {
   return (
-    <>
+    <HoverCard openDelay={200} closeDelay={100}>
       <HoverCardTrigger asChild>
         <div
           onClick={onClick}
@@ -31,9 +44,10 @@ export const PaymentMethodOnline = ({
       </HoverCardTrigger>
       <HoverCardContent side="top" sideOffset={10} align="center">
         <div className="flex items-center gap-x-2">
-          <CreditCard className="size-8" /> <span>Credit card</span>
+          <CreditCard className="size-8" />{" "}
+          <span>{hoverCardContent ?? "Stripe"}</span>
         </div>
       </HoverCardContent>
-    </>
+    </HoverCard>
   );
 };

@@ -1,6 +1,7 @@
 "use client";
 
 import { TableCell, TableRow } from "@/components/ui/table";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { Product } from "@/interface";
 import Image from "next/image";
 
@@ -39,9 +40,13 @@ export const ProductCheckout = ({ product }: ProductCheckoutProps) => {
           </div>
         </div>
       </TableCell>
-      <TableCell>{product.discountPrice}</TableCell>
-      <TableCell>{product.quantity}</TableCell>
-      <TableCell>{product.discountPrice}</TableCell>
+      <TableCell className="font-bold">
+        {formatCurrency(product.discountPrice)}
+      </TableCell>
+      <TableCell className="font-bold">{product.quantity}</TableCell>
+      <TableCell className="font-bold text-[#ff6347]">
+        {formatCurrency(product.discountPrice * (product.quantity as number))}
+      </TableCell>
     </TableRow>
   );
 };
