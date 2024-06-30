@@ -36,6 +36,9 @@ import { PaymentMethodOnline } from "./_checkout-infor-components/payments-onlin
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
+import { AddressReceiveOrder } from "./_checkout-infor-components/address-receive-order";
+import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
+import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
 
 const tabsProps = [
   {
@@ -50,7 +53,6 @@ const tabsProps = [
 
 export const CheckoutInformation = () => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
-  const [addMoreAddress, setAddMoreAddress] = useState<boolean>(false);
 
   let total = 0;
 
@@ -64,82 +66,15 @@ export const CheckoutInformation = () => {
 
   const currencyTransformed = formatCurrency(total);
 
+  const handleMessage = (formData: FormData) => {
+    const message = formData.get("message") as string;
+
+    console.log({ message });
+  };
+
   return (
     <div className="px-10 pb-20">
-      <Card className="my-4">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-x-1">
-            <MapPin className="size-6" />
-            Địa Chỉ Nhận Hàng
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="rounded-lg p-5">
-          <div className="flex items-center justify-between">
-            <div>Dang Huu Phuc (0500229934456)</div>
-
-            <div>
-              S901 Vinhomes Grand Park, Nguyễn Xiển, Phường Long Bình, Thành Phố
-              Thủ Đức, TP. Hồ Chí Minh
-            </div>
-
-            <div className="border border-[#ff6347] p-2 px-4 text-[#ff6347]">
-              Mặc Định
-            </div>
-
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="border-[2px] transition duration-150 hover:underline hover:shadow-lg"
-                >
-                  Thay Đổi
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                {!addMoreAddress ? (
-                  <form action={() => {}} className="flex gap-x-2">
-                    <Checkbox id="address" className="size-5" />
-                    <label
-                      htmlFor="address"
-                      className="flex cursor-pointer flex-col gap-y-2"
-                    >
-                      <div className="flex items-center gap-1">
-                        <h2 className="text-xl font-bold">Dang Huu Phuc</h2>
-                        <h2>|</h2>
-                        <h2 className="font-semibold text-slate-700">
-                          0500229934456
-                        </h2>
-                      </div>
-                      <p className="text-slate-500">
-                        S901 Vinhomes Grand Park, Nguyễn Xiển, Phường Long Bình,
-                        Thành Phố Thủ Đức, TP. Hồ Chí Minh
-                      </p>
-                    </label>
-                  </form>
-                ) : (
-                  <div className="px-10">Add more address</div>
-                )}
-
-                {!addMoreAddress ? (
-                  <Button
-                    onClick={() => setAddMoreAddress(true)}
-                    variant="book"
-                  >
-                    Them dia chi moi
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => setAddMoreAddress(false)}
-                    variant="book"
-                  >
-                    Back
-                  </Button>
-                )}
-              </DialogContent>
-            </Dialog>
-          </div>
-        </CardContent>
-      </Card>
+      <AddressReceiveOrder />
 
       <Card className="my-4">
         <CardContent className="rounded-lg p-5">
@@ -177,8 +112,8 @@ export const CheckoutInformation = () => {
 
           <div className="flex">
             <div className="flex w-[40%] flex-1 items-center gap-x-1">
-              <h3 className="w-20 flex-1">Loi nhan: </h3>
-              <form action={() => {}}>
+              <h3 className="w-20 flex-1">Lời nhắn: </h3>
+              <form action={handleMessage}>
                 <FormInput
                   id="message"
                   placeholder="Lưu ý cho admin shop"
@@ -193,11 +128,22 @@ export const CheckoutInformation = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Đơn vị vận chuyển:</TableHead>
-                  <TableHead>Hàng Cồng Kềnh</TableHead>
+                  <TableHead>Nhanh</TableHead>
                   <TableHead>
-                    <Button variant="outline">Thay Đổi</Button>
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button variant="outline">Thay Đổi</Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <div className="flex flex-col gap-4">
+                          <div>Nhanh</div>
+                          <div>Tiet kiem</div>
+                          <div>Hoa toc</div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </TableHead>
-                  <TableHead>81.000</TableHead>
+                  <TableHead className="text-[#ff6347]">81.000</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody className="w-full hover:bg-transparent">
@@ -219,8 +165,10 @@ export const CheckoutInformation = () => {
           <CardFooter className="text-right">
             {/* Todo: Render number of product */}
             <div className="flex items-center gap-x-5">
-              <h2>Tổng số tiền (1 sản phẩm): </h2>
-              <h2 className="font-bold text-[#ff6347]">177.000d</h2>
+              <h2>Tổng số tiền ({cart?.length} sản phẩm): </h2>
+              <h2 className="font-bold text-[#ff6347]">
+                {currencyTransformed}
+              </h2>
             </div>
           </CardFooter>
         </CardContent>
@@ -232,7 +180,7 @@ export const CheckoutInformation = () => {
         </CardHeader>
         <CardContent>
           <Tabs className="w-full" defaultValue="payment-upon-receipt">
-            <TabsList className="w-full space-x-2">
+            <TabsList className="w-full space-x-1">
               {tabsProps.map((tab) => (
                 <TabsTrigger
                   className="w-52 border border-slate-600 data-[state=active]:bg-sky-600 data-[state=active]:text-white data-[state=active]:shadow-lg"
@@ -242,46 +190,10 @@ export const CheckoutInformation = () => {
                   {tab.label}
                 </TabsTrigger>
               ))}
-              {/* <TabsTrigger value="payment-upon-receipt"></TabsTrigger> */}
-              {/* <TabsTrigger value="credit-card"></TabsTrigger> */}
             </TabsList>
-            <TabsContent value="payment-upon-receipt" className="my-8">
-              <div className="flex items-center gap-x-10">
-                <h3>Thanh toán khi nhận hàng</h3>
-                <h3>
-                  Phí thu hộ: ₫0 VNĐ. Ưu đãi về phí vận chuyển (nếu có) áp dụng
-                  cả với phí thu hộ.
-                </h3>
-              </div>
-            </TabsContent>
-            <TabsContent value="credit-card">
-              <div className="px-10 pt-5">
-                <HoverCard openDelay={200}>
-                  <HoverCardTrigger asChild>
-                    <div
-                      style={{
-                        backgroundImage: "url(/images/credit-card.jpg)",
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                        height: "100px",
-                        width: "100px",
-                        borderRadius: "10px",
-                      }}
-                      className="relative rounded-lg selection:cursor-pointer"
-                    >
-                      <div className="absolute size-full cursor-pointer rounded-lg duration-200 hover:bg-slate-500/20" />
-                    </div>
-                  </HoverCardTrigger>
-                  <HoverCardContent side="top" sideOffset={10} align="center">
-                    <div className="flex items-center gap-x-2">
-                      <CreditCard className="size-8" /> <span>Credit card</span>
-                    </div>
-                  </HoverCardContent>
-                  <PaymentMethodOnline image="/images/credit-card.jpg" />
-                </HoverCard>
-              </div>
-            </TabsContent>
+
+            <PaymentUponReceive value="payment-upon-receipt" />
+            <CreditCardContent value="credit-card" />
           </Tabs>
 
           <CardFooter className="flex justify-end">
@@ -317,8 +229,8 @@ export const CheckoutInformation = () => {
 
           <CardFooter className="flex items-center justify-between">
             <div>
-              Để đảm bảo, bạn hãy kiểm tra lại đơn hàng của mình trước khi Đặt
-              Hàng
+              Để đảm bảo đơn hàng của bạn, bạn hãy kiểm tra lại đơn hàng của
+              mình trước khi Đặt Hàng
             </div>
             <Button className="w-64 text-right" variant="book">
               Đặt hàng

@@ -7,12 +7,8 @@ import { useEventListener } from "usehooks-ts";
 
 import { useLoginModal } from "@/hooks/use-login-modal";
 
-import { FcGoogle } from "react-icons/fc";
-import { AiFillGithub } from "react-icons/ai";
-
 import Heading from "./heading";
 import Modal from "@/components/modal";
-import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { FormError } from "@/components/form/form-error";

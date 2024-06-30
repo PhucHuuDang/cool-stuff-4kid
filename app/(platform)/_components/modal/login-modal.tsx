@@ -17,16 +17,19 @@ import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
 import { FormError } from "@/components/form/form-error";
 import { useAction } from "@/hooks/use-action";
-import { registerAccount } from "@/actions/register";
 import { toast } from "sonner";
 import { loginAccount } from "@/actions/login";
 import { createCookie } from "@/store/actions";
 import { useRegisterModal } from "@/hooks/use-register-modal";
+import { useDrawerCart } from "@/hooks/use-drawer-cart";
+import { useRouter } from "next/navigation";
 
 export const LoginModal = () => {
   const { pending } = useFormStatus();
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
+  const drawerCart = useDrawerCart();
+  const router = useRouter();
 
   const formInputRef = useRef<ElementRef<"form">>(null);
   const inputRef = useRef<ElementRef<"input">>(null);
@@ -39,11 +42,14 @@ export const LoginModal = () => {
 
   const { execute, fieldErrors } = useAction(loginAccount, {
     onSuccess: async (data) => {
-      toast.success("Register successfully");
+      toast.success("Login successfully");
 
       await createCookie(data);
-      loginModal.onClose()
-      
+      loginModal.onClose();
+      if (drawerCart.isOpen) {
+        drawerCart.onClose();
+        router.push("/checkout");
+      }
     },
     onError: (error) => {
       toast.error("Login failed");
