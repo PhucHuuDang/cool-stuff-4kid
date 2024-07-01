@@ -2,57 +2,50 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Upload, Image, message } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import { Plus } from "lucide-react";
-import { UploadImageProductProps } from "@/interface";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/Config/firebase"; // Đảm bảo đường dẫn này chính xác
 
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 
-const getBase64 = (file: FileType): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
+interface UploadImageProductProps {
+  onFileChange: (url: string) => void;
+  initialImage?: string;
+}
 
 const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, initialImage }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [file, setFile] = useState<UploadFile | null>(null);
-  const [fileChange, setFileChange] = useState<string>("");
 
   useEffect(() => {
     if (initialImage) {
-      setFile(null);
-      setFileChange(initialImage);
+      setPreviewImage(initialImage);
     }
   }, [initialImage]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
-      try {
-        file.preview = await getBase64(file.originFileObj as FileType);
-      } catch (error) {
-        message.error("Failed to read file");
-      }
+      file.preview = await getBase64(file.originFileObj as FileType);
     }
     setPreviewImage(file.url || (file.preview as string));
     setPreviewOpen(true);
   };
 
   const handleChange: UploadProps["onChange"] = async ({ fileList: newFileList }) => {
-    const newFile = newFileList.length ? newFileList[0] : null;
+    const newFile = newFileList[0];
     setFile(newFile);
 
-    if (!newFile) {
-      setFileChange("");
-    } else if (newFile.originFileObj) {
+    if (newFile && newFile.originFileObj) {
       try {
-        const base64 = await getBase64(newFile.originFileObj);
-        newFile.url = base64;
-        setFileChange(base64);
-        onFileChange(base64);
+        const storageRef = ref(storage, `products/${Date.now()}_${newFile.name}`);
+        const snapshot = await uploadBytes(storageRef, newFile.originFileObj);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        setPreviewImage(downloadURL);
+        onFileChange(downloadURL);
       } catch (error) {
-        message.error("Failed to convert file to base64");
+        console.error("Error uploading file:", error);
+        message.error("Failed to upload image to Firebase");
       }
     }
   };
@@ -66,6 +59,15 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     </button>
   ), []);
 
+  // Helper function to get base64 for preview
+  const getBase64 = (file: FileType): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+
   return (
     <>
       <Upload
@@ -74,16 +76,15 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
         onPreview={handlePreview}
         onChange={handleChange}
         accept="image/*"
+        beforeUpload={() => false} // Prevent auto upload
       >
         {file ? null : uploadButton()}
       </Upload>
       {previewImage && (
         <Image
-          wrapperStyle={{ display: "none" }}
           preview={{
             visible: previewOpen,
             onVisibleChange: (visible) => setPreviewOpen(visible),
-            afterOpenChange: (visible) => !visible && setPreviewImage(""),
           }}
           src={previewImage}
           alt="Product Image"

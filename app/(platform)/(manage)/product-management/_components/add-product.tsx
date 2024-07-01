@@ -39,6 +39,7 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
 
   const handleFileChange = (newFileChange: string) => {
     dispatch({ type: 'SET_FORM_VALUES', payload: { image: newFileChange } });
+    form.setFieldsValue({ image: newFileChange });
   };
 
   const handleFormChange = (changedValues: Partial<State['formValues']>) => {
@@ -46,11 +47,12 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
   };
 
   const handleOk = async () => {
-    dispatch({ type: 'SET_CONFIRM_LOADING', payload: true });
-
     try {
+      const values = await form.validateFields();
+      dispatch({ type: 'SET_CONFIRM_LOADING', payload: true });
+
       const response = await axios.post<Product>('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
-        ...state.formValues,
+        ...values,
         categoryId: 1,
         originId: 1,
         locationId: 1,
@@ -63,6 +65,8 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         message.error(`Failed to create product: ${error.response.data.message || error.message}`);
+      } else if (error instanceof Error) {
+        message.error(`Failed to create product: ${error.message}`);
       } else {
         message.error('Failed to create product');
       }
@@ -139,7 +143,7 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
               rules={[{ required: true, message: 'Please input discount Percent' }]}
               label="Discount Percent"
             >
-              <Input prefix={<List className="site-form-item-icon mr-1" />} placeholder="ex: 10" />
+              <InputNumber className="w-full" prefix={<List className="site-form-item-icon mr-1" />} placeholder="ex: 10" min={0} max={100} />
             </Form.Item>
           </Col>
         </Row>
