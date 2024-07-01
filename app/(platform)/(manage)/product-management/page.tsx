@@ -71,11 +71,22 @@ const ProductManagementPage: React.FC = () => {
   const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts"
+        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts",
+        { timeout: 10000 }
       );
       dispatch({ type: "SET_PRODUCTS", payload: response.data });
     } catch (error) {
-      console.error("Error fetching products:", error);
+      if (axios.isAxiosError(error)) {
+        if (error.code === 'ECONNABORTED') {
+          console.error("Request timed out. Please try again.");
+        } else if (error.message === 'Network Error') {
+          console.error("Network error. Please check your internet connection.");
+        } else {
+          console.error("Error fetching products:", error.message);
+        }
+      } else {
+        console.error("An unexpected error occurred:", error);
+      }
     }
   }, []);
 
@@ -107,7 +118,6 @@ const ProductManagementPage: React.FC = () => {
   
       const newProduct = response.data;
       dispatch({ type: "ADD_PRODUCT", payload: newProduct });
-      // Remove the fetchProducts call from here
     } catch (error) {
       console.error("Error adding product:", error);
     } finally {
@@ -115,10 +125,6 @@ const ProductManagementPage: React.FC = () => {
       dispatch({ type: "TOGGLE_MODAL" });
     }
   }, []);
-  
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts, state.products]);
 
   const handleProductDelete = async (productId: number) => {
     try {
@@ -126,7 +132,6 @@ const ProductManagementPage: React.FC = () => {
         `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`
       );
       dispatch({ type: "DELETE_PRODUCT", payload: productId });
-      fetchProducts();
     } catch (error) {
       console.error("Error deleting product:", error);
     }
@@ -141,9 +146,19 @@ const ProductManagementPage: React.FC = () => {
   };
 
   const handleProductUpdate = useCallback(async (updatedProduct: Product) => {
-    dispatch({ type: "UPDATE_PRODUCT", payload: updatedProduct });
-    setEditingProduct(null);
+    try {
+      const response = await axios.put(
+        `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
+        updatedProduct
+      );
+      dispatch({ type: "UPDATE_PRODUCT", payload: response.data });
+    } catch (error) {
+      console.error("Error updating product:", error);
+    } finally {
+      setEditingProduct(null);
+    }
   }, []);
+
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts, state.products]);

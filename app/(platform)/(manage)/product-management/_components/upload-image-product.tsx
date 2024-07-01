@@ -6,8 +6,6 @@ import { UploadImageProductProps } from "@/interface";
 
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 
-
-
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -47,7 +45,6 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
         message.error("Failed to read file");
       }
     }
-
     setPreviewImage(file.url || (file.preview as string));
     setPreviewOpen(true);
   };
@@ -59,9 +56,7 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     if (newFileList.length === 0) {
       setFile(null);
       setFileChange("");
-    }
-
-    if (newFile && newFile.originFileObj) {
+    } else if (newFile && newFile.originFileObj) {
       try {
         const base64 = await getBase64(newFile.originFileObj);
         newFile.url = base64;
@@ -72,17 +67,14 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     }
   };
 
-  const uploadButton = useCallback(
-    () => (
-      <button className="items-center" type="button">
-        <div className="items-center ml-3">
-          <Plus />
-        </div>
-        <div>Upload</div>
-      </button>
-    ),
-    []
-  );
+  const uploadButton = useCallback(() => (
+    <button className="items-center" type="button">
+      <div className="items-center ml-3">
+        <Plus />
+      </div>
+      <div>Upload</div>
+    </button>
+  ), []);
 
   return (
     <>
