@@ -43,7 +43,7 @@ export const ProductInformationDetail = ({
   const cartDetail = cart?.find((item) => item.id === productDetailByTitle.id);
 
   const handleLimitDecreaseQuantity = (product: Product) => {
-    if (cartDetail?.quantity! > 1) {
+    if (cartDetail?.quantityOrder! > 1) {
       decreaseQuantity(product);
     }
   };
@@ -145,7 +145,7 @@ export const ProductInformationDetail = ({
                     handleLimitDecreaseQuantity(productDetailByTitle)
                   }
                 />
-                <span>{cartDetail?.quantity}</span>
+                <span>{cartDetail?.quantityOrder}</span>
                 <Plus
                   className="size-6"
                   onClick={() => increaseQuantity(productDetailByTitle)}
@@ -153,12 +153,12 @@ export const ProductInformationDetail = ({
               </div>
             </div>
 
-            {cartDetail?.quantity! > 1 && (
+            {cartDetail?.quantityOrder! > 1 && (
               <div className="item-center flex gap-x-4">
                 <span className="text-lg font-semibold text-slate-600">
                   Tạm tính:{" "}
                   {formatCurrency(
-                    cartDetail?.discountPrice! * cartDetail?.quantity!,
+                    cartDetail?.discountPrice! * cartDetail?.quantityOrder!,
                   )}
                 </span>
               </div>
@@ -172,7 +172,10 @@ export const ProductInformationDetail = ({
                 Add to cart
               </Button>
 
-              <Button className="bg-pink-400 text-lg font-semibold text-white duration-200 hover:scale-105 hover:bg-pink-700/80">
+              <Button
+                onClick={() => router.push("/checkout")}
+                className="bg-pink-400 text-lg font-semibold text-white duration-200 hover:scale-105 hover:bg-pink-700/80"
+              >
                 Buy now
               </Button>
             </div>

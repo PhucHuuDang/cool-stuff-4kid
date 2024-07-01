@@ -4,3 +4,8 @@ export type RegisterProps = {
   email: string;
   password: string;
 };
+
+export type LoginProps = {
+  token: string;
+  refreshToken: string;
+};

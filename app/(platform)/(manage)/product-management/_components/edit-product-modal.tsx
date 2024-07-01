@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { Product, EditProductModalProps } from '@/interface';
+import { ProductManagement, EditProductModalProps } from '@/interface';
 
 export const EditProductModal: React.FC<EditProductModalProps> = ({
   isOpen,
@@ -22,7 +22,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   product,
   onProductUpdate,
 }) => {
-  const [editedProduct, setEditedProduct] = useState<Product>(product);
+  const [editedProduct, setEditedProduct] = useState<ProductManagement>(product);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -54,7 +54,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      const response = await axios.put<Product>(
+      const response = await axios.put<ProductManagement>(
         `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
         editedProduct
       );

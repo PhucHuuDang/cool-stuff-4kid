@@ -6,10 +6,10 @@ import axios from "axios";
 import { AddProductModal } from "./_components/add-product";
 import { EditProductModal } from "./_components/edit-product-modal";
 import { ProductDetailsModal } from "./_components/product-details-modal";
-import { Product, ProductManagementAction } from "@/interface";
+import { ProductManagement, ProductManagementAction } from "@/interface";
 
 interface State {
-  products: Product[];
+  products: ProductManagement[];
   currentPage: number;
   dropdownVisible: number | null;
   isOpen: boolean;
@@ -64,7 +64,7 @@ const reducer = (state: State, action: ProductManagementAction): State => {
 const ProductManagementPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductManagement | null>(null);
   const [viewingProductId, setViewingProductId] = useState<number | null>(null);
   const itemsPerPage = 7;
 
@@ -98,7 +98,7 @@ const ProductManagementPage: React.FC = () => {
     dispatch({ type: "TOGGLE_MODAL" });
   };
 
-  const handleProductAdd = useCallback(async (product: Product) => {
+  const handleProductAdd = useCallback(async (product: ProductManagement) => {
     dispatch({ type: "SET_SUBMITTING", payload: true });
     try {
       const response = await axios.post(
@@ -137,7 +137,7 @@ const ProductManagementPage: React.FC = () => {
     }
   };
 
-  const handleEditClick = (product: Product) => {
+  const handleEditClick = (product: ProductManagement) => {
     setEditingProduct(product);
   };
 
@@ -145,7 +145,7 @@ const ProductManagementPage: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const handleProductUpdate = useCallback(async (updatedProduct: Product) => {
+  const handleProductUpdate = useCallback(async (updatedProduct: ProductManagement) => {
     try {
       const response = await axios.put(
         `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
@@ -268,11 +268,11 @@ const ProductManagementPage: React.FC = () => {
 };
 
 const ProductTable: React.FC<{
-  currentProducts: Product[];
+  currentProducts: ProductManagement[];
   dropdownVisible: number | null;
   toggleDropdown: (productId: number) => void;
   handleProductDelete: (productId: number) => void;
-  handleEditClick: (product: Product) => void;
+  handleEditClick: (product: ProductManagement) => void;
   handleViewDetails: (productId: number) => void;
 }> = ({
   currentProducts,

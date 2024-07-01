@@ -1,4 +1,4 @@
-export interface Product {
+export interface ProductManagement {
   id: number;
   title: string;
   originalPrice: number;
@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   image: string;
   discountPercent: number | null;
-  quantity?: number;
+  quantity: number;
   productId: number;
   productName: string;
   price: number;
