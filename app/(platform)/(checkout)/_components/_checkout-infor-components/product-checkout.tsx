@@ -43,9 +43,11 @@ export const ProductCheckout = ({ product }: ProductCheckoutProps) => {
       <TableCell className="font-bold">
         {formatCurrency(product.discountPrice)}
       </TableCell>
-      <TableCell className="font-bold">{product.quantity}</TableCell>
+      <TableCell className="font-bold">{product.quantityOrder}</TableCell>
       <TableCell className="font-bold text-[#ff6347]">
-        {formatCurrency(product.discountPrice * (product.quantity as number))}
+        {formatCurrency(
+          product.discountPrice * (product.quantityOrder as number),
+        )}
       </TableCell>
     </TableRow>
   );

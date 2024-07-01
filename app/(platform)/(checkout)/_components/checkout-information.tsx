@@ -59,7 +59,7 @@ export const CheckoutInformation = () => {
   if (cart) {
     total = cart.reduce(
       (acc, product) =>
-        acc + product.discountPrice * (product.quantity as number),
+        acc + product.discountPrice * (product.quantityOrder as number),
       0,
     );
   }

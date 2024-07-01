@@ -27,7 +27,7 @@ export const DrawerCheckoutCart = () => {
   if (cart) {
     total = cart.reduce(
       (acc, product) =>
-        acc + product.discountPrice * (product.quantity as number),
+        acc + product.discountPrice * (product.quantityOrder as number),
       0,
     );
   }
@@ -62,7 +62,7 @@ export const DrawerCheckoutCart = () => {
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-        <Drawer.Content className="fixed bottom-0 right-0 z-40 mt-24 flex h-full w-[400px] flex-col overflow-y-auto overflow-x-hidden rounded-t-[10px] bg-white 2xl:w-[600px]">
+        <Drawer.Content className="fixed bottom-0 right-0 z-40 mt-24 flex h-full w-[550px] flex-col overflow-y-auto overflow-x-hidden rounded-t-[10px] bg-white 2xl:w-[600px]">
           <div className="h-full flex-1 border-0 border-s-transparent bg-slate-300/10 p-4">
             <Drawer.Close asChild>
               <div className="absolute left-0 top-[40%] mt-4 h-[100px] w-2 rotate-180 transform cursor-pointer rounded-full bg-sky-600/40 duration-200 hover:bg-sky-700/50" />
