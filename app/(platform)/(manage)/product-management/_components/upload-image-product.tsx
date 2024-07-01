@@ -21,18 +21,8 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
   const [fileChange, setFileChange] = useState<string>("");
 
   useEffect(() => {
-    onFileChange(fileChange);
-  }, [fileChange, onFileChange]);
-
-  useEffect(() => {
     if (initialImage) {
-      const initialFile = {
-        uid: "-1",
-        name: "image.png",
-        status: "done",
-        url: initialImage,
-      } as UploadFile;
-      setFile(initialFile);
+      setFile(null);
       setFileChange(initialImage);
     }
   }, [initialImage]);
@@ -53,14 +43,14 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     const newFile = newFileList.length ? newFileList[0] : null;
     setFile(newFile);
 
-    if (newFileList.length === 0) {
-      setFile(null);
+    if (!newFile) {
       setFileChange("");
-    } else if (newFile && newFile.originFileObj) {
+    } else if (newFile.originFileObj) {
       try {
         const base64 = await getBase64(newFile.originFileObj);
         newFile.url = base64;
         setFileChange(base64);
+        onFileChange(base64);
       } catch (error) {
         message.error("Failed to convert file to base64");
       }
