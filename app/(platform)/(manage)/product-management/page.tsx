@@ -309,7 +309,7 @@ const ProductTable: React.FC<{
             />
           </td>
           <TableCell text={product.productName} />
-          <TableCell text={product.quantity.toString()} />
+          <TableCell text={product.quantity?.toString() ?? '0'} />
           <TableCell text={product.price.toString()} />
           <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
           <TableCell text={product.discountPercent !== null ? `${product.discountPercent}%` : 'N/A'} />

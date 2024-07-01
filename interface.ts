@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   image: string;
   discountPercent: number | null;
-  quantity: number;
+  quantity?: number;
   productId: number;
   productName: string;
   price: number;
