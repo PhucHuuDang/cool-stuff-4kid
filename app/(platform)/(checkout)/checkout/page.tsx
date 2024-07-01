@@ -5,10 +5,10 @@ import { HeaderCheckout } from "../_components/header-checkout";
 import { CheckoutInformation } from "../_components/checkout-information";
 
 const CheckoutPage = async () => {
+  // Todo: should move it to layout
   const checkAuth = await checkAuthenticate();
-
   if (!checkAuth) {
-    redirect("/");
+    return redirect("/");
   }
 
   return (
