@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ProductManagement } from '@/interface';
+import { Product } from '@/interface';
 import { ProductDetailsModalProps } from '@/interface';
 
 
 
 const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, isOpen, onClose }) => {
-  const [product, setProduct] = useState<ProductManagement | null>(null);
+  const [product, setProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     const fetchProductDetails = async (id: number) => {
       try {
-        const response = await axios.get<ProductManagement>(`https://milkapplicationapi.azurewebsites.net/api/Product/GetProductsById/${id}`);
+        const response = await axios.get<Product>(`https://milkapplicationapi.azurewebsites.net/api/Product/GetProductsById/${id}`);
         setProduct(response.data);
       } catch (error) {
         console.error("Error fetching product details:", error);

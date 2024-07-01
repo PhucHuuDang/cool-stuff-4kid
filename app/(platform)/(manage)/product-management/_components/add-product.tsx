@@ -3,7 +3,7 @@ import { Modal, Form, Input, Row, Col, InputNumber, message } from 'antd';
 import { User, DollarSign, List, SquarePlus } from 'lucide-react';
 import axios from 'axios';
 import { UploadImageProduct } from './upload-image-product';
-import { State, AddModalProps, ProductManagement, ProductManagementAction } from '@/interface';
+import { State, AddModalProps, Product, ProductManagementAction } from '@/interface';
 
 const initialState: State = {
   isConfirmLoading: false,
@@ -51,7 +51,7 @@ const AddProductModal: React.FC<AddModalProps> = ({ setIsOpen, isOpen, onProduct
       const values = await form.validateFields();
       dispatch({ type: 'SET_CONFIRM_LOADING', payload: true });
 
-      const response = await axios.post<ProductManagement>('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
+      const response = await axios.post<Product>('https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts', {
         ...values,
         categoryId: 1,
         originId: 1,
