@@ -35,8 +35,8 @@ export const useCartStore = create(
         if (cartItem) {
           const updatedCart = cart.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: item.quantity! + 1 }
-              : item
+              ? { ...item, quantityOrder: item.quantityOrder! + 1 }
+              : item,
           );
 
           set((state) => ({
@@ -45,7 +45,7 @@ export const useCartStore = create(
             totalPrice: state.totalPrice + product.discountPrice,
           }));
         } else {
-          const updateCart = [...cart, { ...product, quantity: 1 }];
+          const updateCart = [...cart, { ...product, quantityOrder: 1 }];
 
           set((state) => ({
             cart: updateCart,
@@ -71,8 +71,8 @@ export const useCartStore = create(
         if (cartItem) {
           const updateCart = cart.map((item) =>
             item.id === product.id
-              ? { ...item, ...product, quantity: item.quantity! - 1 }
-              : item
+              ? { ...item, ...product, quantityOrder: item.quantityOrder! - 1 }
+              : item,
           );
 
           set((state) => ({
@@ -101,6 +101,6 @@ export const useCartStore = create(
 
         return persistedState as State & Actions;
       },
-    }
-  )
+    },
+  ),
 );

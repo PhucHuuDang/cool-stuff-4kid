@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   image: string;
   discountPercent: number;
-  quantity?: number;
+  quantityOrder?: number;
 }
 
 export type UserInformation = {

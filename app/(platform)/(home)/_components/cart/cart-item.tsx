@@ -19,7 +19,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
   const handleDecreaseQuantity = (product: Product) => {
-    if (product.quantity! > 1) {
+    if (product.quantityOrder! > 1) {
       decreaseQuantity(product);
     }
   };
@@ -59,7 +59,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
       <div className="mx-2 flex items-center gap-x-1 rounded-md p-1">
         <span className="text-slate-600">Price: </span>
         <span className="font-bold text-sky-400">
-          {formatCurrency(product.discountPrice * product.quantity!)}
+          {formatCurrency(product.discountPrice * product.quantityOrder!)}
         </span>
       </div>
 
@@ -71,7 +71,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
           </label>
           <Minus
             // onClick={() => {
-            //   if (product.quantity! > 1) {
+            //   if (product.quantityOrder! > 1) {
             //     decreaseQuantity(product);
             //   }
             // }}
@@ -82,7 +82,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
           <input
             type="number"
             min="1"
-            value={product.quantity}
+            value={product.quantityOrder}
             id="Line1Qty"
             className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-base text-sky-400 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
           />
