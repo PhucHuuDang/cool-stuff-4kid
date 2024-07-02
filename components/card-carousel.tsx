@@ -15,14 +15,14 @@ import { cn } from "@/lib/utils";
 
 interface CardCarouselProps {
   titleCard: string;
-  carouselItems: CarouselItem[];
+  carouselItems: CarouselItemProps[];
   delay?: number;
   stopOnInteraction?: boolean;
   loop?: boolean;
-  classNameCarouselItem?: string
+  classNameCarouselItem?: string;
 }
 
-interface CarouselItem {
+interface CarouselItemProps {
   url: string;
   rating: number;
   title: string;
@@ -35,7 +35,7 @@ export const CardCarousel = ({
   delay = 3000,
   stopOnInteraction = false,
   loop = true,
-  classNameCarouselItem
+  classNameCarouselItem,
 }: CardCarouselProps) => {
   return (
     <Card>
@@ -59,7 +59,10 @@ export const CardCarousel = ({
             {carouselItems.map((product) => (
               <CarouselItem
                 key={product.title}
-                className={cn("md:basis-1/3 lg:basis-1/5", classNameCarouselItem)}
+                className={cn(
+                  "md:basis-1/3 lg:basis-1/5",
+                  classNameCarouselItem,
+                )}
               >
                 <div className="flex cursor-pointer flex-col justify-center gap-y-2 p-2 transition hover:scale-105">
                   <Image
