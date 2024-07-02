@@ -6,62 +6,68 @@ import { Activity, LayoutDashboard, ListOrdered, PackageSearch, Settings, Users 
 
 const SideBar: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
-  console.log('currentPage',currentPage)
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);
   };
 
+  const getLinkClassName = (page: string) => {
+    return `flex p-4 items-center transition-colors duration-200
+      ${currentPage === page 
+        ? "bg-pink-600 text-white rounded-l-lg" 
+        : "text-slate-700 hover:bg-red-200"}`;
+  };
+
   return (
-    <aside className="w-64 h-screen bg-[#F5F7FD]">
-      <nav>
+    <aside className="w-64 h-screen bg-slate-500/10">
+      <nav className="space-y-1">
         <Link
           href={routes.dashboard}
-           className={`flex p-4 text-slate-700 items-center ${currentPage === "dashboard" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("dashboard")}
           onClick={() => handlePageChange("dashboard")}
         >
-          <LayoutDashboard />
-          <span className="ml-2">Dashboard</span>
+          <LayoutDashboard className="mr-2" />
+          <span>Dashboard</span>
         </Link>
         <Link
           href={routes.staffManagement}
-          className={`flex p-4 text-slate-700 ${currentPage === "staffManagement" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("staffManagement")}
           onClick={() => handlePageChange("staffManagement")}
         >
-           <Users />
-           <span className="ml-2">Staff</span>
+           <Users className="mr-2" />
+           <span>Staff</span>
         </Link>
         <Link
           href={routes.orders}
-          className={`flex p-4 text-slate-700 ${currentPage === "orders" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("orders")}
           onClick={() => handlePageChange("orders")}
         >
-          <ListOrdered />
-          <span className="ml-2">Orders</span>
+          <ListOrdered className="mr-2" />
+          <span>Orders</span>
         </Link>
         <Link
           href={routes.revenue}
-          className={`flex p-4 text-slate-700 ${currentPage === "revenue" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("revenue")}
           onClick={() => handlePageChange("revenue")}
         >
-          <Activity />
-          <span className="ml-2">Revenue</span>
+          <Activity className="mr-2" />
+          <span>Revenue</span>
         </Link>
         <Link
           href={routes.productManagement}
-          className={`flex p-4 text-slate-700 ${currentPage === "productManagement" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("productManagement")}
           onClick={() => handlePageChange("productManagement")}
         >
-           <PackageSearch />
-           <span className="ml-2">Products</span>
+           <PackageSearch className="mr-2" />
+           <span>Products</span>
         </Link>
         <Link
           href={routes.adminAccount}
-          className={`flex p-4 text-slate-700 ${currentPage === "adminAccount" ? "bg-pink-600 rounded-l-lg text-white" : "bg-[#F5F7FD] hover:bg-red-200"}`}
+          className={getLinkClassName("adminAccount")}
           onClick={() => handlePageChange("adminAccount")}
         >
-           <Settings />
-           <span className="ml-2">Account</span>
+           <Settings className="mr-2" />
+           <span>Account</span>
         </Link>
       </nav>
     </aside>

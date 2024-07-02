@@ -1,4 +1,4 @@
-export interface Product {
+export interface ProductProps {
   id: number;
   title: string;
   originalPrice: number;
@@ -17,14 +17,16 @@ export interface Product {
   locationId: number;
 }
 
-export type UserInformation = {
-  name: string;
-  mail: string;
-  role: string;
-  status: string;
-  date: string;
-  price: string;
-};
+export interface Product {
+  id: number;
+  title: string;
+  originalPrice: number;
+  discountPrice: number;
+  description: string;
+  image: string;
+  discountPercent: number;
+  quantity?: number;
+}
 
 export interface Order {
   orderId: number;
@@ -48,8 +50,8 @@ export interface State {
 export interface EditProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  product: Product;
-  onProductUpdate: (updatedProduct: Product) => void;
+  product: ProductProps;
+  onProductUpdate: (updatedProduct: ProductProps) => void;
 }
 
 export interface AddModalProps {
@@ -70,7 +72,7 @@ export interface UploadImageProductProps {
 }
 
 export interface ProductManagementState {
-  products: Product[];
+  products: ProductProps[];
   currentPage: number;
   dropdownVisible: number | null;
   isOpen: boolean;
@@ -78,9 +80,9 @@ export interface ProductManagementState {
 }
 
 export type ProductManagementAction =
-  | { type: "SET_PRODUCTS"; payload: Product[] }
-  | { type: "ADD_PRODUCT"; payload: Product }
-  | { type: "UPDATE_PRODUCT"; payload: Product }
+  | { type: "SET_PRODUCTS"; payload: ProductProps[] }
+  | { type: "ADD_PRODUCT"; payload: ProductProps }
+  | { type: "UPDATE_PRODUCT"; payload: ProductProps }
   | { type: "DELETE_PRODUCT"; payload: number }
   | { type: "SET_CURRENT_PAGE"; payload: number }
   | { type: "TOGGLE_DROPDOWN"; payload: number }
@@ -98,11 +100,11 @@ export type OrderManagementAction =
   | { type: "CLOSE_DELETE_MODAL" };
 
 export interface ProductTableProps {
-  currentProducts: Product[];
+  currentProducts: ProductProps[];
   dropdownVisible: number | null;
   toggleDropdown: (productId: number) => void;
   handleProductDelete: (productId: number) => void;
-  handleEditClick: (product: Product) => void;
+  handleEditClick: (product: ProductProps) => void;
   handleViewDetails: (productId: number) => void;
 }
 

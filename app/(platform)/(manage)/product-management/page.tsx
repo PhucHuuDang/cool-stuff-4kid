@@ -3,13 +3,14 @@
 import React, { useReducer, useEffect, useCallback, useState } from "react";
 import { Search } from "lucide-react";
 import axios from "axios";
-import { AddProductModal } from "./_components/add-product";
+import { AddProductModal } from "./_components/add-product-modal";
 import { EditProductModal } from "./_components/edit-product-modal";
 import { ProductDetailsModal } from "./_components/product-details-modal";
-import { Product, ProductManagementAction } from "@/interface";
+import { DeleteProductModal } from "./_components/delete-product-modal";
+import { ProductProps, ProductManagementAction } from "@/interface";
 
 interface State {
-  products: Product[];
+  products: ProductProps[];
   currentPage: number;
   dropdownVisible: number | null;
   isOpen: boolean;
@@ -30,13 +31,13 @@ const reducer = (state: State, action: ProductManagementAction): State => {
       return { ...state, products: action.payload };
     case "ADD_PRODUCT":
       return { ...state, products: [action.payload, ...state.products] };
-      case "UPDATE_PRODUCT":
-        return {
-          ...state,
-          products: state.products.map((product) =>
-            product.productId === action.payload.productId ? { ...action.payload } : product
-          ),
-        };
+    case "UPDATE_PRODUCT":
+      return {
+        ...state,
+        products: state.products.map((product) =>
+          product.productId === action.payload.productId ? { ...action.payload } : product
+        ),
+      };
     case "DELETE_PRODUCT":
       return {
         ...state,
@@ -64,8 +65,9 @@ const reducer = (state: State, action: ProductManagementAction): State => {
 const ProductManagementPage: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingProduct, setEditingProduct] = useState<ProductProps | null>(null);
   const [viewingProductId, setViewingProductId] = useState<number | null>(null);
+  const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
   const itemsPerPage = 7;
 
   const fetchProducts = useCallback(async () => {
@@ -98,7 +100,7 @@ const ProductManagementPage: React.FC = () => {
     dispatch({ type: "TOGGLE_MODAL" });
   };
 
-  const handleProductAdd = useCallback(async (product: Product) => {
+  const handleProductAdd = useCallback(async (product: ProductProps) => {
     dispatch({ type: "SET_SUBMITTING", payload: true });
     try {
       const response = await axios.post(
@@ -126,18 +128,11 @@ const ProductManagementPage: React.FC = () => {
     }
   }, []);
 
-  const handleProductDelete = async (productId: number) => {
-    try {
-      await axios.delete(
-        `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`
-      );
-      dispatch({ type: "DELETE_PRODUCT", payload: productId });
-    } catch (error) {
-      console.error("Error deleting product:", error);
-    }
-  };
+  const handleProductDelete = useCallback((productId: number) => {
+    setDeletingProductId(productId);
+  }, []);
 
-  const handleEditClick = (product: Product) => {
+  const handleEditClick = (product: ProductProps) => {
     setEditingProduct(product);
   };
 
@@ -145,7 +140,7 @@ const ProductManagementPage: React.FC = () => {
     setEditingProduct(null);
   };
 
-  const handleProductUpdate = useCallback(async (updatedProduct: Product) => {
+  const handleProductUpdate = useCallback(async (updatedProduct: ProductProps) => {
     try {
       const response = await axios.put(
         `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
@@ -169,6 +164,10 @@ const ProductManagementPage: React.FC = () => {
 
   const handleCloseDetails = () => {
     setViewingProductId(null);
+  };
+
+  const handleCloseDelete = () => {
+    setDeletingProductId(null);
   };
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
@@ -263,16 +262,27 @@ const ProductManagementPage: React.FC = () => {
         onClose={handleCloseDetails}
         productId={viewingProductId}
       />
+      {deletingProductId !== null && (
+        <DeleteProductModal
+          isOpen={deletingProductId !== null}
+          onClose={handleCloseDelete}
+          productId={deletingProductId}
+          onProductDelete={(productId) => {
+            dispatch({ type: "DELETE_PRODUCT", payload: productId });
+            handleCloseDelete();
+          }}
+        />
+      )}
     </div>
   );
 };
 
 const ProductTable: React.FC<{
-  currentProducts: Product[];
+  currentProducts: ProductProps[];
   dropdownVisible: number | null;
   toggleDropdown: (productId: number) => void;
   handleProductDelete: (productId: number) => void;
-  handleEditClick: (product: Product) => void;
+  handleEditClick: (product: ProductProps) => void;
   handleViewDetails: (productId: number) => void;
 }> = ({
   currentProducts,
@@ -289,7 +299,7 @@ const ProductTable: React.FC<{
         <TableHeader text="Product Image" />
         <TableHeader text="Product Name" />
         <TableHeader text="Quantity" />
-        <TableHeader text="Normal Price" />
+        <TableHeader text="Origin Price" />
         <TableHeader text="Discount Price" />
         <TableHeader text="Discount Percent" />
         <TableHeader text="Status" />

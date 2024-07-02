@@ -3,7 +3,7 @@ import { Upload, Image, message } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import { Plus } from "lucide-react";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage } from "@/Config/firebase"; // Đảm bảo đường dẫn này chính xác
+import { storage } from "@/Config/firebase";
 
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 

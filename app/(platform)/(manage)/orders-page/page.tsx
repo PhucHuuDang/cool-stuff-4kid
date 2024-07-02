@@ -99,7 +99,7 @@ const OrdersPage: React.FC = () => {
       <div className="flex rounded-lg mx-6 mr-2">
         <input
           type="text"
-          placeholder="Search Customer ID"
+          placeholder="Search Customer Order ID"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           className="mr-4 flex-grow rounded-lg border p-2"
