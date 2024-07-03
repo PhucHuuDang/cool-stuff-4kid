@@ -39,6 +39,7 @@ import { useState } from "react";
 import { AddressReceiveOrder } from "./_checkout-infor-components/address-receive-order";
 import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
 import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
+import { vouchers } from "@/db";
 
 const tabsProps = [
   {
@@ -102,7 +103,45 @@ export const CheckoutInformation = () => {
                 <TableCell colSpan={3}>Voucher của shop</TableCell>
                 <TableCell className="text-right">
                   {/* Todo: dialog to choose voucher in onClick button */}
-                  <Button variant="book">Chọn Voucher</Button>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="book">Chọn Voucher</Button>
+                    </DialogTrigger>
+                    <DialogContent className="h-[70%] overflow-y-auto">
+                      {/* <div className="flex gap-x-3"> */}
+                      <div>
+                        {vouchers.map((voucher) => {
+                          return (
+                            <div
+                              key={voucher.product}
+                              className="relative my-2 w-full cursor-pointer p-8 shadow-xl"
+                            >
+                              <h2 className="text-lg font-bold text-[#ff6347]">
+                                Giảm {formatCurrency(voucher.price)}
+                              </h2>
+
+                              <h4 className="text-base font-semibold">
+                                {voucher.condition}
+                              </h4>
+                              <p className="text-base font-medium">
+                                {voucher.product}
+                              </p>
+                              <p className="font-sm font-normal">
+                                {voucher.additionalInfo}
+                              </p>
+                              <Button
+                                variant="book"
+                                className="absolute right-3 top-1/2 flex justify-end"
+                              >
+                                Lưu
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      {/* </div> */}
+                    </DialogContent>
+                  </Dialog>
                 </TableCell>
               </TableRow>
             </TableFooter>
@@ -137,8 +176,8 @@ export const CheckoutInformation = () => {
                       <DialogContent>
                         <div className="flex flex-col gap-4">
                           <div>Nhanh</div>
-                          <div>Tiet kiem</div>
-                          <div>Hoa toc</div>
+                          <div>Tiét Kiệm</div>
+                          <div>Hoả Tốc</div>
                         </div>
                       </DialogContent>
                     </Dialog>

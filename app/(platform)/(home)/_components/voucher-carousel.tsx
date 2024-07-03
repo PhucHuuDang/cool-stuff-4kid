@@ -69,7 +69,7 @@ export const VoucherCarousel = ({
                 <CarouselItem
                   key={voucher.product}
                   className={cn(
-                    "md:basis-1/2 lg:basis-1/3",
+                    "md:basis-1/2 lg:basis-1/3 2xl:basis-1/4",
                     classNameCarouselItem,
                   )}
                 >
