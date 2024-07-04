@@ -11,26 +11,45 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, ShoppingCart } from "lucide-react";
 import { useState } from "react";
 import { useLoginModal } from "@/hooks/use-login-modal";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
+import { checkAuthenticate } from "@/app/auth/check-authenticate";
+import { useRouter } from "next/navigation";
 
 export const DrawerCheckoutCart = () => {
   const drawerCart = useDrawerCart();
   const openLoginModal = useLoginModal((state) => state.onOpen);
 
   const cart = useFromStore(useCartStore, (state) => state.cart);
+  const router = useRouter();
 
   let total = 0;
 
   if (cart) {
     total = cart.reduce(
       (acc, product) =>
-        acc + product.discountPrice * (product.quantity as number),
+        acc + product.discountPrice * (product.quantityOrder as number),
       0,
     );
   }
 
+  // console.log({ cart });
+
   const cartCondition = cart?.length! >= 1;
 
   const onOpenChange = (e: boolean) => !e && drawerCart.onClose();
+
+  const handleCheckout = async () => {
+    const isLogin = await checkAuthenticate();
+
+    if (isLogin) {
+      console.log("payment");
+      drawerCart.onClose();
+      router.push("/checkout");
+      return;
+    }
+
+    openLoginModal();
+  };
 
   //? when we use space-y-4 the children will be affected
 
@@ -43,7 +62,7 @@ export const DrawerCheckoutCart = () => {
     >
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40" />
-        <Drawer.Content className="fixed bottom-0 right-0 z-40 mt-24 flex h-full w-[400px] flex-col overflow-y-auto overflow-x-hidden rounded-t-[10px] bg-white 2xl:w-[600px]">
+        <Drawer.Content className="fixed bottom-0 right-0 z-40 mt-24 flex h-full w-[550px] flex-col overflow-y-auto overflow-x-hidden rounded-t-[10px] bg-white 2xl:w-[600px]">
           <div className="h-full flex-1 border-0 border-s-transparent bg-slate-300/10 p-4">
             <Drawer.Close asChild>
               <div className="absolute left-0 top-[40%] mt-4 h-[100px] w-2 rotate-180 transform cursor-pointer rounded-full bg-sky-600/40 duration-200 hover:bg-sky-700/50" />
@@ -84,7 +103,9 @@ export const DrawerCheckoutCart = () => {
               <div className="my-5">
                 <div className="item-center flex gap-1">
                   <p className="text-lg text-zinc-600">Total:</p>
-                  <p className="text-lg text-sky-500">{total.toFixed(2)}đ</p>
+                  <p className="text-lg text-sky-500">
+                    {formatCurrency(total)}
+                  </p>
                 </div>
               </div>
             )}
@@ -93,10 +114,7 @@ export const DrawerCheckoutCart = () => {
           {cartCondition && (
             <div className="my-6 flex flex-col items-center gap-y-5">
               <Button
-                onClick={() => {
-                  console.log("payment");
-                  openLoginModal();
-                }}
+                onClick={handleCheckout}
                 variant="book"
                 className="w-full gap-x-1 text-base transition duration-300 hover:scale-105 hover:text-lg"
               >

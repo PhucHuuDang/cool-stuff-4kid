@@ -8,15 +8,21 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
+import { useCartStore } from "@/hooks/use-cart-store";
+import { Product } from "@/interface";
+import useFromStore from "@/store/use-from-store";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ProductInformationDetailProps {
-  carouselItems: CarouselItem[];
+  carouselItems: CarouselItemProps[];
+  productDetailByTitle: Product;
 }
 
-interface CarouselItem {
+interface CarouselItemProps {
   url: string;
   rating: number;
   title: string;
@@ -25,8 +31,22 @@ interface CarouselItem {
 
 export const ProductInformationDetail = ({
   carouselItems,
+  productDetailByTitle,
 }: ProductInformationDetailProps) => {
   const [api, setApi] = useState<CarouselApi>();
+  const increaseQuantity = useCartStore((state) => state.addToCart);
+  const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
+  const cart = useFromStore(useCartStore, (state) => state.cart);
+
+  const router = useRouter();
+
+  const cartDetail = cart?.find((item) => item.id === productDetailByTitle.id);
+
+  const handleLimitDecreaseQuantity = (product: Product) => {
+    if (cartDetail?.quantityOrder! > 1) {
+      decreaseQuantity(product);
+    }
+  };
 
   const [imageProduct, setImageProduct] = useState<string>(
     carouselItems[0].url,
@@ -100,31 +120,62 @@ export const ProductInformationDetail = ({
 
             <Card className="p-4">
               <div className="flex items-center gap-x-4">
-                <h1 className="text-2xl font-bold text-sky-400">899.000₫</h1>
-                <span className="text-lg text-rose-400">-10%</span>
+                <h1 className="text-2xl font-bold text-sky-400">
+                  {formatCurrency(productDetailByTitle.discountPrice)}
+                </h1>
+                <span className="text-lg text-rose-400">
+                  -{productDetailByTitle.discountPercent}%
+                </span>
               </div>
             </Card>
 
-            <del className="text-xl font-bold text-[#ed9080]">1.200.000d</del>
+            <del className="text-xl font-bold text-[#ed9080]">
+              {formatCurrency(productDetailByTitle.originalPrice)}
+            </del>
 
             <div className="flex items-center gap-x-10">
               <span className="text-lg font-semibold text-slate-600">
-                So luong
+                Số lượng
               </span>
 
               <div className="flex items-center gap-x-4 *:cursor-pointer">
-                <Minus className="size-6" />
-                <span>1</span>
-                <Plus className="size-6" />
+                <Minus
+                  className="size-6"
+                  onClick={() =>
+                    handleLimitDecreaseQuantity(productDetailByTitle)
+                  }
+                />
+                <span>{cartDetail?.quantityOrder}</span>
+                <Plus
+                  className="size-6"
+                  onClick={() => increaseQuantity(productDetailByTitle)}
+                />
               </div>
             </div>
 
+            {cartDetail?.quantityOrder! > 1 && (
+              <div className="item-center flex gap-x-4">
+                <span className="text-lg font-semibold text-slate-600">
+                  Tạm tính:{" "}
+                  {formatCurrency(
+                    cartDetail?.discountPrice! * cartDetail?.quantityOrder!,
+                  )}
+                </span>
+              </div>
+            )}
+
             <div className="flex items-center gap-x-4 *:h-12 *:w-full *:transition">
-              <Button className="bg-sky-400 text-lg font-semibold duration-200 hover:scale-105 hover:bg-sky-600">
-                Add to card
+              <Button
+                className="bg-sky-400 text-lg font-semibold duration-200 hover:scale-105 hover:bg-sky-600"
+                onClick={() => increaseQuantity(productDetailByTitle)}
+              >
+                Add to cart
               </Button>
 
-              <Button className="bg-pink-400 text-lg font-semibold text-white duration-200 hover:scale-105 hover:bg-pink-700/80">
+              <Button
+                onClick={() => router.push("/checkout")}
+                className="bg-pink-400 text-lg font-semibold text-white duration-200 hover:scale-105 hover:bg-pink-700/80"
+              >
                 Buy now
               </Button>
             </div>

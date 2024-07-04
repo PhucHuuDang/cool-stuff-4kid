@@ -17,7 +17,7 @@ export const EvaluateProduct = () => {
           </Avatar>
 
           <div className="flex flex-col gap-x-2">
-            <h2 className="text-lg font-bold">Harry Dang</h2>
+            <h2 className="text-lg font-bold">Harry Dang.</h2>
             <div className="flex items-center gap-x-1">
               <div>5 sao</div>
               <div className="text-slate-400">15/09/2024</div>

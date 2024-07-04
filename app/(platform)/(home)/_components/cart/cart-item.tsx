@@ -7,6 +7,7 @@ import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/hooks/use-cart-store";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 
 interface CartItemProps {
   product: Product;
@@ -18,13 +19,15 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
   const handleDecreaseQuantity = (product: Product) => {
-    if (product.quantity! > 1) {
+    if (product.quantityOrder! > 1) {
       decreaseQuantity(product);
     }
   };
 
+  const MAX_LENGTH = 7;
+
   return (
-    <li className="flex items-center gap-4">
+    <li className="flex cursor-pointer items-center gap-4 duration-200 hover:scale-105">
       <Image
         src={product.image}
         alt="tiny"
@@ -34,7 +37,11 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
       />
 
       <div>
-        <h3 className="text-sm text-gray-900">{product.title}</h3>
+        <h3 className="text-sm text-gray-900">
+          {product.title.length > MAX_LENGTH
+            ? product.title.slice(0, MAX_LENGTH)
+            : product.title}
+        </h3>
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
           <div>
@@ -49,6 +56,13 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
         </dl>
       </div>
 
+      <div className="mx-2 flex items-center gap-x-1 rounded-md p-1">
+        <span className="text-slate-600">Price: </span>
+        <span className="font-bold text-sky-400">
+          {formatCurrency(product.discountPrice * product.quantityOrder!)}
+        </span>
+      </div>
+
       <div className="flex flex-1 items-center justify-end gap-2">
         <form className="flex items-center 2xl:gap-2">
           <label htmlFor="Line1Qty" className="sr-only">
@@ -57,29 +71,29 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
           </label>
           <Minus
             // onClick={() => {
-            //   if (product.quantity! > 1) {
+            //   if (product.quantityOrder! > 1) {
             //     decreaseQuantity(product);
             //   }
             // }}
             onClick={() => handleDecreaseQuantity(product)}
-            className="size-5 2xl:size-6 cursor-pointer"
+            className="size-5 cursor-pointer 2xl:size-6"
           />
 
           <input
             type="number"
             min="1"
-            value={product.quantity}
+            value={product.quantityOrder}
             id="Line1Qty"
             className="h-8 w-12 rounded border-gray-200 bg-gray-50 p-0 text-center text-base text-sky-400 [-moz-appearance:_textfield] focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none"
           />
 
           <Plus
             onClick={() => increaseQuantity(product)}
-            className="size-5 2xl:size-6 cursor-pointer"
+            className="size-5 cursor-pointer 2xl:size-6"
           />
         </form>
 
-        <div className="text-slate-400 text-xl 2xl:mx-2">|</div>
+        <div className="text-xl text-slate-400 2xl:mx-2">|</div>
 
         <Button
           variant="destructive"
