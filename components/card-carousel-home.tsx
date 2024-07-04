@@ -93,7 +93,7 @@ export const CardCarouselHome = ({
                     src={product.url}
                     alt={`image-${product.url}`}
                     height={0}
-                    className="h-full w-full rounded-lg hover:scale-105"
+                    className="h-full w-full rounded-lg"
                     width={1000}
                   />
 
