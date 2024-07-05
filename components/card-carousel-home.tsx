@@ -93,7 +93,7 @@ export const CardCarouselHome = ({
                     src={product.url}
                     alt={`image-${product.url}`}
                     height={0}
-                    className="h-full w-full rounded-lg hover:scale-105"
+                    className="h-full w-full rounded-lg"
                     width={1000}
                   />
 
@@ -118,8 +118,8 @@ export const CardCarouselHome = ({
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="transition hover:-translate-x-1 hover:scale-110" />
-          <CarouselNext className="transition hover:translate-x-1 hover:scale-110" />
+          {/* <CarouselPrevious className="transition hover:-translate-x-1 hover:scale-110" /> */}
+          {/* <CarouselNext className="transition hover:translate-x-1 hover:scale-110" /> */}
         </Carousel>
       </CardContent>
 
