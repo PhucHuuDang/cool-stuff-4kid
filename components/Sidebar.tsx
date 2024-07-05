@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { routes } from "../routes/routes";
-import { Activity, LayoutDashboard, ListOrdered, PackageSearch, Settings, Users } from "lucide-react";
+import { Activity, LayoutDashboard, ListOrdered, PackageSearch, Settings, TicketPercent, Users } from "lucide-react";
 
 const SideBar: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
@@ -60,6 +60,14 @@ const SideBar: React.FC = () => {
         >
            <PackageSearch className="mr-2" />
            <span>Products</span>
+        </Link>
+        <Link
+          href={routes.vouchers}
+          className={getLinkClassName("vouchers")}
+          onClick={() => handlePageChange("vouchers")}
+        >
+          <TicketPercent className="mr-2" />
+          <span>Voucher</span>
         </Link>
         <Link
           href={routes.adminAccount}

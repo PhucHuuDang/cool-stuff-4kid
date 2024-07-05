@@ -1,186 +1,106 @@
 "use client";
 
-import React, { useState } from "react";
-import { Header } from "@/components/Header";
-import { SideBar } from "@/components/Sidebar";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Mail, MessageCircle, Phone } from "lucide-react";
+import { Mail, MessageCircle, Phone, Search } from "lucide-react";
+import AddStaffModal from "./_components/add-staff-modal";
+import { Toaster } from 'react-hot-toast';
+
+interface ApiUser {
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+}
+
+interface StaffMember {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  role?: string;
+  staffId?: string;
+  joinDate?: string;
+  gender?: string;
+}
 
 const StaffManagementPage: React.FC = () => {
-  const staffMembers = [
-    {
-      id: 1,
-      name: "Fox 1",
-      role: "Sales-Staff",
-      staffId: "SS-HCM-GV-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 2,
-      name: "Fox 2",
-      role: "Sales-Staff",
-      staffId: "SS-HCM-D1-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 3,
-      name: "Fox 3",
-      role: "Sales-Staff",
-      staffId: "SS-HCM-D12-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 4,
-      name: "Fox 4",
-      role: "Sales-Staff",
-      staffId: "SS-HCM-GV-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 5,
-      name: "Fox 5",
-      role: "Sales-Staff",
-      staffId: "SS-HCM-D7-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 6,
-      name: "Fox 6",
-      role: "Event-Staff",
-      staffId: "ES-HCM-GV-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 7,
-      name: "Fox 7",
-      role: "Event-Staff",
-      staffId: "ES-HCM-D1-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 8,
-      name: "Fox 8",
-      role: "Event-Staff",
-      staffId: "ES-HCM-D12-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 9,
-      name: "Fox 9",
-      role: "Event-Staff",
-      staffId: "ES-HCM-D7-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 10,
-      name: "Fox 10",
-      role: "Event-Staff",
-      staffId: "ES-HCM-GV-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 11,
-      name: "Fox 11",
-      role: "Event-Staff",
-      staffId: "ES-HCM-D1-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 12,
-      name: "Fox 12",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-GV-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 13,
-      name: "Fox 13",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-D1-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 14,
-      name: "Fox 14",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-D12-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 15,
-      name: "Fox 15",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-D7-0001",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 16,
-      name: "Fox 16",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-GV-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 17,
-      name: "Fox 17",
-      role: "Storage-Staff",
-      staffId: "StS-HCMM-D1-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-    {
-      id: 18,
-      name: "Fox 18",
-      role: "Event-Staff",
-      staffId: "ES-HCM-D7-0002",
-      joinDate: "2/4/2023",
-      gender: "Male",
-    },
-  ];
-
-  // Pagination state
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 9;
 
-  // Pagination logic
+  useEffect(() => {
+    const fetchStaffMembers = async () => {
+      try {
+        const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Users/GetAllStaff');
+        const data = await response.json();
+
+        if (data.isSucceed) {
+          const staffMembers = data.data.map((user: ApiUser, index: number) => ({
+            id: user.userName,
+            fullName: user.fullName,
+            userName: user.userName,
+            email: user.email,
+            role: "Staff",
+            staffId: `NS-${String(index + 1).padStart(4, '0')}`,
+            joinDate: new Date().toLocaleDateString(),
+            gender: "Unknown"
+          }));
+
+          setStaffMembers(staffMembers);
+        }
+      } catch (error) {
+        console.error('Error fetching staff members:', error);
+      }
+    };
+
+    fetchStaffMembers();
+  }, []);
+
+
   const indexOfLastStaff = currentPage * itemsPerPage;
   const indexOfFirstStaff = indexOfLastStaff - itemsPerPage;
-  const currentStaff = staffMembers.slice(indexOfFirstStaff, indexOfLastStaff);
-  const totalPages = Math.ceil(staffMembers.length / itemsPerPage);
+
+  const filteredStaff = staffMembers.filter(staff =>
+    staff.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const currentStaff = filteredStaff.slice(indexOfFirstStaff, indexOfLastStaff);
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   const totalStaff = staffMembers.length;
   const newStaff = staffMembers.filter(
-    (member) => new Date(member.joinDate) > new Date("1/1/2023"),
+    (member) => member.joinDate && new Date(member.joinDate) > new Date("1/1/2023")
   ).length;
   const maleStaff = staffMembers.filter(
-    (member) => member.gender === "Male",
+    (member) => member.gender === "Male"
   ).length;
   const femaleStaff = staffMembers.filter(
-    (member) => member.gender === "Female",
+    (member) => member.gender === "Female"
   ).length;
 
   const handleClick = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const addNewStaff = (newStaff: StaffMember) => {
+    const staffMemberToAdd: StaffMember = {
+      ...newStaff,
+      role: "New Staff",
+      joinDate: new Date().toLocaleDateString(),
+      gender: "Unknown"
+    };
+    setStaffMembers([...staffMembers, staffMemberToAdd]);
+  };
+
   return (
     <div className="flex min-h-screen flex-col bg-gray-100">
+      <Toaster position="top-right" />
       <div className="flex flex-grow">
         <main className="flex-grow overflow-y-auto p-6">
           <div className="mb-6 grid grid-cols-4 gap-4">
@@ -203,21 +123,24 @@ const StaffManagementPage: React.FC = () => {
           </div>
 
           <div className="mb-6 flex rounded-lg">
+          <div className="relative mr-4 flex flex-grow items-center">
+          <Search className="absolute left-3 text-gray-400" />
             <input
               type="text"
               placeholder="Search Name Of Staff"
-              className="mr-4 flex-grow rounded-lg border p-2"
+              className="w-full rounded border p-2 pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
+            </div>
             <select className="mr-4 rounded-lg border p-2">
               <option>Select Status</option>
-              {/* Add more options as needed */}
             </select>
             <select className="mr-4 rounded-lg border p-2">
               <option>Select Priority</option>
-              {/* Add more options as needed */}
             </select>
             <button className="rounded-l-lg bg-black p-2 text-white">Search</button>
-            <button className="ml-auto rounded-r-lg border bg-white p-2 text-black">
+            <button className="ml-auto rounded-r-lg border bg-white p-2 text-black" onClick={openModal}>
               Add Staff
             </button>
           </div>
@@ -232,7 +155,9 @@ const StaffManagementPage: React.FC = () => {
             <button
               onClick={() => handleClick(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`rounded bg-gray-200 px-4 py-2 ${currentPage === 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"}`}
+              className={`rounded bg-gray-200 px-4 py-2 ${
+                currentPage === 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
+              }`}
             >
               Previous
             </button>
@@ -242,18 +167,22 @@ const StaffManagementPage: React.FC = () => {
             <button
               onClick={() => handleClick(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`rounded bg-gray-200 px-4 py-2 ${currentPage === totalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"}`}
+              className={`rounded bg-gray-200 px-4 py-2 ${
+                currentPage === totalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
+              }`}
             >
               Next
             </button>
           </div>
+
+          <AddStaffModal isOpen={isModalOpen} onClose={closeModal} onAddStaff={addNewStaff} />
         </main>
       </div>
     </div>
   );
 };
 
-const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
+const StaffCard: React.FC<{ staff: StaffMember }> = ({ staff }) => {
   return (
     <div className="flex flex-col items-center rounded-lg bg-white p-4 shadow">
       <Image
@@ -264,12 +193,13 @@ const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
         className="mb-4 h-24 w-24 rounded-full"
       />
       <div>
-        <h4 className="mb-2 text-center text-lg font-semibold">{staff.name}</h4>
+        <h4 className="mb-2 text-center text-lg font-semibold">{staff.fullName}</h4>
         <p className="mb-4 text-center text-gray-600">{staff.role}</p>
-        <p className="text-gray-600">Staff ID: {staff.staffId}</p>
-        <p className="text-gray-600">Join Date: {staff.joinDate}</p>
+        <p className="text-gray-600 mb-2">Email: {staff.email}</p>
+        <p className="text-gray-600 mb-2">Join Date: {staff.joinDate}</p>
+        <p className="text-gray-600 mb-2">Gender: Female</p>
       </div>
-      <div className="mt-auto flex justify-center">
+      <div className="mt-5 flex justify-center">
         <button className="mx-2 text-blue-500">
           <Phone />
         </button>

@@ -15,7 +15,6 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { ProductProps, EditProductModalProps } from '@/interface';
 
-// Import FontAwesome components and icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDongSign } from '@fortawesome/free-solid-svg-icons';
 
@@ -58,7 +57,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
     try {
       const response = await axios.put<ProductProps>(
-        `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
+        `https://milkapplication20240705013352.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
         editedProduct
       );
 

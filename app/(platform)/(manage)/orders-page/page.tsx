@@ -2,6 +2,7 @@
 
 import React, { useEffect, useReducer, useState } from "react";
 import { Order, OrderManagementAction } from "@/interface";
+import { Search } from "lucide-react";
 
 type State = {
   orders: Order[];
@@ -47,7 +48,7 @@ const OrdersPage: React.FC = () => {
     const fetchOrders = async () => {
       dispatch({ type: "FETCH_INIT" });
       try {
-        const response = await fetch("https://milkapplicationapi.azurewebsites.net/api/Order/GetAllOrder");
+        const response = await fetch("https://milkapplication20240705013352.azurewebsites.net/api/Order/GetAllOrder");
         if (!response.ok) {
           throw new Error("Failed to fetch orders");
         }
@@ -73,7 +74,7 @@ const OrdersPage: React.FC = () => {
 
   const handleDeleteOrder = async (orderId: string) => {
     try {
-      const response = await fetch(`https://milkapplicationapi.azurewebsites.net/api/Order/DeleteOrder/${orderId}`, {
+      const response = await fetch(`https://milkapplication20240705013352.azurewebsites.net/api/Order/DeleteOrder/${orderId}`, {
         method: 'DELETE',
       });
       if (!response.ok) {
@@ -82,7 +83,6 @@ const OrdersPage: React.FC = () => {
       dispatch({ type: "DELETE_ORDER", payload: orderId });
     } catch (error) {
       console.error("Error deleting order:", error);
-      // Handle error state as needed
     }
   };
 
@@ -97,13 +97,16 @@ const OrdersPage: React.FC = () => {
   return (
     <div>
       <div className="flex rounded-lg mx-6 mr-2">
+      <div className="relative mr-4 flex flex-grow items-center">
+      <Search className="absolute left-3 text-gray-400" />
         <input
           type="text"
           placeholder="Search Customer Order ID"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          className="mr-4 flex-grow rounded-lg border p-2"
+          className="w-full rounded border p-2 pl-10"
         />
+        </div>
       </div>
       <div className="flex flex-grow">
         <main className="flex-grow overflow-y-auto bg-gray-100 p-6">

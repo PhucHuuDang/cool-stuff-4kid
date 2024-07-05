@@ -59,7 +59,6 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     </button>
   ), []);
 
-  // Helper function to get base64 for preview
   const getBase64 = (file: FileType): Promise<string> =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();

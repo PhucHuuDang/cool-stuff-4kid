@@ -84,7 +84,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
 
       const response = await axios.post<Product>(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
+        "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
         {
           ...values,
           categoryId: 1,
@@ -196,9 +196,6 @@ const AddProductModal: React.FC<AddModalProps> = ({
           <Col span={12}>
             <Form.Item
               name="discountPercent"
-              rules={[
-                { required: true, message: "Please input discount percent" },
-              ]}
               label="Discount Percent"
             >
               <InputNumber

@@ -9,7 +9,7 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, is
   useEffect(() => {
     const fetchProductDetails = async (id: number) => {
       try {
-        const response = await axios.get<ProductProps>(`https://milkapplicationapi.azurewebsites.net/api/Product/GetProductsById/${id}`);
+        const response = await axios.get<ProductProps>(`https://milkapplication20240705013352.azurewebsites.net/api/Product/GetProductsById/${id}`);
         setProduct(response.data);
       } catch (error) {
         console.error("Error fetching product details:", error);
@@ -41,9 +41,13 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, is
               <p className="text-lg text-gray-600 mb-4">{product.productDescription}</p>
               <div className="flex items-center mb-4">
                 <Tag className="text-blue-500 mr-2" size={20} />
-                <span className="text-xl font-semibold text-blue-500">{product.price.toLocaleString()} VND</span>
-                {product.discountPrice && (
-                  <span className="ml-2 text-lg text-red-500 line-through">{product.discountPrice.toLocaleString()} VND</span>
+                {product.discountPrice ? (
+                  <>
+                    <span className="text-lg text-blue-500 line-through">{product.price.toLocaleString()} VND</span>
+                    <span className="ml-2 text-xl font-semibold text-red-500">{product.discountPrice.toLocaleString()} VND</span>
+                  </>
+                ) : (
+                  <span className="text-xl font-semibold text-blue-500">{product.price.toLocaleString()} VND</span>
                 )}
               </div>
               {product.discountPercent && (

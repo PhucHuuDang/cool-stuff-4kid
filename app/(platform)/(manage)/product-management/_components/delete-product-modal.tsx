@@ -17,7 +17,7 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`
+        `https://milkapplication20240705013352.azurewebsites.net/api/Product/DeleteProducts/${productId}`
       );
       onProductDelete(productId);
       onClose();

@@ -73,7 +73,7 @@ const ProductManagementPage: React.FC = () => {
   const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts",
+        "https://milkapplication20240705013352.azurewebsites.net/api/Product/GetAllProducts",
         { timeout: 10000 }
       );
       dispatch({ type: "SET_PRODUCTS", payload: response.data });
@@ -104,7 +104,7 @@ const ProductManagementPage: React.FC = () => {
     dispatch({ type: "SET_SUBMITTING", payload: true });
     try {
       const response = await axios.post(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
+        "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
         {
           productName: product.productName,
           price: product.price,
@@ -143,7 +143,7 @@ const ProductManagementPage: React.FC = () => {
   const handleProductUpdate = useCallback(async (updatedProduct: ProductProps) => {
     try {
       const response = await axios.put(
-        `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
+        `https://milkapplication20240705013352.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
         updatedProduct
       );
       dispatch({ type: "UPDATE_PRODUCT", payload: response.data });
@@ -322,7 +322,7 @@ const ProductTable: React.FC<{
           <TableCell text={product.quantity?.toString() ?? '0'} />
           <TableCell text={product.price.toString()} />
           <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
-          <TableCell text={product.discountPercent !== null ? `${product.discountPercent}%` : 'N/A'} />
+          <TableCell text={product.discountPercent !== null && product.discountPercent !== 0 ? `${product.discountPercent}%` : 'N/A'} />
           <TableCell text={product.status === 1 ? 'Active' : 'Inactive'} />
           <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
             <a href="#" target="_blank" rel="noopener noreferrer">
