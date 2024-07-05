@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   Table,
   TableBody,
@@ -15,21 +16,33 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuLabel,
+  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { Pencil, PencilLineIcon, Search } from "lucide-react";
+import {
+  CirclePlus,
+  PencilLineIcon,
+  Search,
+  Trash2Icon,
+  MoreHorizontal,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { data } from "./data";
+import { AddProduct } from "./add-product";
 
-const ITEMS_PER_PAGE = 7;
+const ITEMS_PER_PAGE = 3;
 
-interface Item {
-  ID: number;
-  "Product Name": string;
-  Status: string;
-  Quantity: number;
-  Price: string;
-  "Import Date": string;
+interface Product {
+  productId: number;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
 }
 
 export const Details: React.FC = () => {
@@ -38,7 +51,31 @@ export const Details: React.FC = () => {
     "In Stock",
     "Out of Stock",
   ]);
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
+  const [data, setData] = useState<Product[]>([]);
+  const [filteredData, setFilteredData] = useState<Product[]>([]);
+  const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    axios
+      .get(
+        "https://milkapplication20240705013352.azurewebsites.net/api/Product/GetAllProducts",
+      )
+      .then((response) => {
+        setData(response.data);
+        setFilteredData(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching product data:", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    setFilteredData(
+      data.filter((item: Product) =>
+        statusFilter.includes(item.status === 0 ? "Out of Stock" : "In Stock"),
+      ),
+    );
+  }, [statusFilter, data]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -49,53 +86,47 @@ export const Details: React.FC = () => {
     setStatusFilter((prev: string[]) =>
       prev.includes(status)
         ? prev.filter((item: string) => item !== status)
-        : [...prev, status]
+        : [...prev, status],
     );
   };
-
-  const filteredData = data.filter((item: Item) =>
-    statusFilter.includes(item.Status)
-  );
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const selectedData = filteredData.slice(
     startIndex,
-    startIndex + ITEMS_PER_PAGE
+    startIndex + ITEMS_PER_PAGE,
   );
 
-  const getStatusColor = (status: string) => {
-    return status === "In Stock" ? "text-green-500" : "text-red-500";
+  const getStatusColor = (status: number) => {
+    return status === 1 ? "text-green-500" : "text-red-500";
   };
-
   return (
     <div>
-      <div className="p-3 flex justify-between">
+      <div className="flex justify-between p-3">
         <div className="relative w-[500px]">
           <Input className="pl-10" placeholder="Product Name" />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-500" />
         </div>
         <div>
-          <Button className="mr-3 bg-blue-400">
-            <PencilLineIcon />
-            Update
-          </Button>
-          <Button className="bg-blue-400">
-            <Pencil />
-            Edit
-          </Button>
+          <AddProduct />
         </div>
       </div>
       <Table>
         <TableHeader>
-          <TableRow className="bg-pink-500">
-            <TableHead className="font-bold text-white">ID</TableHead>
-            <TableHead className="w-[500px] font-bold text-base text-white">
+          <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
+            <TableHead className="font-bold text-black">ID</TableHead>
+            <TableHead className="text-base font-bold text-black">
               Product Name
             </TableHead>
-            <TableHead className="font-bold text-base flex items-center text-white">
+            <TableHead className="text-center text-base font-bold text-black">
+              Image
+            </TableHead>
+            <TableHead className="text-base font-bold text-black">
+              Decriptions
+            </TableHead>
+            <TableHead className="flex items-center text-base font-bold text-black">
               Status
               <DropdownMenu>
-                <DropdownMenuTrigger className="ml-2 bg-gray-200 p-1 rounded text-white">
+                <DropdownMenuTrigger className="ml-2 rounded bg-gray-200 p-1 text-black">
                   Filter
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
@@ -115,27 +146,57 @@ export const Details: React.FC = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </TableHead>
-            <TableHead className="font-bold text-base w-[140px] text-white">Quantity</TableHead>
-            <TableHead className="font-bold text-base text-white">Price</TableHead>
-            <TableHead className="text-right font-bold text-base text-white">
-              Import Date
+            <TableHead className="text-base font-bold text-black">
+              Quantity
+            </TableHead>
+            <TableHead className="text-base font-bold text-black">
+              Price
+            </TableHead>
+            <TableHead className="text-center text-base font-bold text-black">
+              Discount
+            </TableHead>
+            <TableHead className="text-center text-base font-bold text-black">
+              Actions
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {selectedData.map((item: Item, index: number) => (
+          {selectedData.map((item: Product, index: number) => (
             <TableRow key={index}>
-              <TableCell className="font-bold">{item.ID}</TableCell>
-              <TableCell className="font-medium w-[500px]">
-                {item["Product Name"]}
+              <TableCell className="w-4 font-bold">{item.productId}</TableCell>
+              <TableCell className="w-36 font-medium">
+                {item.productName}
               </TableCell>
-              <TableCell className={`w-[200px] font-bold ${getStatusColor(item.Status)}`}>
-                {item.Status}
+              <TableCell className="h-[120px] w-[100px]">
+                <img src={item.image} alt={item.productName} />
               </TableCell>
-              <TableCell className="pl-10 w-[140px]">{item.Quantity}</TableCell>
-              <TableCell className="w-[180px]">{item.Price}</TableCell>
-              <TableCell className="text-right w-[180px]">
-                {item["Import Date"]}
+              <TableCell className="w-20">{item.productDescription}</TableCell>
+              <TableCell
+                className={`w-[10px] font-bold ${getStatusColor(item.status)}`}
+              >
+                {item.status === 1 ? "In Stock" : "Out of Stock"}
+              </TableCell>
+              <TableCell className="w-[140px] pl-10">{item.quantity}</TableCell>
+              <TableCell className="w-[50px]">{item.discountPrice}</TableCell>
+              <TableCell className="w-[180px] text-center">
+                {item.discountPercent}
+              </TableCell>
+              <TableCell className="w-11 text-center text-base font-bold text-black">
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="rounded p-1 text-black">
+                    <MoreHorizontal />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem>
+                      <PencilLineIcon className="mr-2" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Trash2Icon className="mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}

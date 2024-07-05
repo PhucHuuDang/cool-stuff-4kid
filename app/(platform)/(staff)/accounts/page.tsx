@@ -1,4 +1,4 @@
-import { Header } from "@/components/Header";
+import { Header } from "../_component/header";
 import SideBar from "@/components/SideBar";
 import { Profile } from "./_component/profile";
 
@@ -8,7 +8,7 @@ const Accounts = () => {
       <SideBar />
       <div className="flex flex-grow flex-col">
         <Header title="Accounts" />
-        <main className="ml-64 flex-grow overflow-auto bg-gray-100 p-6 pb-20">
+        <main className="ml-64 flex-grow overflow-auto bg-gray-100 pb-20">
           <Profile />
         </main>
       </div>

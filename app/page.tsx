@@ -1,6 +1,6 @@
 // import Footer from "@/components/Footer";
-import { Header } from "@/components/Header";
-import SideBar from "@/components/SideBar";
+import { Header } from "./(platform)/(staff)/_component/header";
+import SideBar from "../components/SideBar";
 import React from "react";
 import { DashboardData } from "./(platform)/(staff)/dashboard/data";
 
@@ -10,10 +10,9 @@ const Staff: React.FC = () => {
       <SideBar />
       <div>
         <Header title="Dashboard" />
-        <main className="ml-64 mt-16 flex-grow overflow-auto bg-gray-100 p-3">
+        <main className="ml-64 flex-grow overflow-auto bg-gray-100 p-3">
           <DashboardData />
         </main>
-        {/* <Footer /> */}
       </div>
     </div>
   );

@@ -1,14 +1,19 @@
-import { Button } from '@/components/ui/button';
-import React from 'react';
+import { Button } from "@/components/ui/button";
+import React from "react";
 
 interface PaginationButtonProps {
   data: any[];
-  itemsPerPage: number; 
-  currentPage: number; 
+  itemsPerPage: number;
+  currentPage: number;
   onPageChange: (page: number) => void;
 }
 
-const PaginationButton: React.FC<PaginationButtonProps> = ({ data, itemsPerPage, currentPage, onPageChange }) => {
+const PaginationButton: React.FC<PaginationButtonProps> = ({
+  data,
+  itemsPerPage,
+  currentPage,
+  onPageChange,
+}) => {
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
   const handlePreviousClick = () => {
@@ -20,10 +25,24 @@ const PaginationButton: React.FC<PaginationButtonProps> = ({ data, itemsPerPage,
   };
 
   return (
-    <div className="flex justify-center items-center">
-      <Button onClick={handlePreviousClick} disabled={currentPage === 1} className='bg-pink-500 mr-2 w-[90px]'>Previous</Button>
-      <span>Page {currentPage} of {totalPages}</span>
-      <Button onClick={handleNextClick} disabled={currentPage === totalPages} className='bg-pink-500 ml-2 w-[90px] '>Next</Button>
+    <div className="flex items-center justify-center">
+      <Button
+        onClick={handlePreviousClick}
+        disabled={currentPage === 1}
+        className="mr-2 w-[90px] bg-blue-400 hover:bg-blue-500"
+      >
+        Previous
+      </Button>
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
+      <Button
+        onClick={handleNextClick}
+        disabled={currentPage === totalPages}
+        className="ml-2 w-[90px] bg-blue-400 hover:bg-blue-500"
+      >
+        Next
+      </Button>
     </div>
   );
 };

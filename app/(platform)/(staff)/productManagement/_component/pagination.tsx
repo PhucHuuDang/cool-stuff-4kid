@@ -7,10 +7,15 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
   return (
-    <div className="flex justify-center items-center ">
-      <Button className="bg-pink-500 mr-2 w-[90px]"
+    <div className="flex items-center justify-center">
+      <Button
+        className="mr-2 w-[90px] bg-blue-400 hover:bg-blue-500"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
@@ -19,7 +24,8 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
       <span>
         Page {currentPage} of {totalPages}
       </span>
-      <Button className="bg-pink-500 ml-2 w-[90px]"
+      <Button
+        className="ml-2 w-[90px] bg-blue-400 hover:bg-blue-500"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
       >

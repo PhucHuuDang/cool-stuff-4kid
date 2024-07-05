@@ -1,194 +1,80 @@
-"use client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { PencilIcon } from "lucide-react";
+import React from "react";
 
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-
-export const Profile  = () => {
-  const [firstName, setFirstName] = useState("John");
-  const [lastName, setLastName] = useState("Doe");
-  const [role, setRole] = useState("Staff");
-  const [email, setEmail] = useState("john.doe@example.com");
-  const [phone, setPhone] = useState("123-456-7890");
-  const [address, setAddress] = useState("123 Main St, City, Country");
-  const [angency, setAgency] = useState("Thủ Đức");
-
-  // const handleEdit = (field) => {
-  //   let newValue = prompt(`Enter new value for ${field}:`);
-  //   if (newValue !== null && newValue !== "") {
-  //     switch (field) {
-  //       case "firstName":
-  //         setFirstName(newValue);
-  //         break;
-  //       case "lastName":
-  //         setLastName(newValue);
-  //         break;
-  //       case "role":
-  //         setRole(newValue);
-  //         break;
-  //       case "email":
-  //         setEmail(newValue);
-  //         break;
-  //       case "phone":
-  //         setPhone(newValue);
-  //         break;
-  //       case "address":
-  //         setAddress(newValue);
-  //         break;
-  //       case "angency":
-  //         setAgency(newValue);
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-  // };
-
+export const Profile = () => {
   return (
-    <div className="flex justify-center items-center ">
-      <div className="max-w-3xl w-full bg-white shadow-md rounded px-8 pt-6 pb-8 ">
-        <div className="text-center">
-          <img
-            src="https://artlogic-res.cloudinary.com/w_1200,c_limit,f_auto,fl_lossy,q_auto/artlogicstorage/hofa/images/view/9186b61f2f0b26347335c6dd32d165ee.jpg"
-            alt="Avatar"
-            className="w-28 h-28 rounded-full mx-auto mb-2"
-          />
+    <div>
+      <header className="ml-3 mt-3 flex items-center border-b-2 border-gray-400">
+        <img
+          src="https://boroktimes.com/wp-content/uploads/2023/07/channels4_profile.jpeg"
+          alt="avatar"
+          className="mb-3 w-[100px] rounded-full"
+        />
+        <div className="ml-2">
+          <p className="text-xl font-bold">Johnny Sins</p>
+          <p>Staff</p>
         </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            First Name:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={firstName}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("firstName")}
-            >
-              Edit
-            </button> */}
+      </header>
+      <div className="flex justify-center">
+        <div className="mx-3 mt-4 flex h-[380px] w-3/4 justify-between rounded-2xl bg-white px-14 py-5 shadow-lg">
+          <div className="">
+            <div className="mb-4">
+              <p className="font-semibold">First Name</p>
+              <Card className="p-2">Johnny</Card>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Address</p>
+              <Card className="p-2">Binh Chanh</Card>
+            </div>
+            <div className="flex">
+              <div className="mr-2">
+                <p className="font-semibold">Date of birth</p>
+                <div className="flex">
+                  <Card className="p-2">07</Card>
+                  <Card className="p-2">10</Card>
+                  <Card className="p-2">2002</Card>
+                </div>
+              </div>
+              <div className="mb-4">
+                <p className="font-semibold">Gender</p>
+                <Card className="w-[170px] p-2">Male</Card>
+              </div>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Personal Social</p>
+              <Card className="p-2">
+                <a
+                  href="https://joke-battles.fandom.com/wiki/Gigachad?file=Gigachad.png"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Facebook
+                </a>
+              </Card>
+            </div>
           </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Last Name:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={lastName}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("lastName")}
-            >
-              Edit
-            </button> */}
-          </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Role:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={role}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("role")}
-            >
-              Edit
-            </button> */}
-          </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Email:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="email"
-              value={email}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("email")}
-            >
-              Edit
-            </button> */}
-          </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Phone:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={phone}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("phone")}
-            >
-              Edit
-            </button> */}
-          </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Address:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={address}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("address")}
-            >
-              Edit
-            </button> */}
-          </div>
-        </div>
-        <div className="mb-4 ">
-          <label className="block text-gray-700 text-sm font-bold mb-2 w-[100px]">
-            Agency:
-          </label>
-          <div className="flex">
-            <Input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              type="text"
-              value={angency}
-              readOnly
-            />
-            {/* <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
-              onClick={() => handleEdit("angency")}
-            >
-              Edit
-            </button> */}
+          <div>
+            <div className="mb-4">
+              <p className="font-semibold">Last Name</p>
+              <Card className="w-[300px] p-2">Sins</Card>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">City</p>
+              <Card className="p-2">Ho Chi Minh</Card>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Contacts</p>
+              <Card className="p-2">0123456789</Card>
+            </div>
+            <div className="mb-4">
+              <p className="font-semibold">Email</p>
+              <Card className="p-2">Staff@gmail.com</Card>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-// export default Profile;
