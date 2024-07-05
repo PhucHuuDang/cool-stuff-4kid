@@ -1,8 +1,9 @@
 // import Footer from "@/components/Footer";
-import { Header } from "./(platform)/(staff)/_component/header";
-import SideBar from "../components/SideBar";
+
+import SideBar from "@/components/SideBar";
 import React from "react";
-import { DashboardData } from "./(platform)/(staff)/dashboard/data";
+import { Header } from "../_component/header";
+import { DashboardData } from "./_component/data";
 
 const Staff: React.FC = () => {
   return (
