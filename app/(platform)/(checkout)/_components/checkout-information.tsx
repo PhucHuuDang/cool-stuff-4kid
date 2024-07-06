@@ -40,6 +40,7 @@ import { AddressReceiveOrder } from "./_checkout-infor-components/address-receiv
 import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
 import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
 import { vouchers } from "@/db";
+import { toast } from "sonner";
 
 const tabsProps = [
   {
@@ -71,6 +72,7 @@ export const CheckoutInformation = () => {
     const message = formData.get("message") as string;
 
     console.log({ message });
+    toast.success("Đã lưu lời nhắn");
   };
 
   return (
@@ -114,7 +116,7 @@ export const CheckoutInformation = () => {
                           return (
                             <div
                               key={voucher.product}
-                              className="relative my-2 w-full cursor-pointer p-8 shadow-xl"
+                              className="relative my-4 w-full cursor-pointer rounded-lg border border-slate-400 p-8 shadow-md duration-200 hover:border-slate-600 hover:shadow-xl"
                             >
                               <h2 className="text-lg font-bold text-[#ff6347]">
                                 Giảm {formatCurrency(voucher.price)}

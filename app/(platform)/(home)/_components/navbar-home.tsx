@@ -10,7 +10,7 @@ import useFromStore from "@/store/use-from-store";
 import { LogOut, ShoppingCart } from "lucide-react";
 import { Logo } from "./logo";
 import { checkAuthenticate } from "@/app/auth/check-authenticate";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import {
   Popover,
   PopoverContent,
@@ -22,6 +22,12 @@ import { useLoginModal } from "@/hooks/use-login-modal";
 import { useRegisterModal } from "@/hooks/use-register-modal";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useDebounceValue } from "usehooks-ts";
+
+import { DataProducts } from "@/db";
+import { SearchNavbar } from "./search-navbar";
+import { removeAccent } from "@/lib/remove-accent";
+import { removeMarks } from "@/handle-transform/remove-marks";
 
 interface NavbarHomeProps {
   isAuthenticate: boolean;
@@ -32,6 +38,10 @@ const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
+
+  const [debounceInputValue, setDebounceInputValue] = useDebounceValue("", 400);
+  const [inputValue, setInputValue] = useState("");
+
   const router = useRouter();
 
   const { onOpen: openLoginModal } = loginModal;
@@ -43,33 +53,70 @@ const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
     router.refresh();
   };
 
+  const handleRoute = (title: string) => {
+    const titleTransformed = removeMarks(title);
+
+    // setInputValue("");
+    setDebounceInputValue("");
+
+    router.push(`/${titleTransformed}`);
+  };
+
+  useEffect(() => {
+    setDebounceInputValue(inputValue);
+  }, [inputValue]);
+
+  const filteredProducts = DataProducts.filter((product) => {
+    const removedAccentSearch = removeAccent(debounceInputValue);
+    const removedAccentProduct = removeAccent(product.title);
+
+    return (
+      debounceInputValue !== "" &&
+      removedAccentProduct.includes(removedAccentSearch)
+    );
+  });
+
   return (
     <div className="0 fixed top-0 z-40 flex h-14 w-full items-center justify-between px-8">
       <div className="flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-white to-slate-200 p-2 pt-8 shadow-lg duration-200 hover:shadow-xl">
         {/* Mobile side bar */}
         <Logo height={100} width={100} className="md:text-lg" />
 
-        {/* <h1 className="font-xl font-bold">Children Stuff</h1> */}
-
-        <div className="w-1/3">
-          <FormInput
-            // icon={Search as IconType}
+        <div className="relative w-1/3 rounded-lg">
+          <SearchNavbar
             searchIcon={<SearchIcon fillColor="#a8b3cf" />}
-            placeholder="Search posts"
-            id="search"
+            placeholder="Search products"
+            value={inputValue}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setInputValue(e.target.value)
+            }
             className="rounded-xl border-[1px] border-slate-600 p-5 text-slate-400 caret-sky-600 focus:ring-0 focus:ring-slate-300 focus:ring-opacity-50 focus:ring-offset-0 focus:ring-offset-slate-400"
           />
+
+          {debounceInputValue.length > 0 && (
+            <div className="top-15 absolute z-50 h-52 w-full overflow-y-auto rounded-lg bg-white">
+              {debounceInputValue && filteredProducts.length === 0 ? (
+                <div className="flex h-full items-center justify-center text-lg font-bold">
+                  No product found...
+                </div>
+              ) : (
+                filteredProducts.map((product) => {
+                  return (
+                    <div
+                      onClick={() => handleRoute(product.title)}
+                      key={product.id}
+                      className="cursor-pointer rounded-lg bg-slate-400/35 p-2 text-base font-bold duration-200 hover:bg-slate-300"
+                    >
+                      {product.title}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4">
-          {/* <Button
-            onClick={() => {}}
-            variant="default"
-            className="h-10 rounded-xl border border-slate-300 px-7 font-semibold"
-          >
-            New Post
-          </Button> */}
-
           <div
             onClick={drawerCart.onOpen}
             className="group relative rounded-xl bg-slate-700 p-3 transition hover:cursor-pointer hover:bg-slate-600"
