@@ -1,6 +1,6 @@
-import { Orders } from "../_components/orders";
+import { Orders } from "../_components/_orders-manage/orders";
 
-const ManagePage = () => {
+const ManageOrdersPage = () => {
   return (
     <div className="h-full">
       <Orders />
@@ -8,4 +8,4 @@ const ManagePage = () => {
   );
 };
 
-export default ManagePage;
+export default ManageOrdersPage;
