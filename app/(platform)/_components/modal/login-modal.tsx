@@ -15,10 +15,21 @@ import Modal from "@/components/modal";
 import { Button } from "@/components/ui/button";
 import { FormInput } from "@/components/form/form-input";
 import { FormSubmit } from "@/components/form/form-submit";
+import { FormError } from "@/components/form/form-error";
+import { useAction } from "@/hooks/use-action";
+import { toast } from "sonner";
+import { loginAccount } from "@/actions/login";
+import { createCookie } from "@/store/actions";
+import { useRegisterModal } from "@/hooks/use-register-modal";
+import { useDrawerCart } from "@/hooks/use-drawer-cart";
+import { useRouter } from "next/navigation";
 
 export const LoginModal = () => {
   const { pending } = useFormStatus();
   const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
+  const drawerCart = useDrawerCart();
+  const router = useRouter();
 
   const formInputRef = useRef<ElementRef<"form">>(null);
   const inputRef = useRef<ElementRef<"input">>(null);
@@ -29,9 +40,32 @@ export const LoginModal = () => {
     }
   }, [loginModal.isOpen]);
 
+  const { execute, fieldErrors } = useAction(loginAccount, {
+    onSuccess: async (data) => {
+      toast.success("Login successfully");
+
+      await createCookie(data);
+      loginModal.onClose();
+      if (drawerCart.isOpen) {
+        drawerCart.onClose();
+        router.push("/checkout");
+      }
+    },
+    onError: (error) => {
+      toast.error("Login failed");
+    },
+  });
+
   const onSubmit = (formData: FormData) => {
-    const email = formData.get("email") as string;
+    const userName = formData.get("userName") as string;
     const password = formData.get("password") as string;
+
+    execute({ userName, password });
+  };
+
+  const toggle = () => {
+    loginModal.onClose();
+    registerModal.onOpen();
   };
 
   const onKeyDown = (e: KeyboardEvent) => {
@@ -47,17 +81,19 @@ export const LoginModal = () => {
       <Heading title="Welcome back" subtitle="Login to your account!" center />
 
       <FormInput
-        id="email"
-        label="Email"
+        id="userName"
+        label="User Name"
         disabled={pending}
         ref={inputRef}
-        placeholder="Email address"
+        placeholder="nguyenvanloc"
         className="h-12"
         labelClassName="text-neutral-700"
         // register={register}
         // errors={errors}
         required
       />
+
+      <FormError id="userName" errors={fieldErrors} />
 
       <FormInput
         id="password"
@@ -70,14 +106,16 @@ export const LoginModal = () => {
         required
       />
 
-      <FormSubmit variant="book" className="h-12 " disabled={pending}>
+      <FormError id="password" errors={fieldErrors} />
+
+      <FormSubmit variant="book" className="h-12" disabled={pending}>
         Login
       </FormSubmit>
     </form>
   );
   // the footer body of form register
   const footerContent = (
-    <div className="flex flex-col gap-4 mt-1">
+    <div className="mt-1 flex flex-col gap-4">
       <hr />
       <Button
         // onClick={() => signIn("google")}
@@ -91,19 +129,12 @@ export const LoginModal = () => {
       >
         <AiFillGithub size={22} /> Continue with GitHub
       </Button>
-      <div
-        className="
-            text-neutral-500
-            text-center
-            mt-4
-            font-light
-          "
-      >
-        <div className="justify-center flex flex-row items-center gap-2">
+      <div className="mt-4 text-center font-light text-neutral-500">
+        <div className="flex flex-row items-center justify-center gap-2">
           <div>Are you have account?</div>
           <div
-            //?  onClick={toggle} toggle for register form
-            className="text-neutral-500 cursor-pointer hover:underline"
+            onClick={toggle}
+            className="cursor-pointer text-neutral-500 hover:underline"
           >
             Create an account
           </div>

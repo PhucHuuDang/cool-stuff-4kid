@@ -12,6 +12,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Filter from "./filter";
+import {
+  ArrowUp,
+  ArrowDown,
+  ArrowDownWideNarrow,
+  ArrowUpNarrowWide,
+} from "lucide-react"; // Importing icons from Lucide
 
 type StatusType =
   | "Canceled"
@@ -34,12 +40,15 @@ interface Order {
   status: number;
   totalPrice: number;
   id: string;
+  username: string; // Add username field
 }
 
 export const Details: React.FC = () => {
   const [data, setData] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [sortOrder, setSortOrder] = useState<string>("asc"); // Add state for sort order
+  const [searchQuery, setSearchQuery] = useState<string>(""); // Add state for search query
   const itemsPerPage = 7;
 
   useEffect(() => {
@@ -57,13 +66,27 @@ export const Details: React.FC = () => {
     fetchData();
   }, []);
 
-  const filteredData = filterStatus
-    ? data.filter((item) => item.status.toString() === filterStatus)
-    : data;
+  const filteredData = data.filter((item) => {
+    const matchesStatus = filterStatus
+      ? item.status.toString() === filterStatus
+      : true;
+    const matchesSearchQuery = searchQuery
+      ? item.username.toLowerCase().includes(searchQuery.toLowerCase())
+      : true;
+    return matchesStatus && matchesSearchQuery;
+  });
+
+  const sortedData = filteredData.sort((a, b) => {
+    if (sortOrder === "asc") {
+      return a.totalPrice - b.totalPrice;
+    } else {
+      return b.totalPrice - a.totalPrice;
+    }
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(
+  const currentItems = sortedData.slice(
     indexOfFirstItem,
     indexOfFirstItem + itemsPerPage,
   );
@@ -77,6 +100,18 @@ export const Details: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleSortOrderChange = (order: string) => {
+    setSortOrder(order);
+    setCurrentPage(1);
+  };
+
+  const handleSearchQueryChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setSearchQuery(event.target.value);
+    setCurrentPage(1);
+  };
+
   const statusMap: Record<number, StatusType> = {
     0: "Processing",
     1: "Delivering",
@@ -87,13 +122,49 @@ export const Details: React.FC = () => {
 
   return (
     <div>
-      <Filter onFilterChange={handleFilterChange} />
+      <div className="flex justify-between">
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by username"
+            value={searchQuery}
+            onChange={handleSearchQueryChange}
+            className="w-full border p-2"
+          />
+        </div>
+        <Filter onFilterChange={handleFilterChange} />
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
             <TableHead className="text-base font-bold text-black">ID</TableHead>
             <TableHead className="text-base font-bold text-black">
-              Prices
+              User Name
+            </TableHead>
+            <TableHead className="text-base font-bold text-black">
+              <div className="flex items-center">
+                Prices
+                <div className="ml-2 flex space-x-2">
+                  <button
+                    title="Down"
+                    onClick={() => handleSortOrderChange("desc")}
+                    className="flex items-center rounded border border-gray-300 p-1"
+                  >
+                    <ArrowDownWideNarrow />
+                  </button>
+                  <button
+                    title="Up"
+                    onClick={() => handleSortOrderChange("asc")}
+                    className="flex items-center rounded border border-gray-300 p-1"
+                  >
+                    <ArrowUpNarrowWide />
+                  </button>
+                </div>
+              </div>
+            </TableHead>
+            <TableHead className="text-base font-bold text-black">
+              Voucher
             </TableHead>
             <TableHead className="text-base font-bold text-black">
               Status
@@ -107,7 +178,9 @@ export const Details: React.FC = () => {
           {currentItems.map((item, index) => (
             <TableRow key={index}>
               <TableCell>{item.orderId}</TableCell>
+              <TableCell>{item.username}</TableCell>
               <TableCell className="w-[180px]">{item.totalPrice}</TableCell>
+              <TableCell className="w-[180px]">Voucher</TableCell>
               <TableCell
                 className={`w-[180px] font-bold ${statusColors[statusMap[item.status]]}`}
               >

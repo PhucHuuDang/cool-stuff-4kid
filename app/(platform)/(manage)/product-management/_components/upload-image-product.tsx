@@ -1,43 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { Upload, Image } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Upload, Image, message } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import { Plus } from "lucide-react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/Config/firebase";
 
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 
 interface UploadImageProductProps {
-  onFileChange: (fileChange: string) => void;
+  onFileChange: (url: string) => void;
   initialImage?: string;
 }
 
-const getBase64 = (file: FileType): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-
-const UploadImageProduct: React.FC<UploadImageProductProps> = (props) => {
-  const { onFileChange, initialImage } = props;
-  const [previewOpen, setPreviewOpen] = useState(false);  
+const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, initialImage }) => {
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [file, setFile] = useState<UploadFile | null>(null);
-  const [fileChange, setFileChange] = useState<string>("");
-
-  useEffect(() => {
-    onFileChange(fileChange);
-  }, [fileChange, onFileChange]);
 
   useEffect(() => {
     if (initialImage) {
-      setFile({
-        uid: "-1",
-        name: "image.png",
-        status: "done",
-        url: initialImage,
-      });
-      setFileChange(initialImage);
+      setPreviewImage(initialImage);
     }
   }, [initialImage]);
 
@@ -45,37 +27,45 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = (props) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj as FileType);
     }
-
     setPreviewImage(file.url || (file.preview as string));
     setPreviewOpen(true);
   };
 
-  const handleChange: UploadProps["onChange"] = async ({
-    fileList: newFileList,
-  }) => {
-    const newFile = newFileList.length ? newFileList[0] : null;
+  const handleChange: UploadProps["onChange"] = async ({ fileList: newFileList }) => {
+    const newFile = newFileList[0];
     setFile(newFile);
 
-    if (newFileList.length === 0) {
-      setFile(null);
-      setFileChange("");
-    }
-
     if (newFile && newFile.originFileObj) {
-      const base64 = await getBase64(newFile.originFileObj);
-      newFile.url = base64;
-      setFileChange(base64);
+      try {
+        const storageRef = ref(storage, `products/${Date.now()}_${newFile.name}`);
+        const snapshot = await uploadBytes(storageRef, newFile.originFileObj);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        setPreviewImage(downloadURL);
+        onFileChange(downloadURL);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+        message.error("Failed to upload image to Firebase");
+      }
     }
   };
 
-  const uploadButton = (
+  const uploadButton = useCallback(() => (
     <button className="items-center" type="button">
       <div className="items-center ml-3">
-      <Plus />
+        <Plus />
       </div>
       <div>Upload</div>
     </button>
-  );
+  ), []);
+
+  const getBase64 = (file: FileType): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
 
   return (
     <>
@@ -85,18 +75,18 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = (props) => {
         onPreview={handlePreview}
         onChange={handleChange}
         accept="image/*"
+        beforeUpload={() => false} // Prevent auto upload
       >
-        {file ? null : uploadButton}
+        {file ? null : uploadButton()}
       </Upload>
       {previewImage && (
         <Image
-          wrapperStyle={{ display: "none" }}
           preview={{
             visible: previewOpen,
             onVisibleChange: (visible) => setPreviewOpen(visible),
-            afterOpenChange: (visible) => !visible && setPreviewImage(""),
           }}
           src={previewImage}
+          alt="Product Image"
         />
       )}
     </>

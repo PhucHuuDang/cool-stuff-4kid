@@ -21,9 +21,7 @@ export const RateFilter: React.FC<RateFilterProps> = ({
         className="rounded-full border bg-blue-400 p-2 text-white outline-none"
         value={selectedRate || "All"}
       >
-        <option className="" value="All">
-          All
-        </option>
+        <option value="All">All</option>
         <option className="bg-white text-red-500" value="1">
           1
         </option>

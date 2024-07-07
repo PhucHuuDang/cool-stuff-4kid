@@ -8,8 +8,14 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   return (
     <header className="flex items-center justify-between border-2 bg-[#FCFBF4] p-4 shadow-md">
       <div className="flex items-center">
-        <div className="h-[65px] border border-black p-4 text-2xl font-bold text-black shadow-lg">
-          CucCung
+        <div className="ml-10">
+          <Image
+            src="/cool-stuff-for-kid.jpeg"
+            alt="logo"
+            height={100}
+            width={100}
+            className=""
+          />
         </div>
         <h1 className="ml-24 text-2xl font-bold">{title}</h1>
       </div>

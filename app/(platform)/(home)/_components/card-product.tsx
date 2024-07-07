@@ -1,9 +1,12 @@
 "use client";
 
+import { GlareCard } from "@/components/glare-card";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { removeMarks } from "@/handle-transform/remove-marks";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { Product } from "@/interface";
+import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
@@ -46,15 +49,18 @@ export const CardProduct = ({ product }: CardProductProps) => {
             {`-${product.discountPercent}%`}
           </span>
         </div>
-        <div className="relative aspect-square w-full overflow-hidden rounded-xl">
+        <div className="relative aspect-square h-full w-full overflow-hidden rounded-xl">
+          {/* <GlareCard className="flex flex-col items-center justify-center"> */}
           <Image
             fill
-            alt="Listing"
+            alt={`product-${product.title}`}
             src={product.image}
             className="h-full w-full object-cover transition group-hover:scale-110"
+            // className="absolute size-full object-cover transition group-hover:scale-110"
           />
 
           {/* can add here the icon cart or not */}
+          {/* </GlareCard> */}
         </div>
         <div className="min-h-[56px] text-lg font-semibold">
           {/* {data?.serviceName} */}
@@ -65,29 +71,30 @@ export const CardProduct = ({ product }: CardProductProps) => {
             ? description.slice(0, MAX_LENGTH) + "..."
             : description}
         </div>
-        <div className="text-md mt-3 flex flex-row items-center gap-3">
-          <div className="flex flex-row items-center gap-2">
-            <del className="font-light text-[#ed9080]">
-              {/* {formattedPrice(data?.originalPrice as number)} */}
-              {product.originalPrice}
-            </del>{" "}
-            <span>₫</span>
+
+        <div className="flex items-center justify-between">
+          <div className="text-md mt-3 flex flex-row items-center gap-1">
+            <div className="flex flex-row items-center gap-2">
+              <del className="font-light text-[#ed9080]">
+                {/* {formattedPrice(data?.originalPrice as number)} */}
+                {formatCurrency(product.originalPrice)}
+              </del>{" "}
+            </div>
+
+            <h1 className="text-xl font-semibold text-neutral-500">|</h1>
+
+            <div className="flex flex-row items-center gap-2">
+              <span className="font-bold text-[#ff6347]">
+                {formatCurrency(product.discountPrice)}
+              </span>
+            </div>
           </div>
 
-          <h1 className="ml-1 mr-1 text-xl font-semibold text-neutral-500">
-            |
-          </h1>
-
-          <div className="flex flex-row items-center gap-2">
-            <span className="font-light text-[#ff6347]">
-              {product.discountPrice}
-            </span>{" "}
-            <span>₫</span>
-          </div>
+          <ShoppingCart
+            onClick={(e) => handleAddToCart(e, product)}
+            className="size-10 cursor-pointer rounded-lg p-1 text-slate-600 duration-200 hover:scale-110 hover:bg-slate-200 hover:text-slate-800 hover:shadow-lg"
+          />
         </div>
-        <Button onClick={(e) => handleAddToCart(e, product)} variant="book">
-          Add to cart
-        </Button>
       </div>
     </div>
   );

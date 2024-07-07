@@ -1,151 +1,217 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Header } from '@/components/Header';
-import { SideBar } from '@/components/side-bar';
-import Image from 'next/image';
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { Mail, MessageCircle, Phone, Search } from "lucide-react";
+import AddStaffModal from "./_components/add-staff-modal";
+import { Toaster } from 'react-hot-toast';
+
+interface ApiUser {
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+}
+
+interface StaffMember {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  role?: string;
+  staffId?: string;
+  joinDate?: string;
+  gender?: string;
+}
 
 const StaffManagementPage: React.FC = () => {
-  const staffMembers = [
-    { id: 1, name: 'Fox 1', role: 'Sales-Staff', staffId: 'SS-HCM-GV-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 2, name: 'Fox 2', role: 'Sales-Staff', staffId: 'SS-HCM-D1-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 3, name: 'Fox 3', role: 'Sales-Staff', staffId: 'SS-HCM-D12-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 4, name: 'Fox 4', role: 'Sales-Staff', staffId: 'SS-HCM-GV-0002', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 5, name: 'Fox 5', role: 'Sales-Staff', staffId: 'SS-HCM-D7-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 6, name: 'Fox 6', role: 'Event-Staff', staffId: 'ES-HCM-GV-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 7, name: 'Fox 7', role: 'Event-Staff', staffId: 'ES-HCM-D1-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 8, name: 'Fox 8', role: 'Event-Staff', staffId: 'ES-HCM-D12-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 9, name: 'Fox 9', role: 'Event-Staff', staffId: 'ES-HCM-D7-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 10, name: 'Fox 10', role: 'Event-Staff', staffId: 'ES-HCM-GV-0002', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 11, name: 'Fox 11', role: 'Event-Staff', staffId: 'ES-HCM-D1-0002', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 12, name: 'Fox 12', role: 'Storage-Staff', staffId: 'StS-HCMM-GV-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 13, name: 'Fox 13', role: 'Storage-Staff', staffId: 'StS-HCMM-D1-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 14, name: 'Fox 14', role: 'Storage-Staff', staffId: 'StS-HCMM-D12-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 15, name: 'Fox 15', role: 'Storage-Staff', staffId: 'StS-HCMM-D7-0001', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 16, name: 'Fox 16', role: 'Storage-Staff', staffId: 'StS-HCMM-GV-0002', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 17, name: 'Fox 17', role: 'Storage-Staff', staffId: 'StS-HCMM-D1-0002', joinDate: '2/4/2023', gender: 'Male' },
-    { id: 18, name: 'Fox 18', role: 'Event-Staff', staffId: 'ES-HCM-D7-0002', joinDate: '2/4/2023', gender: 'Male' },
-  ];
-
-  // Pagination state
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const itemsPerPage = 9;
 
-  // Pagination logic
+  useEffect(() => {
+    const fetchStaffMembers = async () => {
+      try {
+        const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Users/GetAllStaff');
+        const data = await response.json();
+
+        if (data.isSucceed) {
+          const staffMembers = data.data.map((user: ApiUser, index: number) => ({
+            id: user.userName,
+            fullName: user.fullName,
+            userName: user.userName,
+            email: user.email,
+            role: "Staff",
+            staffId: `NS-${String(index + 1).padStart(4, '0')}`,
+            joinDate: new Date().toLocaleDateString(),
+            gender: "Unknown"
+          }));
+
+          setStaffMembers(staffMembers);
+        }
+      } catch (error) {
+        console.error('Error fetching staff members:', error);
+      }
+    };
+
+    fetchStaffMembers();
+  }, []);
+
+
   const indexOfLastStaff = currentPage * itemsPerPage;
   const indexOfFirstStaff = indexOfLastStaff - itemsPerPage;
-  const currentStaff = staffMembers.slice(indexOfFirstStaff, indexOfLastStaff);
-  const totalPages = Math.ceil(staffMembers.length / itemsPerPage);
+
+  const filteredStaff = staffMembers.filter(staff =>
+    staff.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const currentStaff = filteredStaff.slice(indexOfFirstStaff, indexOfLastStaff);
+  const totalPages = Math.ceil(filteredStaff.length / itemsPerPage);
 
   const totalStaff = staffMembers.length;
-  const newStaff = staffMembers.filter(member => new Date(member.joinDate) > new Date('1/1/2023')).length;
-  const maleStaff = staffMembers.filter(member => member.gender === 'Male').length;
-  const femaleStaff = staffMembers.filter(member => member.gender === 'Female').length;
+  const newStaff = staffMembers.filter(
+    (member) => member.joinDate && new Date(member.joinDate) > new Date("1/1/2023")
+  ).length;
+  const maleStaff = staffMembers.filter(
+    (member) => member.gender === "Male"
+  ).length;
+  const femaleStaff = staffMembers.filter(
+    (member) => member.gender === "Female"
+  ).length;
 
   const handleClick = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const addNewStaff = (newStaff: StaffMember) => {
+    const staffMemberToAdd: StaffMember = {
+      ...newStaff,
+      role: "New Staff",
+      joinDate: new Date().toLocaleDateString(),
+      gender: "Unknown"
+    };
+    setStaffMembers([...staffMembers, staffMemberToAdd]);
+  };
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="fixed top-0 left-0 h-full w-64 bg-pink-600 text-white">
-        <SideBar />
-      </div>
-      <div className="flex-grow ml-64">
-        <div className="fixed top-0 left-64 right-0 bg-white shadow-md z-10">
-          <Header title="Staff Management" />
-        </div>
-        <main className="flex-grow p-6 mt-16 mb-16 bg-gray-100 overflow-y-auto">
-          <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="bg-purple-200 p-4 rounded">
+    <div className="flex min-h-screen flex-col bg-gray-100">
+      <Toaster position="top-right" />
+      <div className="flex flex-grow">
+        <main className="flex-grow overflow-y-auto p-6">
+          <div className="mb-6 grid grid-cols-4 gap-4">
+            <div className="rounded-lg bg-purple-200 p-4">
               <p>Total Staff</p>
               <h3>{totalStaff}</h3>
             </div>
-            <div className="bg-yellow-200 p-4 rounded">
+            <div className="rounded-lg bg-yellow-200 p-4">
               <p>New Staff</p>
               <h3>{newStaff}</h3>
             </div>
-            <div className="bg-blue-200 p-4 rounded">
+            <div className="rounded-lg bg-blue-200 p-4">
               <p>Male</p>
               <h3>{maleStaff}</h3>
             </div>
-            <div className="bg-green-200 p-4 rounded">
+            <div className="rounded-lg bg-green-200 p-4">
               <p>Female</p>
               <h3>{femaleStaff}</h3>
             </div>
           </div>
 
-          <div className="flex mb-6">
-            <input type="text" placeholder="Staff Name" className="border p-2 rounded mr-4 flex-grow" />
-            <select className="border p-2 rounded mr-4">
+          <div className="mb-6 flex rounded-lg">
+          <div className="relative mr-4 flex flex-grow items-center">
+          <Search className="absolute left-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search Name Of Staff"
+              className="w-full rounded border p-2 pl-10"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            </div>
+            <select className="mr-4 rounded-lg border p-2">
               <option>Select Status</option>
-              {/* Add more options as needed */}
             </select>
-            <select className="border p-2 rounded mr-4">
+            <select className="mr-4 rounded-lg border p-2">
               <option>Select Priority</option>
-              {/* Add more options as needed */}
             </select>
-            <button className="bg-black text-white p-2 rounded">Search</button>
-            <button className="ml-auto bg-white text-black border p-2 rounded">Add Staff</button>
+            <button className="rounded-l-lg bg-black p-2 text-white">Search</button>
+            <button className="ml-auto rounded-r-lg border bg-white p-2 text-black" onClick={openModal}>
+              Add Staff
+            </button>
           </div>
 
           <div className="grid grid-cols-3 gap-6">
-            {currentStaff.map(staff => (
+            {currentStaff.map((staff) => (
               <StaffCard key={staff.id} staff={staff} />
             ))}
           </div>
 
-              <div className="mt-4 flex justify-between items-center">
-                <button 
-                  onClick={() => handleClick(currentPage - 1)} 
-                  disabled={currentPage === 1} 
-                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                >
-                  Previous
-                </button>
-                <div className="text-sm text-gray-700">
-                  Page {currentPage} of {totalPages}
-                </div>
-                <button 
-                  onClick={() => handleClick(currentPage + 1)} 
-                  disabled={currentPage === totalPages} 
-                  className={`bg-gray-200 py-2 px-4 rounded ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-300'}`}
-                >
-                  Next
-                </button>
-              </div>
-        </main>
-        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
-          <Footer />
-        </div> */}
-      </div>
-    </div>
-  );
-}
+          <div className="mt-4 flex items-center justify-between">
+            <button
+              onClick={() => handleClick(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`rounded bg-gray-200 px-4 py-2 ${
+                currentPage === 1 ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
+              }`}
+            >
+              Previous
+            </button>
+            <div className="text-sm text-gray-700">
+              Page {currentPage} of {totalPages}
+            </div>
+            <button
+              onClick={() => handleClick(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className={`rounded bg-gray-200 px-4 py-2 ${
+                currentPage === totalPages ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
+              }`}
+            >
+              Next
+            </button>
+          </div>
 
-const StaffCard: React.FC<{ staff: any }> = ({ staff }) => {
-  return (
-    <div className="bg-white p-4 rounded shadow flex flex-col items-center">
-      <Image 
-      src="https://via.placeholder.com/100" 
-      alt="avatar" 
-      height={100}
-      width={100}
-      className="rounded-full w-24 h-24 mb-4" 
-      />
-      <div className="text-center">
-        <h4 className="text-lg font-semibold mb-2">{staff.name}</h4>
-        <p className="text-gray-600 mb-4">{staff.role}</p>
-        <p className="text-gray-600 mb-1">Staff ID: {staff.staffId}</p>
-        <p className="text-gray-600 mb-4">Join Date: {staff.joinDate}</p>
-      </div>
-      <div className="flex justify-center mt-auto">
-        <button className="text-blue-500 mx-2">Call</button>
-        <button className="text-blue-500 mx-2">Message</button>
-        <button className="text-blue-500 mx-2">Email</button>
+          <AddStaffModal isOpen={isModalOpen} onClose={closeModal} onAddStaff={addNewStaff} />
+        </main>
       </div>
     </div>
   );
-}
+};
+
+const StaffCard: React.FC<{ staff: StaffMember }> = ({ staff }) => {
+  return (
+    <div className="flex flex-col items-center rounded-lg bg-white p-4 shadow">
+      <Image
+        src="https://via.placeholder.com/100"
+        alt="avatar"
+        height={100}
+        width={100}
+        className="mb-4 h-24 w-24 rounded-full"
+      />
+      <div>
+        <h4 className="mb-2 text-center text-lg font-semibold">{staff.fullName}</h4>
+        <p className="mb-4 text-center text-gray-600">{staff.role}</p>
+        <p className="text-gray-600 mb-2">Email: {staff.email}</p>
+        <p className="text-gray-600 mb-2">Join Date: {staff.joinDate}</p>
+        <p className="text-gray-600 mb-2">Gender: Female</p>
+      </div>
+      <div className="mt-5 flex justify-center">
+        <button className="mx-2 text-blue-500">
+          <Phone />
+        </button>
+        <button className="mx-2 text-blue-500">
+          <MessageCircle />
+        </button>
+        <button className="mx-2 text-blue-500">
+          <Mail />
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export default StaffManagementPage;

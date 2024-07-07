@@ -7,18 +7,47 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { useDrawerCart } from "@/hooks/use-drawer-cart";
 import useFromStore from "@/store/use-from-store";
-import { ShoppingCart } from "lucide-react";
+import { LogOut, ShoppingCart } from "lucide-react";
 import { Logo } from "./logo";
+import { checkAuthenticate } from "@/app/auth/check-authenticate";
+import { useEffect, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import Link from "next/link";
+import { deleteCookie } from "@/store/actions";
+import { useLoginModal } from "@/hooks/use-login-modal";
+import { useRegisterModal } from "@/hooks/use-register-modal";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
-const NavbarHome = () => {
+interface NavbarHomeProps {
+  isAuthenticate: boolean;
+}
+
+const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
   const drawerCart = useDrawerCart();
   const cart = useFromStore(useCartStore, (state) => state.cart);
+  const loginModal = useLoginModal();
+  const registerModal = useRegisterModal();
+  const router = useRouter();
+
+  const { onOpen: openLoginModal } = loginModal;
+  const { onOpen: openRegisterModal } = registerModal;
+
+  const handleLogout = () => {
+    deleteCookie();
+    toast.success("Logout successfully!");
+    router.refresh();
+  };
 
   return (
-    <div className="fixed top-0 z-40 flex h-14 w-full items-center justify-between px-8 pt-8">
-      <div className="flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-white to-slate-200 p-2 shadow-lg duration-200 hover:shadow-xl">
+    <div className="0 fixed top-0 z-40 flex h-14 w-full items-center justify-between px-8">
+      <div className="flex w-full items-center justify-between gap-x-10 rounded-xl bg-gradient-to-r from-white to-slate-200 p-2 pt-8 shadow-lg duration-200 hover:shadow-xl">
         {/* Mobile side bar */}
-        <Logo height={150} width={150} className="md:text-lg" />
+        <Logo height={100} width={100} className="md:text-lg" />
 
         {/* <h1 className="font-xl font-bold">Children Stuff</h1> */}
 
@@ -33,13 +62,13 @@ const NavbarHome = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <Button
+          {/* <Button
             onClick={() => {}}
             variant="default"
             className="h-10 rounded-xl border border-slate-300 px-7 font-semibold"
           >
             New Post
-          </Button>
+          </Button> */}
 
           <div
             onClick={drawerCart.onOpen}
@@ -51,7 +80,50 @@ const NavbarHome = () => {
             </div>
           </div>
 
-          <Skeleton className="h-8 w-8 rounded-full" />
+          {isAuthenticate ? (
+            <Popover>
+              <>
+                <PopoverTrigger>
+                  <Skeleton className="size-10 cursor-pointer rounded-full bg-slate-500" />
+                  {/* 123asdasdasdasd */}
+                </PopoverTrigger>
+                <PopoverContent className="flex w-80 flex-col gap-y-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleLogout}
+                    className="border-[2px] text-slate-600 duration-200 hover:border-slate-800 hover:text-slate-950"
+                  >
+                    <LogOut className="mr-1" />
+                    Log out
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="border-[2px] text-slate-600 duration-200 hover:border-slate-800 hover:text-slate-950"
+                  >
+                    <LogOut className="mr-1" />
+                    Profile
+                  </Button>
+                </PopoverContent>
+              </>
+            </Popover>
+          ) : (
+            <div className="flex items-center gap-x-2">
+              <Button
+                variant="book"
+                className="h-10 rounded-xl"
+                onClick={openLoginModal}
+              >
+                Login
+              </Button>
+              <Button
+                variant="outline"
+                onClick={openRegisterModal}
+                className="border duration-200 hover:border-slate-800 hover:text-slate-900"
+              >
+                Register
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>

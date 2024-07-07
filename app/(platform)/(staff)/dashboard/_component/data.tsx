@@ -77,7 +77,7 @@ export const DashboardData = () => {
             </tbody>
           </table>
         </div>
-        <div className="rounded-lg bg-white p-6 shadow-md">
+        {/* <div className="rounded-lg bg-white p-6 shadow-md">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-xl font-bold">Staff</h2>
             <button className="rounded-lg bg-pink-600 px-4 py-2 text-white">
@@ -141,7 +141,7 @@ export const DashboardData = () => {
               </div>
             </li>
           </ul>
-        </div>
+        </div> */}
       </div>
     </div>
   );

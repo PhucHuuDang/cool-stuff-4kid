@@ -20,6 +20,7 @@ interface FormInputProps {
   defaultValue?: string;
   label?: string;
   labelClassName?: string;
+  iconClassName?: string;
 }
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
@@ -37,8 +38,9 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
       defaultValue = "",
       label,
       labelClassName,
+      iconClassName,
     },
-    ref
+    ref,
   ) => {
     const { pending } = useFormStatus();
 
@@ -49,7 +51,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             <Label
               className={cn(
                 "text-lg font-semibold text-neutral-200",
-                labelClassName
+                labelClassName,
               )}
               htmlFor={id}
             >
@@ -58,7 +60,12 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           ) : null}
           {Icon ? (
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              <div
+                className={cn(
+                  "pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2",
+                  iconClassName,
+                )}
+              >
                 <Icon />
               </div>
               <Input
@@ -70,14 +77,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                 id={id}
                 name={id}
                 defaultValue={defaultValue}
-                className={cn("text-sm pl-8 py-1 h-7 w-full", className)}
+                className={cn("h-7 w-full py-1 pl-8 text-sm", className)}
                 aria-describedby={`${id}-error`}
                 style={{ paddingLeft: <Icon /> ? "2.5rem" : "1rem" }}
               />
             </div>
           ) : searchIcon ? (
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2">
                 {searchIcon}
               </div>
               <Input
@@ -89,7 +96,7 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
                 id={id}
                 name={id}
                 defaultValue={defaultValue}
-                className={cn("text-sm pl-8 py-1 h-7 w-full", className)}
+                className={cn("h-7 w-full py-1 pl-8 text-sm", className)}
                 aria-describedby={`${id}-error`}
                 style={{ paddingLeft: searchIcon ? "3rem" : "1rem" }}
               />
@@ -104,14 +111,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
               id={id}
               name={id}
               defaultValue={defaultValue}
-              className={cn("text-sm pl-4 py-1 h-7 w-full", className)}
+              className={cn("h-7 w-full py-1 pl-4 text-sm", className)}
               aria-describedby={`${id}-error`}
             />
           )}
         </div>
       </div>
     );
-  }
+  },
 );
 
 FormInput.displayName = "FormInput";

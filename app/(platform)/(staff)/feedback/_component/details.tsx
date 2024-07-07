@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -10,78 +10,58 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Search, Star } from "lucide-react";
-import { RateFilter } from "./ratefilter";
-import { Input } from "@/components/ui/input";
-import { feedbackData } from "./feedbackdata";
+import axios from "axios";
+
+interface Comment {
+  commentId: number;
+  commentDetail: string;
+  rating: number;
+  date: string;
+  productId: number;
+}
 
 export const Details = () => {
+  const [comments, setComments] = useState<Comment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRate, setSelectedRate] = useState("All");
-  const [searchQuery, setSearchQuery] = useState("");
-  const rowsPerPage = 5;
+  const commentsPerPage = 3;
 
-  const handleNextPage = () => {
-    setCurrentPage((prevPage) =>
-      Math.min(
-        prevPage + 1,
-        Math.ceil(filteredFeedbackData.length / rowsPerPage),
-      ),
-    );
-  };
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get<Comment[]>(
+          "https://milkapplication20240705013352.azurewebsites.net/api/Comment/GetAllComment",
+        );
+        setComments(response.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
 
-  const handlePreviousPage = () => {
-    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-  };
+    fetchComments();
+  }, []);
 
-  const handleRateFilterChange = (value: string) => {
-    setSelectedRate(value === "All" ? "All" : value);
-    setCurrentPage(1);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const filteredFeedbackData = feedbackData
-    .filter((feedback) =>
-      selectedRate !== "All" ? feedback.Rate.toString() === selectedRate : true,
-    )
-    .filter((feedback) =>
-      feedback.Username.toLowerCase().includes(searchQuery.toLowerCase()),
-    );
-
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const limitedFeedbackData = filteredFeedbackData.slice(
-    startIndex,
-    startIndex + rowsPerPage,
+  const indexOfLastComment = currentPage * commentsPerPage;
+  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
+  const currentComments = comments.slice(
+    indexOfFirstComment,
+    indexOfLastComment,
   );
 
-  const renderStars = (rate: number) => {
-    const stars = [];
-    for (let i = 0; i < rate; i++) {
-      stars.push(<Star className="fill-yellow-400" key={i} />);
+  const handlePrevious = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
-    return stars;
+  };
+
+  const handleNext = () => {
+    if (currentPage < Math.ceil(comments.length / commentsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
   return (
     <div>
-      <div className="flex justify-between">
-        <div className="relative w-[500px]">
-          <Input
-            className="pl-10"
-            placeholder="User Name"
-            value={searchQuery}
-            onChange={handleSearchChange}
-          />
-          <Search className="absolute left-3 top-5 -translate-y-1/2 transform text-gray-500" />
-        </div>
-        <RateFilter
-          selectedRate={selectedRate}
-          onChange={handleRateFilterChange}
-        />
-      </div>
+      <div className="flex justify-between"></div>
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
@@ -103,38 +83,30 @@ export const Details = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {limitedFeedbackData.map((feedback, index) => (
-            <TableRow key={index}>
-              <TableCell className="font-bold">{feedback.ID}</TableCell>
+          {currentComments.map((comment) => (
+            <TableRow key={comment.commentId}>
+              <TableCell className="font-bold">{comment.commentId}</TableCell>
               <TableCell className="font-semibold">
-                {feedback.Username}
+                <ProductName productId={comment.productId} />
               </TableCell>
-              <TableCell>{feedback.Comments}</TableCell>
+              <TableCell>{comment.commentDetail}</TableCell>
               <TableCell className="flex w-[200px] text-yellow-400">
-                {renderStars(feedback.Rate)}
+                <Star className="mr-1 h-4 w-4" />
+                {comment.rating}
               </TableCell>
-              <TableCell className="text-center">{feedback.Time}</TableCell>
+              <TableCell className="text-center">{comment.date}</TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className="mt-2 flex items-center justify-center">
-        <Button
-          className="bg-blue-400 hover:bg-blue-500"
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-        >
+      <div className="mt-2 flex items-center justify-center space-x-4">
+        <Button onClick={handlePrevious} disabled={currentPage === 1}>
           Previous
         </Button>
-        <span className="mx-4">
-          Page {currentPage} of{" "}
-          {Math.ceil(filteredFeedbackData.length / rowsPerPage)}
-        </span>
         <Button
-          className="w-[90px] bg-blue-400 hover:bg-blue-500"
-          onClick={handleNextPage}
+          onClick={handleNext}
           disabled={
-            currentPage === Math.ceil(filteredFeedbackData.length / rowsPerPage)
+            currentPage === Math.ceil(comments.length / commentsPerPage)
           }
         >
           Next
@@ -142,4 +114,25 @@ export const Details = () => {
       </div>
     </div>
   );
+};
+
+const ProductName: React.FC<{ productId: number }> = ({ productId }) => {
+  const [productName, setProductName] = useState("");
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await axios.get<{ productName: string }>(
+          `https://milkapplication20240705013352.azurewebsites.net/api/Product/GetProductsById/${productId}`,
+        );
+        setProductName(response.data.productName);
+      } catch (error) {
+        console.error(`Error fetching product ${productId}:`, error);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
+
+  return <>{productName}</>;
 };

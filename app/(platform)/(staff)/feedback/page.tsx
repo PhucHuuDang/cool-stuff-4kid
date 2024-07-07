@@ -1,7 +1,8 @@
 import { Footer } from "@/components/Footer";
 import { Header } from "../_component/header";
-import SideBar from "@/components/SideBar";
+
 import { Details } from "./_component/details";
+import SideBar from "../_component/sidebar";
 
 const Feedback = () => {
   return (
@@ -12,7 +13,6 @@ const Feedback = () => {
         <main className="ml-64 flex-grow overflow-auto bg-gray-100 p-3">
           <Details />
         </main>
-        {/* <Footer /> */}
       </div>
     </div>
   );

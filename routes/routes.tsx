@@ -5,6 +5,7 @@ const routes = {
   staffManagement: '/staff-management',
   revenue: '/revenue-page',
   adminAccount: '/admin-account',
+  vouchers: '/vouchers-management'
 };
 
 export { routes };

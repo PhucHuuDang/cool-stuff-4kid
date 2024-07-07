@@ -1,11 +1,14 @@
+import { checkAuthenticate } from "@/app/auth/check-authenticate";
 import { DrawerCheckoutCart } from "./_components/cart/drawer-checkout-cart";
 import NavbarHome from "./_components/navbar-home";
 
-const HomeLayout = ({ children }: { children: React.ReactNode }) => {
+const HomeLayout = async ({ children }: { children: React.ReactNode }) => {
+  const checkAuth = await checkAuthenticate();
+
   return (
     <div className="h-full bg-[#F5F7FD]">
       {/* <DrawerCheckoutCart /> */}
-      <NavbarHome />
+      <NavbarHome isAuthenticate={checkAuth} />
       {children}
     </div>
   );

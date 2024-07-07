@@ -1,6 +1,5 @@
-import { Footer } from "@/components/Footer";
 import { Header } from "../_component/header";
-import SideBar from "@/components/SideBar";
+import SideBar from "../_component/sidebar";
 import { Details } from "./_component/details";
 
 const Orders = () => {

@@ -1,5 +1,6 @@
 import { Header } from "../_component/header";
-import SideBar from "@/components/SideBar";
+import SideBar from "../_component/sidebar";
+
 import { Profile } from "./_component/profile";
 
 const Accounts = () => {
