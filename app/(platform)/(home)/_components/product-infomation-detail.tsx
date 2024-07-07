@@ -18,19 +18,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface ProductInformationDetailProps {
-  carouselItems: CarouselItemProps[];
+  // carouselItems: CarouselItemProps[];
   productDetail: ProductDetailProps;
 }
 
-interface CarouselItemProps {
-  url: string;
-  rating: number;
-  title: string;
-  price: number;
-}
-
 export const ProductInformationDetail = ({
-  carouselItems,
   productDetail,
 }: ProductInformationDetailProps) => {
   const [api, setApi] = useState<CarouselApi>();
@@ -44,14 +36,12 @@ export const ProductInformationDetail = ({
     (item) => item.productId === productDetail.productId,
   );
 
-  console.log({ cartDetail });
+  // console.log({ cartDetail });
 
   const price =
     cartDetail?.discountPrice! > 0
       ? cartDetail?.discountPrice! * cartDetail?.quantityOrder!
-      : cartDetail?.price! * cartDetail?.quantityOrder!
-
-  console.log(price);
+      : cartDetail?.price! * cartDetail?.quantityOrder!;
 
   const handleLimitDecreaseQuantity = (product: ProductApiProps) => {
     if (cartDetail?.quantityOrder! > 1) {
@@ -59,8 +49,11 @@ export const ProductInformationDetail = ({
     }
   };
 
+  const imagesCarousel = [productDetail.image, ...productDetail.imagesCarousel];
+
   const [imageProduct, setImageProduct] = useState<string>(
-    carouselItems[0].url,
+    // carouselItems[0].url,
+    productDetail.image,
   );
 
   useEffect(
@@ -80,14 +73,14 @@ export const ProductInformationDetail = ({
         <div className="flex gap-5">
           <div className="flex flex-col items-center gap-y-2">
             <Image
-              src={productDetail.image}
+              src={imageProduct}
               alt={productDetail.productName}
               className="rounded-lg"
               height={600}
               width={600}
             />
 
-            {/* <Carousel
+            <Carousel
               opts={{
                 align: "start",
               }}
@@ -95,33 +88,33 @@ export const ProductInformationDetail = ({
               setApi={setApi}
             >
               <CarouselContent className="ml-1 h-20 w-full p-1">
-                <CarouselItem
-                    key={product.title}
-                    className="ml-1 flex h-full cursor-pointer items-center justify-center rounded-lg md:basis-1/2 lg:basis-1/4"
-                    style={{
-                      backgroundImage: `url(${product.url})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                      backgroundRepeat: "no-repeat",
-                    }}
-                    onClick={() => setImageProduct(product.url)}
-                  />
+                {/* <CarouselItem
+                  key={productDetail.productId}
+                  className="ml-1 flex h-full cursor-pointer items-center justify-center rounded-lg md:basis-1/2 lg:basis-1/4"
+                  style={{
+                    backgroundImage: `url(${productDetail.image})`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
+                  }}
+                  onClick={() => setImageProduct(product.url)}
+                /> */}
 
-                {carouselItems.map((product) => (
+                {imagesCarousel.map((image: string, index: number) => (
                   <CarouselItem
-                    key={product.title}
+                    key={index}
                     className="ml-1 flex h-full cursor-pointer items-center justify-center rounded-lg md:basis-1/2 lg:basis-1/4"
                     style={{
-                      backgroundImage: `url(${product.url})`,
+                      backgroundImage: `url(${image})`,
                       backgroundSize: "cover",
                       backgroundPosition: "center",
                       backgroundRepeat: "no-repeat",
                     }}
-                    onClick={() => setImageProduct(product.url)}
+                    onClick={() => setImageProduct(image)}
                   />
                 ))}
               </CarouselContent>
-            </Carousel> */}
+            </Carousel>
           </div>
 
           <div className="flex flex-col gap-y-4">
@@ -171,7 +164,7 @@ export const ProductInformationDetail = ({
                   className="size-6"
                   onClick={() => handleLimitDecreaseQuantity(productDetail)}
                 />
-                <span>{cartDetail?.quantityOrder}</span>
+                <span>{cartDetail?.quantityOrder ?? 0}</span>
                 <Plus
                   className="size-6"
                   onClick={() => increaseQuantity(productDetail)}

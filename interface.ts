@@ -1,11 +1,17 @@
 export interface Product {
-  id: number;
-  title: string;
-  originalPrice: number;
+  productId: string;
+  productName: string;
+  price: number;
   discountPrice: number;
-  description: string;
-  image: string;
   discountPercent: number;
+  productDescription: string;
+  image: string;
+  imagesCarousel: string[];
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
   quantityOrder?: number;
 }
 
@@ -18,21 +24,7 @@ export type UserInformation = {
   price: string;
 };
 
-export type ProductApiProps = {
-  productId: string;
-  productName: string;
-  price: number;
-  discountPrice: number;
-  discountPercent: number;
-  productDescription: string;
-  image: string;
-  quantity: number;
-  status: number;
-  categoryId: number;
-  originId: number;
-  locationId: number;
-  quantityOrder?: number;
-};
+export type ProductApiProps = Omit<Product, "imagesCarousel">;
 
 export type ProductDetailProps = {
   productId: string;
@@ -42,6 +34,7 @@ export type ProductDetailProps = {
   discountPercent: number;
   productDescription: string;
   image: string;
+  imagesCarousel: string[];
   quantity: number;
   status: number;
   categoryId: number;
@@ -49,3 +42,8 @@ export type ProductDetailProps = {
   locationId: number;
   quantityOrder?: number;
 };
+
+export type CardCarouselPropsPicked = Pick<
+  ProductApiProps,
+  "productId" | "price" | "discountPercent" | "productName" | "image"
+>;
