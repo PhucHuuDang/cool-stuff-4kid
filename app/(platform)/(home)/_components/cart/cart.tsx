@@ -1,19 +1,20 @@
 "use client";
 
-import { Product } from "@/interface";
+import { Product, ProductApiProps } from "@/interface";
 import { CardProduct } from "../card-product";
 import useFromStore from "@/store/use-from-store";
 import { useCartStore } from "@/hooks/use-cart-store";
 
 interface CartProps {
-  product: Product[];
+  // products: Product[];
+  products: ProductApiProps[];
 }
 
-export const Cart: React.FC<CartProps> = ({ product }) => {
+export const Cart: React.FC<CartProps> = ({ products }) => {
   return (
     <>
-      {product.map((item) => (
-        <CardProduct key={item.id} product={item} />
+      {products.map((item) => (
+        <CardProduct key={item.productId} product={item} />
       ))}
     </>
   );

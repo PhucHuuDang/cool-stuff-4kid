@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { useCartStore } from "@/hooks/use-cart-store";
-import { Product } from "@/interface";
+import { Product, ProductApiProps, ProductDetailProps } from "@/interface";
 import useFromStore from "@/store/use-from-store";
 import { Minus, Plus } from "lucide-react";
 import Image from "next/image";
@@ -19,7 +19,7 @@ import { useEffect, useState } from "react";
 
 interface ProductInformationDetailProps {
   carouselItems: CarouselItemProps[];
-  productDetailByTitle: Product;
+  productDetail: ProductDetailProps;
 }
 
 interface CarouselItemProps {
@@ -31,7 +31,7 @@ interface CarouselItemProps {
 
 export const ProductInformationDetail = ({
   carouselItems,
-  productDetailByTitle,
+  productDetail,
 }: ProductInformationDetailProps) => {
   const [api, setApi] = useState<CarouselApi>();
   const increaseQuantity = useCartStore((state) => state.addToCart);
@@ -40,9 +40,20 @@ export const ProductInformationDetail = ({
 
   const router = useRouter();
 
-  const cartDetail = cart?.find((item) => item.id === productDetailByTitle.id);
+  const cartDetail = cart?.find(
+    (item) => item.productId === productDetail.productId,
+  );
 
-  const handleLimitDecreaseQuantity = (product: Product) => {
+  console.log({ cartDetail });
+
+  const price =
+    cartDetail?.discountPrice! > 0
+      ? cartDetail?.discountPrice! * cartDetail?.quantityOrder!
+      : cartDetail?.price! * cartDetail?.quantityOrder!
+
+  console.log(price);
+
+  const handleLimitDecreaseQuantity = (product: ProductApiProps) => {
     if (cartDetail?.quantityOrder! > 1) {
       decreaseQuantity(product);
     }
@@ -69,14 +80,14 @@ export const ProductInformationDetail = ({
         <div className="flex gap-5">
           <div className="flex flex-col items-center gap-y-2">
             <Image
-              src={imageProduct}
-              alt="main image"
+              src={productDetail.image}
+              alt={productDetail.productName}
               className="rounded-lg"
               height={600}
               width={600}
             />
 
-            <Carousel
+            {/* <Carousel
               opts={{
                 align: "start",
               }}
@@ -84,6 +95,18 @@ export const ProductInformationDetail = ({
               setApi={setApi}
             >
               <CarouselContent className="ml-1 h-20 w-full p-1">
+                <CarouselItem
+                    key={product.title}
+                    className="ml-1 flex h-full cursor-pointer items-center justify-center rounded-lg md:basis-1/2 lg:basis-1/4"
+                    style={{
+                      backgroundImage: `url(${product.url})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
+                    }}
+                    onClick={() => setImageProduct(product.url)}
+                  />
+
                 {carouselItems.map((product) => (
                   <CarouselItem
                     key={product.title}
@@ -98,7 +121,7 @@ export const ProductInformationDetail = ({
                   />
                 ))}
               </CarouselContent>
-            </Carousel>
+            </Carousel> */}
           </div>
 
           <div className="flex flex-col gap-y-4">
@@ -106,10 +129,7 @@ export const ProductInformationDetail = ({
               Thương hiệu:{" "}
               <span className="text-xl font-bold">Herbs of Gold</span>
             </h3>
-            <h1 className="text-3xl font-bold">
-              Thực phẩm bảo vệ sức khoẻ Herbs of Gold Herbs of Gold
-              Breastfeeding Support
-            </h1>
+            <h1 className="text-3xl font-bold">{productDetail.productName}</h1>
 
             <div className="flex items-center gap-3">
               <div>5.0</div>
@@ -121,17 +141,25 @@ export const ProductInformationDetail = ({
             <Card className="p-4">
               <div className="flex items-center gap-x-4">
                 <h1 className="text-2xl font-bold text-sky-400">
-                  {formatCurrency(productDetailByTitle.discountPrice)}
+                  {formatCurrency(
+                    productDetail.discountPrice > 0
+                      ? productDetail.discountPrice
+                      : productDetail.price,
+                  )}
                 </h1>
-                <span className="text-lg text-rose-400">
-                  -{productDetailByTitle.discountPercent}%
-                </span>
+                {productDetail.discountPercent > 0 && (
+                  <span className="text-lg text-rose-400">
+                    -{productDetail.discountPercent}%
+                  </span>
+                )}
               </div>
             </Card>
 
-            <del className="text-xl font-bold text-[#ed9080]">
-              {formatCurrency(productDetailByTitle.originalPrice)}
-            </del>
+            {productDetail.discountPrice > 0 && (
+              <del className="text-xl font-bold text-[#ed9080]">
+                {formatCurrency(productDetail.price)}
+              </del>
+            )}
 
             <div className="flex items-center gap-x-10">
               <span className="text-lg font-semibold text-slate-600">
@@ -141,14 +169,12 @@ export const ProductInformationDetail = ({
               <div className="flex items-center gap-x-4 *:cursor-pointer">
                 <Minus
                   className="size-6"
-                  onClick={() =>
-                    handleLimitDecreaseQuantity(productDetailByTitle)
-                  }
+                  onClick={() => handleLimitDecreaseQuantity(productDetail)}
                 />
                 <span>{cartDetail?.quantityOrder}</span>
                 <Plus
                   className="size-6"
-                  onClick={() => increaseQuantity(productDetailByTitle)}
+                  onClick={() => increaseQuantity(productDetail)}
                 />
               </div>
             </div>
@@ -156,10 +182,7 @@ export const ProductInformationDetail = ({
             {cartDetail?.quantityOrder! > 1 && (
               <div className="item-center flex gap-x-4">
                 <span className="text-lg font-semibold text-slate-600">
-                  Tạm tính:{" "}
-                  {formatCurrency(
-                    cartDetail?.discountPrice! * cartDetail?.quantityOrder!,
-                  )}
+                  Tạm tính: {formatCurrency(price)}
                 </span>
               </div>
             )}
@@ -167,7 +190,7 @@ export const ProductInformationDetail = ({
             <div className="flex items-center gap-x-4 *:h-12 *:w-full *:transition">
               <Button
                 className="bg-sky-400 text-lg font-semibold duration-200 hover:scale-105 hover:bg-sky-600"
-                onClick={() => increaseQuantity(productDetailByTitle)}
+                onClick={() => increaseQuantity(productDetail)}
               >
                 Add to cart
               </Button>

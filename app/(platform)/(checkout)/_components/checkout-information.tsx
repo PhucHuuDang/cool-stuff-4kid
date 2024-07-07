@@ -58,10 +58,21 @@ export const CheckoutInformation = () => {
 
   let total = 0;
 
+  // if (cart) {
+  //   total = cart.reduce(
+  //     (acc, product) =>
+  //       acc + product.discountPrice * (product.quantityOrder as number),
+  //     0,
+  //   );
+  // }
+
   if (cart) {
     total = cart.reduce(
       (acc, product) =>
-        acc + product.discountPrice * (product.quantityOrder as number),
+        acc +
+        (product.discountPercent > 0
+          ? product.discountPrice * (product.quantityOrder as number)
+          : product.price * (product.quantityOrder as number)),
       0,
     );
   }
@@ -97,7 +108,7 @@ export const CheckoutInformation = () => {
             </TableHeader>
             <TableBody>
               {cart?.map((product) => (
-                <ProductCheckout key={product.id} product={product} />
+                <ProductCheckout key={product.productId} product={product} />
               ))}
             </TableBody>
             <TableFooter>

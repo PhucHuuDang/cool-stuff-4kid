@@ -2,15 +2,20 @@
 
 import { TableCell, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
-import { Product } from "@/interface";
+import { Product, ProductApiProps } from "@/interface";
 import Image from "next/image";
 
 interface ProductCheckoutProps {
-  product: Product;
+  product: ProductApiProps;
 }
 
 export const ProductCheckout = ({ product }: ProductCheckoutProps) => {
   const MAX_LENGTH = 45;
+
+  const price =
+    product.discountPrice > 0
+      ? product.discountPrice * (product.quantityOrder as number)
+      : product.price * (product.quantityOrder as number);
 
   return (
     <TableRow>
@@ -21,7 +26,7 @@ export const ProductCheckout = ({ product }: ProductCheckoutProps) => {
             <Image
               fill
               src={product.image}
-              alt={`product-${product.title}`}
+              alt={`product-${product.productName}`}
               className="size-full object-cover transition group-hover:scale-110"
               // className="absolute size-full object-cover transition group-hover:scale-110"
             />
@@ -32,22 +37,26 @@ export const ProductCheckout = ({ product }: ProductCheckoutProps) => {
 
           <div>
             <h1 className="text-lg font-bold">
-              {product.title.length > MAX_LENGTH
-                ? product.title.slice(0, MAX_LENGTH) + "..."
-                : product.title}
+              {product.productName.length > MAX_LENGTH
+                ? product.productName.slice(0, MAX_LENGTH) + "..."
+                : product.productName}
             </h1>
             {/* <div>SKU: 123456789</div> */}
           </div>
         </div>
       </TableCell>
-      <TableCell className="font-bold">
-        {formatCurrency(product.discountPrice)}
-      </TableCell>
+      {product.discountPrice > 0 ? (
+        <TableCell className="font-bold">
+          {formatCurrency(product.discountPrice)}
+        </TableCell>
+      ) : (
+        <TableCell className="font-bold">
+          {formatCurrency(product.price)}
+        </TableCell>
+      )}
       <TableCell className="font-bold">{product.quantityOrder}</TableCell>
       <TableCell className="font-bold text-[#ff6347]">
-        {formatCurrency(
-          product.discountPrice * (product.quantityOrder as number),
-        )}
+        {formatCurrency(price)}
       </TableCell>
     </TableRow>
   );

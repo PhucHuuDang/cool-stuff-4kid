@@ -17,3 +17,35 @@ export type UserInformation = {
   date: string;
   price: string;
 };
+
+export type ProductApiProps = {
+  productId: string;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
+  quantityOrder?: number;
+};
+
+export type ProductDetailProps = {
+  productId: string;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
+  quantityOrder?: number;
+};
