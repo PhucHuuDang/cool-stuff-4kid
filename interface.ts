@@ -15,6 +15,23 @@ export interface ProductProps {
   categoryId: number;
   originId: number;
   locationId: number;
+  imagesCarousel?: string[];
+}
+
+export interface Category {
+  categoryId: number;
+  categoryName: string;
+}
+
+export interface Location {
+  locationId: number;
+  locationName: string;
+  address: string;
+}
+
+export interface Origin {
+  originId: number;
+  originName: string;
 }
 
 export interface Product {
@@ -26,6 +43,7 @@ export interface Product {
   image: string;
   discountPercent: number;
   quantity?: number;
+  imagesCarousel?: string[];
 }
 
 export interface Order {
@@ -34,6 +52,7 @@ export interface Order {
   totalPrice: number;
   id: string;
 }
+
 
 export interface State {
   isConfirmLoading: boolean;
@@ -44,7 +63,18 @@ export interface State {
     quantity: number;
     productDescription: string;
     image: string;
+    categoryId?: number;
+    originId?: number;
+    locationId?: number;
+    imagesCarousel?: string[];
   };
+  categoryName: string;
+  locationName: string;
+  locationAddress: string;
+  originName: string;
+  categories: Category[];
+  origins: Origin[];
+  locations: Location[];
 }
 
 export interface EditProductModalProps {
@@ -58,6 +88,10 @@ export interface AddModalProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
   onProductAdd: (newProduct: any) => void;
+  onCategoryAdd: (category: Category) => Promise<void>;
+  onLocationAdd?: (location: Location) => Promise<void>;
+  onOriginAdd?: (origin: Origin) => Promise<void>;
+  
 }
 
 export interface ProductDetailsModalProps {
@@ -89,7 +123,16 @@ export type ProductManagementAction =
   | { type: "TOGGLE_MODAL" }
   | { type: "SET_SUBMITTING"; payload: boolean }
   | { type: "SET_CONFIRM_LOADING"; payload: boolean }
-  | { type: "SET_FORM_VALUES"; payload: Partial<State['formValues']> };
+  | { type: "SET_FORM_VALUES"; payload: Partial<State['formValues']> }
+  | { type: "SET_CATEGORY_NAME"; payload: string }
+  | { type: "SET_LOCATION_NAME"; payload: string }
+  | { type: "SET_LOCATION_ADDRESS"; payload: string }
+  | { type: "SET_ORIGIN_NAME"; payload: string }
+  | { type: "SET_CATEGORIES"; payload: Category[] }
+  | { type: "SET_ORIGINS"; payload: Origin[] }
+  | { type: "SET_LOCATIONS"; payload: Location[] }
+  | { type: "SET_IMAGES_CAROUSEL"; payload: string[] };
+  
 
 export type OrderManagementAction =
   | { type: "FETCH_INIT" }
@@ -132,3 +175,4 @@ export interface PaginationButtonProps {
   disabled: boolean;
   text: string;
 }
+

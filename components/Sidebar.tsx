@@ -14,12 +14,12 @@ const SideBar: React.FC = () => {
   const getLinkClassName = (page: string) => {
     return `flex p-4 items-center transition-colors duration-200
       ${currentPage === page 
-        ? "bg-pink-600 text-white rounded-l-lg" 
-        : "text-slate-700 hover:bg-red-200"}`;
+        ? "text-slate-700 bg-slate-500/10 rounded-sm" 
+        : "text-slate-700 hover:rounded-sm hover:bg-slate-500/10"}`;
   };
 
   return (
-    <aside className="w-64 h-screen bg-slate-500/10">
+    <aside className="w-64 h-screen bg-slate-500/10 sm:rounded-lg">
       <nav className="space-y-1">
         <Link
           href={routes.dashboard}

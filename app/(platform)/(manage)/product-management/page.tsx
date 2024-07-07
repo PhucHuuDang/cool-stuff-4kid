@@ -7,7 +7,7 @@ import { AddProductModal } from "./_components/add-product-modal";
 import { EditProductModal } from "./_components/edit-product-modal";
 import { ProductDetailsModal } from "./_components/product-details-modal";
 import { DeleteProductModal } from "./_components/delete-product-modal";
-import { ProductProps, ProductManagementAction } from "@/interface";
+import { ProductProps, ProductManagementAction, Category, Location, Origin } from "@/interface";
 
 interface State {
   products: ProductProps[];
@@ -68,6 +68,9 @@ const ProductManagementPage: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<ProductProps | null>(null);
   const [viewingProductId, setViewingProductId] = useState<number | null>(null);
   const [deletingProductId, setDeletingProductId] = useState<number | null>(null);
+  const [categories, setCategories] = useState<{ categoryId: number; categoryName: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>("");
   const itemsPerPage = 7;
 
   const fetchProducts = useCallback(async () => {
@@ -96,6 +99,22 @@ const ProductManagementPage: React.FC = () => {
     fetchProducts();
   }, [fetchProducts]);
 
+  const fetchCategories = useCallback(async () => {
+    try {
+      const response = await axios.get(
+        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys"
+      );
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, [fetchProducts, fetchCategories]);
+
   const handleAddProduct = () => {
     dispatch({ type: "TOGGLE_MODAL" });
   };
@@ -120,13 +139,14 @@ const ProductManagementPage: React.FC = () => {
   
       const newProduct = response.data;
       dispatch({ type: "ADD_PRODUCT", payload: newProduct });
+      await fetchProducts();
     } catch (error) {
       console.error("Error adding product:", error);
     } finally {
       dispatch({ type: "SET_SUBMITTING", payload: false });
       dispatch({ type: "TOGGLE_MODAL" });
     }
-  }, []);
+  }, [fetchProducts]);
 
   const handleProductDelete = useCallback((productId: number) => {
     setDeletingProductId(productId);
@@ -147,16 +167,17 @@ const ProductManagementPage: React.FC = () => {
         updatedProduct
       );
       dispatch({ type: "UPDATE_PRODUCT", payload: response.data });
+      await fetchProducts();
     } catch (error) {
       console.error("Error updating product:", error);
     } finally {
       setEditingProduct(null);
     }
-  }, []);
+}, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts, state.products]);
+useEffect(() => {
+  fetchProducts();
+}, [fetchProducts, state.products]);
 
   const handleViewDetails = (productId: number) => {
     setViewingProductId(productId);
@@ -170,11 +191,25 @@ const ProductManagementPage: React.FC = () => {
     setDeletingProductId(null);
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedStatus(e.target.value);
+  };
+
+  const filteredProducts = state.products.filter((product) =>
+    product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+    (selectedCategory === "" || product.categoryId.toString() === selectedCategory) &&
+    (selectedStatus === "" || 
+      (selectedStatus === "Active" && product.status === 1) ||
+      (selectedStatus === "Inactive" && product.status === 0)
+    )
+  );
+
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const filteredProducts = state.products.filter((product) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
   const currentProducts = filteredProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
@@ -206,17 +241,26 @@ const ProductManagementPage: React.FC = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <select className="mr-4 rounded border p-2">
-                  <option>Select Category</option>
-                  <option>Tã</option>
-                  <option>Sữa</option>
-                  <option>Quần Áo</option>
-                  <option>Ăn Dặm</option>
+                <select 
+                  className="mr-4 rounded border p-2"
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                >
+                  <option value="">Select Category</option>
+                  {categories.map((category) => (
+                    <option key={category.categoryId} value={category.categoryId.toString()}>
+                      {category.categoryName}
+                    </option>
+                  ))}
                 </select>
-                <select className="mr-4 rounded border p-2">
-                  <option>Select Status</option>
-                  <option>Active</option>
-                  <option>Inactive</option>
+                <select 
+                  className="mr-4 rounded border p-2"
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                >
+                  <option value="">Select Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
                 </select>
                 <button
                   className="ml-auto rounded border bg-white p-2 text-black"
@@ -247,6 +291,15 @@ const ProductManagementPage: React.FC = () => {
           setIsOpen={handleAddProduct}
           isOpen={state.isOpen}
           onProductAdd={handleProductAdd}
+          onCategoryAdd={async (category: Category) => {
+            console.log("Adding category:", category);
+          }}
+          onLocationAdd={async (location: Location) => {
+            console.log("Adding location:", location);
+          }}
+          onOriginAdd={async (origin: Origin) => {
+            console.log("Adding origin:", origin);
+          }}
         />
       )}
       {editingProduct && (
@@ -267,9 +320,10 @@ const ProductManagementPage: React.FC = () => {
           isOpen={deletingProductId !== null}
           onClose={handleCloseDelete}
           productId={deletingProductId}
-          onProductDelete={(productId) => {
+          onProductDelete={async (productId) => {
             dispatch({ type: "DELETE_PRODUCT", payload: productId });
             handleCloseDelete();
+            await fetchProducts();
           }}
         />
       )}

@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Mail, MessageCircle, Phone, Search } from "lucide-react";
+import { Mail, MessageCircle, Phone, Search, Trash2 } from "lucide-react";
 import AddStaffModal from "./_components/add-staff-modal";
 import { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 
 interface ApiUser {
   fullName: string;
@@ -59,6 +60,23 @@ const StaffManagementPage: React.FC = () => {
     fetchStaffMembers();
   }, []);
 
+  const handleDeleteStaff = async (userId: string) => {
+    try {
+      const response = await fetch(`https://milkapplication20240705013352.azurewebsites.net/api/Users/DeleteUser/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setStaffMembers(staffMembers.filter(staff => staff.id !== userId));
+        toast.success('Nhân viên đã được xóa thành công!');
+      } else {
+        toast.error('Không thể xóa nhân viên. Vui lòng thử lại.');
+      }
+    } catch (error) {
+      console.error('Error deleting staff:', error);
+      toast.error('Đã xảy ra lỗi. Vui lòng thử lại sau.');
+    }
+  };
 
   const indexOfLastStaff = currentPage * itemsPerPage;
   const indexOfFirstStaff = indexOfLastStaff - itemsPerPage;
@@ -123,15 +141,15 @@ const StaffManagementPage: React.FC = () => {
           </div>
 
           <div className="mb-6 flex rounded-lg">
-          <div className="relative mr-4 flex flex-grow items-center">
-          <Search className="absolute left-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search Name Of Staff"
-              className="w-full rounded border p-2 pl-10"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+            <div className="relative mr-4 flex flex-grow items-center">
+              <Search className="absolute left-3 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search Name Of Staff"
+                className="w-full rounded border p-2 pl-10"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
             <select className="mr-4 rounded-lg border p-2">
               <option>Select Status</option>
@@ -147,7 +165,7 @@ const StaffManagementPage: React.FC = () => {
 
           <div className="grid grid-cols-3 gap-6">
             {currentStaff.map((staff) => (
-              <StaffCard key={staff.id} staff={staff} />
+              <StaffCard key={staff.id} staff={staff} onDelete={handleDeleteStaff} />
             ))}
           </div>
 
@@ -182,7 +200,7 @@ const StaffManagementPage: React.FC = () => {
   );
 };
 
-const StaffCard: React.FC<{ staff: StaffMember }> = ({ staff }) => {
+const StaffCard: React.FC<{ staff: StaffMember; onDelete: (id: string) => void }> = ({ staff, onDelete }) => {
   return (
     <div className="flex flex-col items-center rounded-lg bg-white p-4 shadow">
       <Image
@@ -197,7 +215,7 @@ const StaffCard: React.FC<{ staff: StaffMember }> = ({ staff }) => {
         <p className="mb-4 text-center text-gray-600">{staff.role}</p>
         <p className="text-gray-600 mb-2">Email: {staff.email}</p>
         <p className="text-gray-600 mb-2">Join Date: {staff.joinDate}</p>
-        <p className="text-gray-600 mb-2">Gender: Female</p>
+        <p className="text-gray-600 mb-2">Gender: {staff.gender}</p>
       </div>
       <div className="mt-5 flex justify-center">
         <button className="mx-2 text-blue-500">
@@ -208,6 +226,9 @@ const StaffCard: React.FC<{ staff: StaffMember }> = ({ staff }) => {
         </button>
         <button className="mx-2 text-blue-500">
           <Mail />
+        </button>
+        <button className="mx-2 text-red-500" onClick={() => onDelete(staff.id)}>
+          <Trash2 />
         </button>
       </div>
     </div>
