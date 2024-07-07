@@ -5,39 +5,52 @@ import { DescribeProduct } from "../_components/describe-product";
 import { EvaluateProduct } from "../_components/evaluate-product";
 import { Review } from "../_components/review";
 import { removeMarks } from "@/handle-transform/remove-marks";
-import { Product } from "@/interface";
+import {
+  CardCarouselPropsPicked,
+  Product,
+  ProductApiProps,
+  ProductDetailProps,
+} from "@/interface";
+import { getData } from "@/get-data-actions/get-data";
+import { getProducts } from "@/get-data-actions/get-products";
 
-const ProductDetailPage = ({
+const ProductDetailPage = async ({
   params,
 }: {
   params: { productDetail: string };
 }) => {
   const { productDetail } = params;
 
-  const productDetailByTitle = DataProducts.find((item) => {
-    const removeMarksTitle = removeMarks(item.title);
-    return removeMarksTitle === productDetail;
-  });
+  // console.log({ productDetail });
+
+  const idProduct = Number(productDetail.slice(1).toString());
+
+  const getProductDetailInformation: ProductDetailProps = await getData(
+    `/Product/GetProductsById/${idProduct}`,
+  );
+
+  const productsCarousel: CardCarouselPropsPicked[] = await getProducts();
+
+  // console.log({ productsCarousel });
 
   return (
     <div className="2xl:max-w-screen pt-28">
       <div className="space-y-8 px-20 py-10">
-        <ProductInformationDetail
-          carouselItems={carouselItems}
-          productDetailByTitle={productDetailByTitle!}
-        />
+        <ProductInformationDetail productDetail={getProductDetailInformation} />
 
         <CardCarousel
           titleCard="Thường được mua cùng"
-          carouselItems={carouselItems}
+          carouselItems={productsCarousel}
         />
 
         <CardCarousel
           titleCard="Sản phẩm tương tự"
-          carouselItems={carouselItems}
+          carouselItems={productsCarousel}
         />
 
-        <DescribeProduct />
+        <DescribeProduct
+          description={getProductDetailInformation.productDescription}
+        />
 
         <EvaluateProduct />
 

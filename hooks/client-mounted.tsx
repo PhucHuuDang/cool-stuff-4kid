@@ -1,4 +1,5 @@
 "use client";
+import { Loading } from "@/app/(platform)/(home)/_components/loading";
 import { useEffect, useState } from "react";
 
 export const ClientMounted = ({ children }: { children: React.ReactNode }) => {
@@ -8,7 +9,7 @@ export const ClientMounted = ({ children }: { children: React.ReactNode }) => {
     return setIsMounted(true);
   }, []);
 
-  if (!isMounted) return null;
+  if (!isMounted) return <Loading />;
 
   return <>{children}</>;
 };

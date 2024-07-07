@@ -1,18 +1,18 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import { Product } from "@/interface";
+import { Product, ProductApiProps } from "@/interface";
 
 interface State {
-  cart: Product[];
+  cart: ProductApiProps[];
   totalItems: number;
   totalPrice: number;
 }
 
 interface Actions {
-  addToCart: (product: Product) => void;
-  removeFromCart: (product: Product) => void;
-  decreaseQuantity: (productId: Product) => void;
+  addToCart: (product: ProductApiProps) => void;
+  removeFromCart: (product: ProductApiProps) => void;
+  decreaseQuantity: (productId: ProductApiProps) => void;
 }
 
 const INITIAL_STATE = {
@@ -27,14 +27,16 @@ export const useCartStore = create(
       cart: INITIAL_STATE.cart,
       totalItems: INITIAL_STATE.totalItems,
       totalPrice: INITIAL_STATE.totalPrice,
-      addToCart: (product: Product) => {
+      addToCart: (product: ProductApiProps) => {
         const cart = get().cart;
 
-        const cartItem = cart.find((item) => item.id === product.id);
+        const cartItem = cart.find(
+          (item) => item.productId === product.productId,
+        );
 
         if (cartItem) {
           const updatedCart = cart.map((item) =>
-            item.id === product.id
+            item.productId === product.productId
               ? { ...item, quantityOrder: item.quantityOrder! + 1 }
               : item,
           );
@@ -55,22 +57,26 @@ export const useCartStore = create(
         }
       },
 
-      removeFromCart: (product: Product) => {
+      removeFromCart: (product: ProductApiProps) => {
         set((state) => ({
-          cart: state.cart.filter((item) => item.id !== product.id),
+          cart: state.cart.filter(
+            (item) => item.productId !== product.productId,
+          ),
           totalItems: state.totalItems - 1,
           totalPrice: state.totalPrice - product.discountPrice,
         }));
       },
 
-      decreaseQuantity: (product: Product) => {
+      decreaseQuantity: (product: ProductApiProps) => {
         const cart = get().cart;
 
-        const cartItem = cart.find((item) => item.id === product.id);
+        const cartItem = cart.find(
+          (item) => item.productId === product.productId,
+        );
 
         if (cartItem) {
           const updateCart = cart.map((item) =>
-            item.id === product.id
+            item.productId === product.productId
               ? { ...item, ...product, quantityOrder: item.quantityOrder! - 1 }
               : item,
           );
@@ -82,7 +88,9 @@ export const useCartStore = create(
           }));
         } else {
           set((state) => ({
-            cart: state.cart.filter((item) => item.id !== product.id),
+            cart: state.cart.filter(
+              (item) => item.productId !== product.productId,
+            ),
             totalItems: state.totalItems - 1,
             totalPrice: state.totalPrice - product.discountPrice,
           }));

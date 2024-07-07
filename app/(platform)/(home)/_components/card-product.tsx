@@ -5,13 +5,14 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { removeMarks } from "@/handle-transform/remove-marks";
 import { useCartStore } from "@/hooks/use-cart-store";
-import { Product } from "@/interface";
+import { Product, ProductApiProps } from "@/interface";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface CardProductProps {
-  product: Product;
+  // product: Product;
+  product: ProductApiProps;
 }
 
 export const CardProduct = ({ product }: CardProductProps) => {
@@ -23,37 +24,41 @@ export const CardProduct = ({ product }: CardProductProps) => {
 
   const MAX_LENGTH = 54;
 
-  const handleAddToCart = (e: any, product: Product) => {
+  const handleAddToCart = (e: any, product: ProductApiProps) => {
     e.stopPropagation();
     addToCart(product);
   };
 
-  const handleRoute = (title: string) => {
+  const handleRoute = (title: string, id: string) => {
     const titleTransformed = removeMarks(title);
 
-    router.push(`/${titleTransformed}`);
+    const params = {
+      titleTransformed,
+      id,
+    };
+
+    console.log({ params });
+
+    router.push(`/${params.titleTransformed}/${params.id}`);
   };
 
   return (
     <div
       className="group col-span-1 cursor-pointer"
-      onClick={() => handleRoute(product.title)}
+      onClick={() => handleRoute(product.productName, product.productId)}
     >
       <div className="relative flex w-full flex-col gap-2">
-        <div className="absolute right-0 top-0 z-10 m-0 flex items-center gap-1 rounded-bl-xl bg-[#489bee] p-2 text-xs font-semibold text-white">
-          <span>Sale</span>
-          <span>
-            {/* {data?.discountPercent !== undefined
-          ? `-${data?.discountPercent}%`
-          : "-0%"} */}
-            {`-${product.discountPercent}%`}
-          </span>
-        </div>
+        {product.discountPercent > 0 && product.discountPercent && (
+          <div className="absolute right-0 top-0 z-10 m-0 flex items-center gap-1 rounded-bl-xl bg-[#489bee] p-2 text-xs font-semibold text-white">
+            <span>Sale</span>
+            <span>{`-${product.discountPercent}%`}</span>
+          </div>
+        )}
         <div className="relative aspect-square h-full w-full overflow-hidden rounded-xl">
           {/* <GlareCard className="flex flex-col items-center justify-center"> */}
           <Image
             fill
-            alt={`product-${product.title}`}
+            alt={`product-${product.productName}`}
             src={product.image}
             className="h-full w-full object-cover transition group-hover:scale-110"
             // className="absolute size-full object-cover transition group-hover:scale-110"
@@ -64,7 +69,7 @@ export const CardProduct = ({ product }: CardProductProps) => {
         </div>
         <div className="min-h-[56px] text-lg font-semibold">
           {/* {data?.serviceName} */}
-          {product.title}
+          {product.productName}
         </div>
         <div className="h-[65px] font-light text-neutral-500">
           {description.length > MAX_LENGTH
@@ -74,20 +79,31 @@ export const CardProduct = ({ product }: CardProductProps) => {
 
         <div className="flex items-center justify-between">
           <div className="text-md mt-3 flex flex-row items-center gap-1">
-            <div className="flex flex-row items-center gap-2">
-              <del className="font-light text-[#ed9080]">
-                {/* {formattedPrice(data?.originalPrice as number)} */}
-                {formatCurrency(product.originalPrice)}
-              </del>{" "}
-            </div>
+            {product.discountPercent && product.discountPercent > 0 ? (
+              <>
+                <div className="flex flex-row items-center gap-2">
+                  <del className="font-light text-[#ed9080]">
+                    {/* {formattedPrice(data?.originalPrice as number)} */}
+                    {formatCurrency(product.price)}
+                  </del>{" "}
+                </div>
 
-            <h1 className="text-xl font-semibold text-neutral-500">|</h1>
+                <h1 className="text-xl font-semibold text-neutral-500">|</h1>
 
-            <div className="flex flex-row items-center gap-2">
-              <span className="font-bold text-[#ff6347]">
-                {formatCurrency(product.discountPrice)}
-              </span>
-            </div>
+                <div className="flex flex-row items-center gap-2">
+                  <span className="font-bold text-[#ff6347]">
+                    {formatCurrency(product.discountPrice)}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-row items-center gap-2">
+                <div className="font-bold text-[#ed9080]">
+                  {/* {formattedPrice(data?.originalPrice as number)} */}
+                  {formatCurrency(product.price)}
+                </div>{" "}
+              </div>
+            )}
           </div>
 
           <ShoppingCart

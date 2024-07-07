@@ -15,18 +15,22 @@ import {
 } from "@/components/ui/collapsible";
 import { useState } from "react";
 
-export const DescribeProduct = () => {
+interface DescribeProductProps {
+  description: string;
+}
+
+export const DescribeProduct = ({ description }: DescribeProductProps) => {
   const MAX_LENGTH_DESCRIPTION = 150;
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
-  const description = `
-  Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-  Doloremque quo, consectetur deleniti aliquam iste magnam. Sequi
-  cupiditate placeat aspernatur quod sit minus, cumque quis quisquam
-  quo natus id consequuntur laudantium. lorem, cumque quis quisquam
-  quo natus id consequuntur laudantium. lorem,
-  
-  `;
+  // const description = `
+  // Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+  // Doloremque quo, consectetur deleniti aliquam iste magnam. Sequi
+  // cupiditate placeat aspernatur quod sit minus, cumque quis quisquam
+  // quo natus id consequuntur laudantium. lorem, cumque quis quisquam
+  // quo natus id consequuntur laudantium. lorem,
+
+  // `;
   return (
     <Card>
       <CardHeader>
