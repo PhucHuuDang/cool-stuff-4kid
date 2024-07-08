@@ -90,8 +90,8 @@ export const Details = () => {
                 <ProductName productId={comment.productId} />
               </TableCell>
               <TableCell>{comment.commentDetail}</TableCell>
-              <TableCell className="flex w-[200px] text-yellow-400">
-                <Star className="mr-1 h-4 w-4" />
+              <TableCell className="flex w-[200px] text-xl text-yellow-400">
+                <Star className="mr-1" />
                 {comment.rating}
               </TableCell>
               <TableCell className="text-center">{comment.date}</TableCell>

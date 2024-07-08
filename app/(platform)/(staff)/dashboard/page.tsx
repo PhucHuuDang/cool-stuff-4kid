@@ -1,15 +1,19 @@
 import React from "react";
-import { Header } from "../_component/header";
+import { Header } from "@/components/Header";
 import { DashboardData } from "./_component/data";
 import SideBar from "../_component/sidebar";
 
 const Staff: React.FC = () => {
   return (
-    <div>
-      <SideBar />
-      <div>
-        <Header title="Dashboard" />
-        <main className="ml-64 flex-grow overflow-auto bg-gray-100 p-3">
+    <div className="">
+      <div className="fixed w-full">
+        <Header title="Product Management" />
+      </div>
+      <div className="flex">
+        <div>
+          <SideBar />
+        </div>
+        <main className="ml-64 mt-[100px] h-full w-full px-2 pt-2">
           <DashboardData />
         </main>
       </div>

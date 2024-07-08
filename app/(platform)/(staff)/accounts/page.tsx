@@ -1,15 +1,19 @@
-import { Header } from "../_component/header";
+import { Header } from "@/components/Header";
 import SideBar from "../_component/sidebar";
 
 import { Profile } from "./_component/profile";
 
 const Accounts = () => {
   return (
-    <div className="flex min-h-screen">
-      <SideBar />
-      <div className="flex flex-grow flex-col">
-        <Header title="Accounts" />
-        <main className="ml-64 flex-grow overflow-auto bg-gray-100 pb-20">
+    <div className="">
+      <div className="fixed w-full">
+        <Header title="Product Management" />
+      </div>
+      <div className="flex">
+        <div>
+          <SideBar />
+        </div>
+        <main className="ml-64 mt-[100px] h-full w-full px-2 pb-[92px]">
           <Profile />
         </main>
       </div>

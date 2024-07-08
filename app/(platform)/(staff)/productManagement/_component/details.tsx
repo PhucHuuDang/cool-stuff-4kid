@@ -218,9 +218,23 @@ export const Details: React.FC = () => {
       });
   };
 
+  const truncateDescription = (description: string): string => {
+    if (description.length > 100) {
+      return description.substring(0, 100) + "...";
+    }
+    return description;
+  };
+
+  const formatPrice = (price: number) => {
+    return price.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    });
+  };
+
   return (
     <div>
-      <div className="flex justify-between p-3">
+      <div className="flex justify-between py-3 pr-3">
         <div className="relative w-[500px]">
           <Input className="pl-10" placeholder="Product Name" />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-500" />
@@ -295,7 +309,7 @@ export const Details: React.FC = () => {
                 <img src={item.image} alt={item.productName} />
               </TableCell>
               <TableCell className="w-56 font-medium">
-                {item.productDescription}
+                {truncateDescription(item.productDescription)}
               </TableCell>
               <TableCell
                 className={`w-16 font-medium ${getStatusColor(item.status)}`}
@@ -305,15 +319,17 @@ export const Details: React.FC = () => {
               <TableCell className="w-20 font-medium">
                 {item.quantity}
               </TableCell>
-              <TableCell className="w-20 font-medium">${item.price}</TableCell>
+              <TableCell className="w-20 font-medium">
+                {formatPrice(item.price)}
+              </TableCell>
               <TableCell className="w-24 text-center font-medium">
                 {item.discountPrice > 0 ? (
                   <>
-                    ${item.discountPrice}
+                    {formatPrice(item.discountPrice)}
                     <br />({item.discountPercent}%)
                   </>
                 ) : (
-                  "N/A"
+                  0
                 )}
               </TableCell>
               <TableCell className="w-16 text-center">
@@ -322,12 +338,16 @@ export const Details: React.FC = () => {
                     <MoreHorizontal />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleEdit(item)}>
+                    <DropdownMenuItem
+                      onClick={() => handleEdit(item)}
+                      className="text-blue-500"
+                    >
                       <PencilLineIcon className="mr-2" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleDelete(item.productId)}
+                      className="text-red-500 "
                     >
                       <Trash2Icon className="mr-2" />
                       Delete
@@ -346,101 +366,113 @@ export const Details: React.FC = () => {
       />
       {isAdding && (
         <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-50">
-          <div className="w-[500px] rounded-lg bg-white p-6 shadow-lg">
+          <div className="w-[600px] rounded-lg bg-white p-6 shadow-lg">
             <h2 className="mb-4 text-2xl font-bold">Add New Product</h2>
-            <div className="mb-4">
-              <Label>Product Name</Label>
-              <Input
-                type="text"
-                placeholder="Product Name"
-                value={newProduct.productName}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, productName: e.target.value })
-                }
-              />
+            <div className="flex justify-between">
+              <div>
+                <div className="mb-4">
+                  <Label>Product Name</Label>
+                  <Input
+                    type="text"
+                    placeholder="Product Name"
+                    value={newProduct.productName}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        productName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Price</Label>
+                  <Input
+                    type="number"
+                    placeholder="Price"
+                    value={newProduct.price}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setNewProduct({ ...newProduct, price: value });
+                      }
+                    }}
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Discount Price</Label>
+                  <Input
+                    type="number"
+                    placeholder="Discount Price"
+                    value={newProduct.discountPrice}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setNewProduct({ ...newProduct, discountPrice: value });
+                      }
+                    }}
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Discount Percent</Label>
+                  <Input
+                    type="number"
+                    placeholder="Discount Percent"
+                    value={newProduct.discountPercent}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setNewProduct({
+                          ...newProduct,
+                          discountPercent: value,
+                        });
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mb-4">
+                  <Label>Product Description</Label>
+                  <Input
+                    type="text"
+                    placeholder="Product Description"
+                    value={newProduct.productDescription}
+                    onChange={(e) =>
+                      setNewProduct({
+                        ...newProduct,
+                        productDescription: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Image URL</Label>
+                  <Input
+                    type="text"
+                    placeholder="Image URL"
+                    value={newProduct.image}
+                    onChange={(e) =>
+                      setNewProduct({ ...newProduct, image: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Quantity</Label>
+                  <Input
+                    type="number"
+                    placeholder="Quantity"
+                    value={newProduct.quantity}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setNewProduct({ ...newProduct, quantity: value });
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="mb-4">
-              <Label>Price</Label>
-              <Input
-                type="number"
-                placeholder="Price"
-                value={newProduct.price}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setNewProduct({ ...newProduct, price: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Discount Price</Label>
-              <Input
-                type="number"
-                placeholder="Discount Price"
-                value={newProduct.discountPrice}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setNewProduct({ ...newProduct, discountPrice: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Discount Percent</Label>
-              <Input
-                type="number"
-                placeholder="Discount Percent"
-                value={newProduct.discountPercent}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setNewProduct({ ...newProduct, discountPercent: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Product Description</Label>
-              <Input
-                type="text"
-                placeholder="Product Description"
-                value={newProduct.productDescription}
-                onChange={(e) =>
-                  setNewProduct({
-                    ...newProduct,
-                    productDescription: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Image URL</Label>
-              <Input
-                type="text"
-                placeholder="Image URL"
-                value={newProduct.image}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, image: e.target.value })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Quantity</Label>
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={newProduct.quantity}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setNewProduct({ ...newProduct, quantity: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
+            <div className="mb-4 text-right">
               <button
                 onClick={handleSaveNewProduct}
                 className="rounded-md bg-blue-500 px-4 py-2 text-white"
@@ -459,110 +491,130 @@ export const Details: React.FC = () => {
       )}
       {editProduct && (
         <div className="fixed left-0 top-0 z-50 flex h-full w-full items-center justify-center bg-gray-700 bg-opacity-50">
-          <div className="w-[500px] rounded-lg bg-white p-6 shadow-lg">
+          <div className="w-[600px] rounded-lg bg-white p-6 shadow-lg">
             <h2 className="mb-4 text-2xl font-bold">Edit Product</h2>
-            <div className="mb-4">
-              <Input
-                type="text"
-                placeholder="Product Name"
-                value={editProduct.productName}
-                onChange={(e) =>
-                  setEditProduct({
-                    ...editProduct,
-                    productName: e.target.value,
-                  })
-                }
-              />
+            <div className="flex justify-between">
+              <div>
+                <div className="mb-4">
+                  <Label>Product Name</Label>
+                  <Input
+                    type="text"
+                    placeholder="Product Name"
+                    value={editProduct.productName}
+                    onChange={(e) =>
+                      setEditProduct({
+                        ...editProduct,
+                        productName: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Price</Label>
+                  <Input
+                    type="number"
+                    placeholder="Price"
+                    value={editProduct.price}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setEditProduct({ ...editProduct, price: value });
+                      }
+                    }}
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Discount Price</Label>
+                  <Input
+                    type="number"
+                    placeholder="Discount Price"
+                    value={editProduct.discountPrice}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setEditProduct({
+                          ...editProduct,
+                          discountPrice: value,
+                        });
+                      }
+                    }}
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Discount Percent</Label>
+                  <Input
+                    type="number"
+                    placeholder="Discount Percent"
+                    value={editProduct.discountPercent}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setEditProduct({
+                          ...editProduct,
+                          discountPercent: value,
+                        });
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="mb-4">
+                  <Label>Description</Label>
+                  <Input
+                    type="text"
+                    placeholder="Product Description"
+                    value={editProduct.productDescription}
+                    onChange={(e) =>
+                      setEditProduct({
+                        ...editProduct,
+                        productDescription: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Image</Label>
+                  <Input
+                    type="text"
+                    placeholder="Image URL"
+                    value={editProduct.image}
+                    onChange={(e) =>
+                      setEditProduct({ ...editProduct, image: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Quantity</Label>
+                  <Input
+                    type="number"
+                    placeholder="Quantity"
+                    value={editProduct.quantity}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setEditProduct({ ...editProduct, quantity: value });
+                      }
+                    }}
+                  />
+                </div>
+                <div className="mb-4">
+                  <Label>Status</Label>
+                  <Input
+                    type="number"
+                    placeholder="Status"
+                    value={editProduct.status}
+                    onChange={(e) => {
+                      const value = +e.target.value;
+                      if (value >= 0) {
+                        setEditProduct({ ...editProduct, status: value });
+                      }
+                    }}
+                  />
+                </div>
+              </div>
             </div>
-            <div className="mb-4">
-              <Input
-                type="number"
-                placeholder="Price"
-                value={editProduct.price}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setEditProduct({ ...editProduct, price: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="number"
-                placeholder="Discount Price"
-                value={editProduct.discountPrice}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setEditProduct({ ...editProduct, discountPrice: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="number"
-                placeholder="Discount Percent"
-                value={editProduct.discountPercent}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setEditProduct({ ...editProduct, discountPercent: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="text"
-                placeholder="Product Description"
-                value={editProduct.productDescription}
-                onChange={(e) =>
-                  setEditProduct({
-                    ...editProduct,
-                    productDescription: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="text"
-                placeholder="Image URL"
-                value={editProduct.image}
-                onChange={(e) =>
-                  setEditProduct({ ...editProduct, image: e.target.value })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="number"
-                placeholder="Quantity"
-                value={editProduct.quantity}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setEditProduct({ ...editProduct, quantity: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
-              <Input
-                type="number"
-                placeholder="Status"
-                value={editProduct.status}
-                onChange={(e) => {
-                  const value = +e.target.value;
-                  if (value >= 0) {
-                    setEditProduct({ ...editProduct, status: value });
-                  }
-                }}
-              />
-            </div>
-            <div className="mb-4">
+            <div className="mb-4 text-right">
               <button
                 onClick={handleSaveEdit}
                 className="rounded-md bg-blue-500 px-4 py-2 text-white"

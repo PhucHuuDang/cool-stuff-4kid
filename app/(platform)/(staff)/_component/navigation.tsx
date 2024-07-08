@@ -18,7 +18,7 @@ export const Navigation = () => {
   return (
     <div>
       <aside className="fixed bottom-0 left-0 top-[100px] w-64 rounded-sm bg-slate-500/10 shadow-lg">
-        <nav className="mt-6">
+        <nav className="">
           <Link
             href="/dashboard"
             className={`flex rounded-r-3xl p-4 text-black ${getLinkClass("/dashboard")}`}
