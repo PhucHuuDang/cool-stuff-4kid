@@ -9,6 +9,7 @@ import { getData, infiniteData } from "@/get-data-actions/get-data";
 import { useCallback, useMemo, useRef } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Loading } from "../loading";
+import { FailedToFetch } from "../fail-to-fetch";
 
 interface CartProps {
   // products: Product[];
@@ -73,12 +74,9 @@ export const Cart: React.FC<CartProps> = ({ products }) => {
 
   if (isLoading) return <Loading />;
 
-  if (error)
-    return (
-      <h1 className="text-center text-lg font-semibold text-rose-500">
-        Something went wrong...
-      </h1>
-    );
+  // console.log({ isFetching });
+
+  if (error) return <FailedToFetch route="Home page route (cart)" />;
 
   return (
     <>

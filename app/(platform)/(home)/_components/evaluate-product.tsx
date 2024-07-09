@@ -6,10 +6,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Rating } from "react-simple-star-rating";
 
 export const EvaluateProduct = () => {
+  const handleRating = (rating: number) => {
+    console.log({ rating });
+  };
+
+  const tooltipArray = [
+    "Rất tệ 🙁",
+    "Tệ 😐",
+    "Tạm được 👍",
+    "Tốt 🙂",
+    "Rất tốt 👏",
+  ];
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Đánh giá sản phẩm</CardTitle>
+        <CardTitle>Sản phẩm được đánh giá</CardTitle>
       </CardHeader>
       <CardContent className="rounded-lg p-5">
         <div className="flex gap-x-2">
@@ -27,15 +39,6 @@ export const EvaluateProduct = () => {
             </div>
           </div>
         </div>
-        {/* <div
-          style={{
-            direction: "ltr",
-            fontFamily: "sans-serif",
-            touchAction: "none",
-            display: "flex",
-            alignItems: "center",
-          }}
-        > */}
         <Rating
           fillColorArray={[
             "#f14f45",
@@ -44,14 +47,17 @@ export const EvaluateProduct = () => {
             "#f1b345",
             "#f1d045",
           ]}
-          style={{
-            direction: "ltr",
-            display: "flex",
-          }}
-          // onClick={function noRefCheck(){}}
+          allowFraction={false}
+          readonly
+          onClick={handleRating}
           transition
+          showTooltip
+          tooltipArray={tooltipArray}
+          emptyStyle={{ display: "flex" }}
+          SVGstyle={{ display: "inline-block", marginBottom: 10 }}
+          style={{ marginBottom: -10 }}
+          id="rating"
         />
-        {/* </div> */}
       </CardContent>
     </Card>
   );
