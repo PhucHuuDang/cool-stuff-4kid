@@ -7,7 +7,7 @@ const Accounts = () => {
   return (
     <div className="">
       <div className="fixed w-full">
-        <Header title="Product Management" />
+        <Header title="Accounts" />
       </div>
       <div className="flex">
         <div>

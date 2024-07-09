@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { AddProduct } from "./add-product";
 
 const ITEMS_PER_PAGE = 3;
 
@@ -69,6 +68,7 @@ export const Details: React.FC = () => {
     locationId: 1,
   });
   const [isAdding, setIsAdding] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>(""); // New state for search query
   const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
 
   useEffect(() => {
@@ -87,11 +87,18 @@ export const Details: React.FC = () => {
 
   useEffect(() => {
     setFilteredData(
-      data.filter((item: Product) =>
-        statusFilter.includes(item.status === 0 ? "Out of Stock" : "In Stock"),
-      ),
+      data
+        .filter((item: Product) =>
+          statusFilter.includes(
+            item.status === 0 ? "Out of Stock" : "In Stock",
+          ),
+        )
+        .filter(
+          (item: Product) =>
+            item.productName.toLowerCase().includes(searchQuery.toLowerCase()), // Filter by search query
+        ),
     );
-  }, [statusFilter, data]);
+  }, [statusFilter, searchQuery, data]);
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -104,6 +111,10 @@ export const Details: React.FC = () => {
         ? prev.filter((item: string) => item !== status)
         : [...prev, status],
     );
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value); // Update search query state
   };
 
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -236,7 +247,12 @@ export const Details: React.FC = () => {
     <div>
       <div className="flex justify-between py-3 pr-3">
         <div className="relative w-[500px]">
-          <Input className="pl-10" placeholder="Product Name" />
+          <Input
+            className="pl-10"
+            placeholder="Product Name"
+            value={searchQuery}
+            onChange={handleSearchChange} // Add onChange handler for search input
+          />
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 transform text-gray-500" />
         </div>
         <div>
@@ -347,7 +363,7 @@ export const Details: React.FC = () => {
                     </DropdownMenuItem>
                     <DropdownMenuItem
                       onClick={() => handleDelete(item.productId)}
-                      className="text-red-500 "
+                      className="text-red-500"
                     >
                       <Trash2Icon className="mr-2" />
                       Delete

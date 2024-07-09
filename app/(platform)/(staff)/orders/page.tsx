@@ -6,7 +6,7 @@ const Orders = () => {
   return (
     <div className="">
       <div className="fixed w-full">
-        <Header title="Product Management" />
+        <Header title="Orders" />
       </div>
       <div className="flex">
         <div>

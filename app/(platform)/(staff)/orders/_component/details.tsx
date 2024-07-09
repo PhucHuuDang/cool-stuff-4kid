@@ -12,12 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Filter from "./filter";
-import {
-  ArrowUp,
-  ArrowDown,
-  ArrowDownWideNarrow,
-  ArrowUpNarrowWide,
-} from "lucide-react"; // Importing icons from Lucide
+import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react"; // Importing icons from Lucide
 
 type StatusType =
   | "Canceled"
@@ -57,7 +52,16 @@ export const Details: React.FC = () => {
         const response = await axios.get(
           "https://milkapplication20240705013352.azurewebsites.net/api/Order/GetAllOrder",
         );
-        setData(response.data);
+        setData(
+          response.data.map((order: any) => ({
+            orderId: order.orderId,
+            orderDate: order.orderDate,
+            status: order.status,
+            totalPrice: order.totalPrice,
+            id: order.id,
+            username: order.userName, // Đã sửa lại từ `username` thành `userName` để khớp với API
+          })),
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -129,7 +133,7 @@ export const Details: React.FC = () => {
             placeholder="Search by username"
             value={searchQuery}
             onChange={handleSearchQueryChange}
-            className="w-full border p-2"
+            className="w-full rounded-sm border p-2"
           />
         </div>
         <Filter onFilterChange={handleFilterChange} />

@@ -6,7 +6,7 @@ const Feedback = () => {
   return (
     <div className="">
       <div className="fixed w-full">
-        <Header title="Product Management" />
+        <Header title="Feedback" />
       </div>
       <div className="flex">
         <div>
