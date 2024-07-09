@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { X, ShoppingCart, Tag, MapPin, Package, Folder, Globe } from 'lucide-react';
+import { X, ShoppingCart, Tag, MapPin, Package, Folder, Globe, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductDetails {
   productId: number;
@@ -27,6 +27,7 @@ interface ProductDetailsModalProps {
 
 const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, isOpen, onClose }) => {
   const [product, setProduct] = useState<ProductDetails | null>(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchProductDetails = async (id: number) => {
@@ -44,6 +45,18 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, is
     }
   }, [isOpen, productId]);
 
+  const nextImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      (prevIndex + 1) % (product ? product.imagesCarousel.length + 1 : 1)
+    );
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prevIndex) => 
+      (prevIndex - 1 + (product ? product.imagesCarousel.length + 1 : 1)) % (product ? product.imagesCarousel.length + 1 : 1)
+    );
+  };
+
   if (!isOpen || !product) {
     return null;
   }
@@ -60,7 +73,32 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, is
         <div className="flex-grow overflow-y-auto p-6">
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="lg:w-1/2">
-              <img src={product.image} alt={product.productName} className="w-full h-80 object-cover rounded-lg shadow-md" />
+              <img 
+                src={currentImageIndex === 0 ? product.image : product.imagesCarousel[currentImageIndex - 1]} 
+                alt={product.productName} 
+                className="w-full h-80 object-cover rounded-lg shadow-md"
+              />
+              <div className="mt-4 flex justify-center items-center">
+                <button onClick={prevImage} className="p-2 bg-gray-200 rounded-full mr-2">
+                  <ChevronLeft size={20} />
+                </button>
+                <div className="flex space-x-2 overflow-x-auto">
+                  {[product.image, ...product.imagesCarousel].map((img, index) => (
+                    <img
+                      key={index}
+                      src={img}
+                      alt={`Product view ${index + 1}`}
+                      className={`w-16 h-16 object-cover rounded-md cursor-pointer ${
+                        index === currentImageIndex ? 'border-2 border-blue-500' : ''
+                      }`}
+                      onClick={() => setCurrentImageIndex(index)}
+                    />
+                  ))}
+                </div>
+                <button onClick={nextImage} className="p-2 bg-gray-200 rounded-full ml-2">
+                  <ChevronRight size={20} />
+                </button>
+              </div>
             </div>
             <div className="lg:w-1/2 flex flex-col justify-between">
               <div>

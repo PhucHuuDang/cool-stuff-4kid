@@ -8,4 +8,5 @@ export type RegisterProps = {
 export type LoginProps = {
   token: string;
   refreshToken: string;
+  role: string;
 };

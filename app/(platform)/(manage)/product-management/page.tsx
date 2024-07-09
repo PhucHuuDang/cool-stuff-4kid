@@ -173,11 +173,11 @@ const ProductManagementPage: React.FC = () => {
     } finally {
       setEditingProduct(null);
     }
-}, []);
+  }, [fetchProducts]);
 
-useEffect(() => {
-  fetchProducts();
-}, [fetchProducts, state.products]);
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, state.products]);
 
   const handleViewDetails = (productId: number) => {
     setViewingProductId(productId);
@@ -269,14 +269,16 @@ useEffect(() => {
                   Add Product
                 </button>
               </div>
-              <ProductTable
-                currentProducts={currentProducts}
-                dropdownVisible={state.dropdownVisible}
-                toggleDropdown={toggleDropdown}
-                handleProductDelete={handleProductDelete}
-                handleEditClick={handleEditClick}
-                handleViewDetails={handleViewDetails}
-              />
+              <div className="overflow-x-auto">
+                <ProductTable
+                  currentProducts={currentProducts}
+                  dropdownVisible={state.dropdownVisible}
+                  toggleDropdown={toggleDropdown}
+                  handleProductDelete={handleProductDelete}
+                  handleEditClick={handleEditClick}
+                  handleViewDetails={handleViewDetails}
+                />
+              </div>
               <Pagination
                 currentPage={state.currentPage}
                 totalPages={totalPages}
@@ -346,7 +348,7 @@ const ProductTable: React.FC<{
   handleEditClick,
   handleViewDetails,
 }) => (
-  <table className="min-w-full divide-y divide-gray-200">
+  <table className="min-w-full divide-y divide-gray-200 table-fixed">
     <thead className="bg-gray-50">
       <tr>
         <TableHeader text="ID" />
@@ -372,7 +374,7 @@ const ProductTable: React.FC<{
               alt="Product"
             />
           </td>
-          <TableCell text={product.productName} />
+          <TableCell text={product.productName} isProductName={true} />
           <TableCell text={product.quantity?.toString() ?? '0'} />
           <TableCell text={product.price.toString()} />
           <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
@@ -444,8 +446,10 @@ const TableHeader: React.FC<{ text: string }> = ({ text }) => (
   </th>
 );
 
-const TableCell: React.FC<{ text: string }> = ({ text }) => (
-  <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+const TableCell: React.FC<{ text: string; isProductName?: boolean }> = ({ text, isProductName }) => (
+  <td className={`px-6 py-4 text-center text-sm text-gray-500 ${
+    isProductName ? 'max-w-xs break-words' : 'whitespace-nowrap'
+  }`}>
     {text}
   </td>
 );
