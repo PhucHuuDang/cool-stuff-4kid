@@ -1,11 +1,21 @@
-import { DataProducts, vouchers } from "@/db";
+import {
+  // DataProducts
+
+  vouchers,
+} from "@/db";
 import { CardProduct } from "./_components/card-product";
 import Sidebar from "./_components/sidebar";
 import { Cart } from "./_components/cart/cart";
 import { CardCarouselHome } from "@/components/card-carousel-home";
 import { VoucherCarousel } from "./_components/voucher-carousel";
+import { getProducts } from "@/get-data-actions/get-products";
+import { ProductApiProps } from "@/interface";
 
-const HomePage = ({ children }: { children: React.ReactNode }) => {
+const HomePage = async ({ children }: { children: React.ReactNode }) => {
+  const products: ProductApiProps[] = await getProducts();
+
+  // console.log({ products });
+
   const urls = [
     {
       url: "/images/clothes-event.png",
@@ -41,7 +51,7 @@ const HomePage = ({ children }: { children: React.ReactNode }) => {
               <CardProduct key={product.id} product={product} />
             ))} */}
 
-            <Cart product={DataProducts} />
+            <Cart products={products} />
           </div>
           {/* {children} */}
         </div>

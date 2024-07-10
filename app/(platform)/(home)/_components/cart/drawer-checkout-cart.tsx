@@ -24,10 +24,15 @@ export const DrawerCheckoutCart = () => {
 
   let total = 0;
 
+  // console.log({ cart });
+
   if (cart) {
     total = cart.reduce(
       (acc, product) =>
-        acc + product.discountPrice * (product.quantityOrder as number),
+        acc +
+        (product.discountPercent > 0
+          ? product.discountPrice * (product.quantityOrder as number)
+          : product.price * (product.quantityOrder as number)),
       0,
     );
   }
@@ -94,7 +99,7 @@ export const DrawerCheckoutCart = () => {
               )}
               <ul className="space-y-5">
                 {cart?.map((product) => (
-                  <CartItem key={product.id} product={product} />
+                  <CartItem key={product.productId} product={product} />
                 ))}
               </ul>
             </div>
@@ -102,9 +107,10 @@ export const DrawerCheckoutCart = () => {
             {cartCondition && (
               <div className="my-5">
                 <div className="item-center flex gap-1">
-                  <p className="text-lg text-zinc-600">Total:</p>
-                  <p className="text-lg text-sky-500">
+                  <p className="text-lg font-bold text-zinc-600">Tạm tính:</p>
+                  <p className="text-lg font-bold text-[#ff6347]">
                     {formatCurrency(total)}
+                    {/* {total} */}
                   </p>
                 </div>
               </div>

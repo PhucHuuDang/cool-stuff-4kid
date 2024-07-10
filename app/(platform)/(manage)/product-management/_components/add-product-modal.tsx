@@ -27,7 +27,7 @@ import { UploadImageProduct } from "./upload-image-product";
 import {
   State,
   AddModalProps,
-  Product,
+  AddProduct,
   ProductManagementAction,
   Category,
   Location,
@@ -205,7 +205,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
         locationId: values.locationId
       };
 
-      const response = await axios.post<Product>(
+      const response = await axios.post<AddProduct>(
         "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
         productData
       );

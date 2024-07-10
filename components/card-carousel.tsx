@@ -12,22 +12,24 @@ import {
 } from "./ui/carousel";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { CardCarouselPropsPicked } from "@/interface";
+import { formatCurrency } from "@/handle-transform/formatCurrency";
 
 interface CardCarouselProps {
   titleCard: string;
-  carouselItems: CarouselItemProps[];
+  carouselItems: CardCarouselPropsPicked[];
   delay?: number;
   stopOnInteraction?: boolean;
   loop?: boolean;
   classNameCarouselItem?: string;
 }
 
-interface CarouselItemProps {
-  url: string;
-  rating: number;
-  title: string;
-  price: number;
-}
+// interface CarouselItemProps {
+//   url: string;
+//   rating: number;
+//   title: string;
+//   price: number;
+// }
 
 export const CardCarousel = ({
   titleCard = "Sản phẩm tương tự",
@@ -58,7 +60,7 @@ export const CardCarousel = ({
           <CarouselContent>
             {carouselItems.map((product) => (
               <CarouselItem
-                key={product.title}
+                key={product.productId}
                 className={cn(
                   "md:basis-1/3 lg:basis-1/5",
                   classNameCarouselItem,
@@ -66,17 +68,23 @@ export const CardCarousel = ({
               >
                 <div className="flex cursor-pointer flex-col justify-center gap-y-2 p-2 transition hover:scale-105">
                   <Image
-                    src={product.url}
-                    alt={product.title}
+                    src={product.image}
+                    alt={product.productName}
                     height={300}
                     className="rounded-lg"
                     width={300}
                   />
 
                   <div>
-                    <h1 className="text-lg">{product.title}</h1>
-                    <span>{product.rating}</span>
-                    <h2 className="text-xl font-bold">{product.price}d</h2>
+                    <h1 className="truncate text-lg">{product.productName}</h1>
+                    <span>{product.discountPercent}</span>
+                    <h2 className="text-xl font-bold">
+                      {formatCurrency(
+                        product.discountPercent > 0
+                          ? product.discountPercent
+                          : product.price,
+                      )}
+                    </h2>
                   </div>
                 </div>
               </CarouselItem>
