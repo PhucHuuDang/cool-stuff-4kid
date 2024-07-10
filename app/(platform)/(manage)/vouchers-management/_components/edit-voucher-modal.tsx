@@ -38,11 +38,16 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    const newValue = name === 'discountPercent' || name === 'quantity' ? Number(value) : value;
-    setEditedVoucher(prev => ({ ...prev, [name]: newValue }));
-    if (name === 'discountPercent' || name === 'quantity') {
-      validateInput(name, Number(value));
+    let newValue: string | number = value;
+    
+    if (name === 'discountPercent' || name === 'quantity' || name === 'vouchersStatus') {
+      newValue = Number(value);
+      if (name !== 'vouchersStatus') {
+        validateInput(name, newValue);
+      }
     }
+    
+    setEditedVoucher(prev => ({ ...prev, [name]: newValue }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -128,8 +133,8 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
               <input
                 id="date"
                 name="date"
-                type="date"
-                value={editedVoucher.date.split('T')[0]}
+                type="datetime-local"
+                value={editedVoucher.date.split('.')[0]} // Remove milliseconds if present
                 onChange={handleChange}
                 className="pl-10 pr-3 py-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out"
                 required

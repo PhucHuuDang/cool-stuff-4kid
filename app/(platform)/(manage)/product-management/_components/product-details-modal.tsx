@@ -76,7 +76,7 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({ productId, is
               <img 
                 src={currentImageIndex === 0 ? product.image : product.imagesCarousel[currentImageIndex - 1]} 
                 alt={product.productName} 
-                className="w-full h-80 object-cover rounded-lg shadow-md"
+                className="w-full h-full object-cover rounded-lg shadow-md"
               />
               <div className="mt-4 flex justify-center items-center">
                 <button onClick={prevImage} className="p-2 bg-gray-200 rounded-full mr-2">

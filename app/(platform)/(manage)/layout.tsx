@@ -17,7 +17,7 @@ const Layout: React.FC<LayoutProps> = ({ children, title }) => {
       try {
         const info = await informationDecoded();
         setDecodedInfo(info);
-        console.log("User information fetched:", info);
+        console.log("User information fetched:", null);
       } catch (error) {
         console.error("Error fetching decoded information:", error);
       }

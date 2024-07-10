@@ -16,7 +16,7 @@ interface Voucher {
   discountPercent: number;
   quantity: number;
   date: string;
-  vouchersStatus: number;
+  vouchersStatus: number;  // 0 for InActive, 1 for Active
 }
 
 const VouchersPage: React.FC = () => {
@@ -59,15 +59,17 @@ const VouchersPage: React.FC = () => {
   };
 
   const handleAddVoucher = async (newVoucher: Omit<Voucher, 'voucherId'>) => {
-        try {
+    try {
       const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/CreateVouchers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          ...newVoucher,
-          voucherId: 0 // API expects this field
+          vouchersDTO: {
+            ...newVoucher,
+            voucherId: 0 // API expects this field
+          }
         }),
       });
 
@@ -91,32 +93,39 @@ const VouchersPage: React.FC = () => {
 
   const handleUpdateVoucher = async (updatedVoucher: Voucher) => {
     try {
+      const requestBody = {
+        voucherId: updatedVoucher.voucherId,
+        code: updatedVoucher.code,
+        discountPercent: updatedVoucher.discountPercent,
+        quantity: updatedVoucher.quantity,
+        date: new Date(updatedVoucher.date).toISOString(),
+        vouchersStatus: updatedVoucher.vouchersStatus
+      };
+  
+      console.log('Sending updated voucher:', JSON.stringify(requestBody, null, 2));
+  
       const response = await fetch(`https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/UpdateVouchers/${updatedVoucher.voucherId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedVoucher),
+        body: JSON.stringify(requestBody),
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to update voucher');
-      }
-
-      const result = await response.json();
-      
-      // Check the result returned from the API
-      if (result.success) {
+  
+      const result = await response.text();
+  
+      if (response.ok) {
+        console.log('Update successful:', result);
         await fetchVouchers(); // Refresh the voucher list
         setShowEditModal(false);
         setSuccessMessage('Voucher updated successfully');
       } else {
-        throw new Error(result.message || 'Failed to update voucher');
+        console.error('Error response:', response.status, result);
+        throw new Error(`Failed to update voucher: ${response.status} ${result}`);
       }
     } catch (error) {
       console.error('Error updating voucher:', error);
       setError('Failed to update voucher. Please try again.');
-      // Don't close the modal in case of an error
     }
   };
 
