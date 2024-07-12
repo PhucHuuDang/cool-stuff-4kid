@@ -1,7 +1,7 @@
 "use client";
 
 import { Product, ProductApiProps } from "@/interface";
-import { CardProduct } from "../card-product";
+import { CardProduct, CardProductSkeleton } from "../card-product";
 import useFromStore from "@/store/use-from-store";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { useInfiniteQuery } from "@tanstack/react-query";
@@ -88,6 +88,13 @@ export const Cart: React.FC<CartProps> = ({ products }) => {
             ref={lastElementRef}
           />
         ))}
+
+      {isFetching && (
+        <>
+          <CardProductSkeleton />
+          <CardProductSkeleton />
+        </>
+      )}
 
       {isFetching && (
         <div className="text-center">

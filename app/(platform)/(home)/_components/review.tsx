@@ -56,7 +56,7 @@ export const Review = ({
       <CardContent className="rounded-lg p-5">
         <ReviewDialog productDetail={productDetail} />
 
-        <div className="flex gap-x-2">
+        <div className="my-4 flex gap-x-2">
           <Avatar className="size-12">
             <AvatarImage className="" src="/images/tiny-home.webp" />
             <AvatarFallback />
