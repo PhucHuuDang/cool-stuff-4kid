@@ -43,9 +43,9 @@ export const LoginModal = () => {
   const { execute, fieldErrors } = useAction(loginAccount, {
     onSuccess: async (data) => {
       toast.success("Login successfully");
-
       await createCookie(data);
       loginModal.onClose();
+      router.push("/dash-board")
       if (drawerCart.isOpen) {
         drawerCart.onClose();
         router.push("/checkout");
