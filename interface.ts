@@ -15,6 +15,15 @@ export interface Product {
   quantityOrder?: number;
 }
 
+export interface Voucher {
+  voucherId: number;
+  code: string;
+  discountPercent: number;
+  quantity: number;
+  date: string;
+  vouchersStatus: number;
+}
+
 export interface ProductProps {
   id: number;
   title: string;

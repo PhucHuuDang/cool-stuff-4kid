@@ -29,6 +29,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const [categories, setCategories] = useState<Category[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [origins, setOrigins] = useState<Origin[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     console.log("EditProductModal mounted or product changed");
@@ -77,6 +78,21 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     }
   };
 
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!editedProduct.productName.trim()) {
+      newErrors.productName = "Product name is required";
+    }
+
+    if (!editedProduct.price || editedProduct.price < 1) {
+      newErrors.price = "Price must be 1 or greater";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleInputChange = useCallback((
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -87,6 +103,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         ? parseFloat(value)
         : value,
     }));
+    // Clear error when user starts typing
+    setErrors(prev => ({ ...prev, [name]: '' }));
     console.log(`Input changed: ${name} = ${value}`);
   }, []);
 
@@ -101,6 +119,12 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Form submitted");
+
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -145,27 +169,33 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
               <Package className="h-5 w-5 text-primary" />
-              <Input
-                id="productName"
-                name="productName"
-                placeholder="Product Name"
-                value={editedProduct.productName}
-                onChange={handleInputChange}
-                className="flex-1"
-              />
+              <div className="flex-1">
+                <Input
+                  id="productName"
+                  name="productName"
+                  placeholder="Product Name"
+                  value={editedProduct.productName}
+                  onChange={handleInputChange}
+                  className={errors.productName ? "border-red-500" : ""}
+                />
+                {errors.productName && <p className="text-red-500 text-sm mt-1">{errors.productName}</p>}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center space-x-4">
                 <FontAwesomeIcon icon={faDongSign} className="h-5 w-5 text-green-600" />
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  placeholder="Price"
-                  value={editedProduct.price}
-                  onChange={handleInputChange}
-                  className="flex-1"
-                />
+                <div className="flex-1">
+                  <Input
+                    id="price"
+                    name="price"
+                    type="number"
+                    placeholder="Price"
+                    value={editedProduct.price}
+                    onChange={handleInputChange}
+                    className={errors.price ? "border-red-500" : ""}
+                  />
+                  {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <Percent className="h-5 w-5 text-orange-600" />

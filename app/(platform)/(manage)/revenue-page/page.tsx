@@ -1,6 +1,4 @@
 import React from 'react';
-import { Header } from '@/components/Header';
-import { SideBar } from '@/components/Sidebar';
 import { BarChart } from '@/components/bar-chart';
 
 const RevenuePage = () => {
@@ -30,10 +28,6 @@ const RevenuePage = () => {
             <BarChart />
           </div>
         </main>
-        {/* Footer */}
-        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
-          <Footer />
-        </div> */}
       </div>
     </div>
   );

@@ -1,14 +1,6 @@
 import React, { useState } from 'react';
 import { X, Percent, Hash, Tag } from 'lucide-react';
-
-interface Voucher {
-  voucherId: number;
-  code: string;
-  discountPercent: number;
-  quantity: number;
-  date: string;
-  vouchersStatus: number;
-}
+import { Voucher } from '@/interface';
 
 interface AddVoucherModalProps {
   isOpen: boolean;
@@ -19,8 +11,8 @@ interface AddVoucherModalProps {
 const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAdd }) => {
   const [newVoucher, setNewVoucher] = useState<Omit<Voucher, 'voucherId' | 'vouchersStatus'>>({
     code: '',
-    discountPercent: 0,
-    quantity: 0,
+    discountPercent: 1,
+    quantity: 1,
     date: new Date().toISOString(),
   });
 
@@ -30,8 +22,8 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
   });
 
   const validateInput = (name: string, value: number) => {
-    if (value < 0) {
-      setErrors(prev => ({ ...prev, [name]: 'Value must be 0 or greater' }));
+    if (value < 1) {
+      setErrors(prev => ({ ...prev, [name]: 'Value must be 1 or greater' }));
     } else {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -47,7 +39,7 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newVoucher.discountPercent < 0 || newVoucher.quantity < 0) {
+    if (newVoucher.discountPercent < 1 || newVoucher.quantity < 1) {
       return; // Don't submit if there are validation errors
     }
     console.log('Submitting voucher:', newVoucher);
@@ -55,8 +47,8 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
       await onAdd(newVoucher);
       setNewVoucher({
         code: '',
-        discountPercent: 0,
-        quantity: 0,
+        discountPercent: 1,
+        quantity: 1,
         date: new Date().toISOString(),
       });
     } catch (error) {
@@ -103,7 +95,7 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
                 id="discountPercent"
                 name="discountPercent"
                 type="number"
-                min="0"
+                min="1"
                 placeholder="Enter discount percentage"
                 className={`pl-10 pr-3 py-3 w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out ${errors.discountPercent ? 'border-red-500' : 'border-gray-300'}`}
                 value={newVoucher.discountPercent}
@@ -121,7 +113,7 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
                 id="quantity"
                 name="quantity"
                 type="number"
-                min="0"
+                min="1"
                 placeholder="Enter quantity"
                 className={`pl-10 pr-3 py-3 w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out ${errors.quantity ? 'border-red-500' : 'border-gray-300'}`}
                 value={newVoucher.quantity}
@@ -143,7 +135,7 @@ const AddVoucherModal: React.FC<AddVoucherModalProps> = ({ isOpen, onClose, onAd
             <button
               type="submit"
               className="py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-              disabled={newVoucher.discountPercent < 0 || newVoucher.quantity < 0}
+              disabled={newVoucher.discountPercent < 1 || newVoucher.quantity < 1}
             >
               Add Voucher
             </button>

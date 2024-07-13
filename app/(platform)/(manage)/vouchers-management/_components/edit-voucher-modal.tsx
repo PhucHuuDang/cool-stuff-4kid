@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Percent, Hash, Tag, Calendar, ToggleLeft } from 'lucide-react';
+import { Voucher } from '@/interface';
 
-interface Voucher {
-  voucherId: number;
-  code: string;
-  discountPercent: number;
-  quantity: number;
-  date: string;
-  vouchersStatus: number;
-}
 
 interface EditVoucherModalProps {
   isOpen: boolean;

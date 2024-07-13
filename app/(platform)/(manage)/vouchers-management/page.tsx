@@ -9,15 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
-interface Voucher {
-  voucherId: number;
-  code: string;
-  discountPercent: number;
-  quantity: number;
-  date: string;
-  vouchersStatus: number;  // 0 for InActive, 1 for Active
-}
+import { Voucher } from '@/interface';
 
 const VouchersPage: React.FC = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
