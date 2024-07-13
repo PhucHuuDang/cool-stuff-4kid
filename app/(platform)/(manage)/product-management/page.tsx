@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useReducer, useEffect, useCallback, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import axios from "axios";
 import { AddProductModal } from "./_components/add-product-modal";
 import { EditProductModal } from "./_components/edit-product-modal";
@@ -71,6 +71,8 @@ const ProductManagementPage: React.FC = () => {
   const [categories, setCategories] = useState<{ categoryId: number; categoryName: string }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const itemsPerPage = 7;
 
   const fetchProducts = useCallback(async () => {
@@ -199,22 +201,42 @@ const ProductManagementPage: React.FC = () => {
     setSelectedStatus(e.target.value);
   };
 
-  const filteredProducts = state.products.filter((product) =>
-    product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (selectedCategory === "" || product.categoryId.toString() === selectedCategory) &&
-    (selectedStatus === "" || 
-      (selectedStatus === "Active" && product.status === 1) ||
-      (selectedStatus === "Inactive" && product.status === 0)
+  const sortProducts = (products: ProductProps[]) => {
+    if (!sortField) return products;
+
+    return [...products].sort((a, b) => {
+      if (sortField === 'discountPrice') {
+        const aValue = a.discountPrice ?? Number.MAX_VALUE;
+        const bValue = b.discountPrice ?? Number.MAX_VALUE;
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      if (sortField === 'discountPercent') {
+        const aValue = a.discountPercent ?? 0;
+        const bValue = b.discountPercent ?? 0;
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
+  };
+
+  const filteredAndSortedProducts = sortProducts(
+    state.products.filter((product) =>
+      product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (selectedCategory === "" || product.categoryId.toString() === selectedCategory) &&
+      (selectedStatus === "" || 
+        (selectedStatus === "Active" && product.status === 1) ||
+        (selectedStatus === "Inactive" && product.status === 0)
+      )
     )
   );
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = filteredProducts.slice(
+  const currentProducts = filteredAndSortedProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct
   );
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
 
   const handleClick = useCallback((pageNumber: number) => {
     dispatch({ type: "SET_CURRENT_PAGE", payload: pageNumber });
@@ -223,6 +245,15 @@ const ProductManagementPage: React.FC = () => {
   const toggleDropdown = useCallback((productId: number) => {
     dispatch({ type: "TOGGLE_DROPDOWN", payload: productId });
   }, []);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -277,6 +308,9 @@ const ProductManagementPage: React.FC = () => {
                   handleProductDelete={handleProductDelete}
                   handleEditClick={handleEditClick}
                   handleViewDetails={handleViewDetails}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  handleSort={handleSort}
                 />
               </div>
               <Pagination
@@ -340,6 +374,9 @@ const ProductTable: React.FC<{
   handleProductDelete: (productId: number) => void;
   handleEditClick: (product: ProductProps) => void;
   handleViewDetails: (productId: number) => void;
+  sortField: string | null;
+  sortDirection: 'asc' | 'desc';
+  handleSort: (field: string) => void;
 }> = ({
   currentProducts,
   dropdownVisible,
@@ -347,21 +384,36 @@ const ProductTable: React.FC<{
   handleProductDelete,
   handleEditClick,
   handleViewDetails,
+  sortField,
+  sortDirection,
+  handleSort,
 }) => (
   <table className="min-w-full divide-y divide-gray-200 table-fixed">
     <thead className="bg-gray-50">
-      <tr>
-        <TableHeader text="ID" />
-        <TableHeader text="Product Image" />
-        <TableHeader text="Product Name" />
-        <TableHeader text="Quantity" />
-        <TableHeader text="Origin Price" />
-        <TableHeader text="Discount Price" />
-        <TableHeader text="Discount Percent" />
-        <TableHeader text="Status" />
-        <TableHeader text="Link" />
-        <TableHeader text="Action" />
-      </tr>
+    <TableHeader text="ID" />
+<TableHeader text="Product Image" />
+<TableHeader text="Product Name" />
+<TableHeader text="Quantity" />
+<TableHeader text="Origin Price" />
+<TableHeader 
+  text="Discount Price" 
+  sortable 
+  field="discountPrice" 
+  currentSortField={sortField} 
+  currentSortDirection={sortDirection} 
+  onSort={handleSort} 
+/>
+<TableHeader 
+  text="Discount Percent" 
+  sortable 
+  field="discountPercent" 
+  currentSortField={sortField} 
+  currentSortDirection={sortDirection} 
+  onSort={handleSort} 
+/>
+<TableHeader text="Status" />
+<TableHeader text="Link" />
+<TableHeader text="Action" />
     </thead>
     <tbody className="divide-y divide-gray-200 bg-white">
       {currentProducts.map((product) => (
@@ -437,12 +489,37 @@ const Pagination: React.FC<{
   </div>
 );
 
-const TableHeader: React.FC<{ text: string }> = ({ text }) => (
+const TableHeader: React.FC<{ 
+  text: string;
+  sortable?: boolean;
+  field?: string;
+  currentSortField?: string | null;
+  currentSortDirection?: 'asc' | 'desc';
+  onSort?: (field: string) => void;
+}> = ({ text, sortable, field, currentSortField, currentSortDirection, onSort }) => (
   <th
     scope="col"
-    className="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500"
+    className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 ${
+      sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+    }`}
+    onClick={() => sortable && field && onSort && onSort(field)}
   >
-    {text}
+    <div className="flex items-center justify-center">
+      {text}
+      {sortable && (
+        <span className="ml-1">
+          {currentSortField === field ? (
+            currentSortDirection === 'asc' ? (
+              <ArrowUp className="h-4 w-4" />
+            ) : (
+              <ArrowDown className="h-4 w-4" />
+            )
+          ) : (
+            <ArrowUpDown className="h-4 w-4 text-gray-400" />
+          )}
+        </span>
+      )}
+    </div>
   </th>
 );
 
