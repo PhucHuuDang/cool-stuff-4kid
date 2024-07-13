@@ -68,6 +68,8 @@ export interface Order {
   orderDate: string;
   totalPrice: number;
   id: string;
+  userName: string;
+  status: number;
 }
 
 

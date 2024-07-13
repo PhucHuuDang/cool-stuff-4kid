@@ -69,7 +69,7 @@ const OrdersPage: React.FC = () => {
   const { orders, loading, error, deleteModalOpen, orderToDelete } = state;
 
   const filteredOrders = orders.filter(order =>
-    order.id.toLowerCase().includes(searchQuery.toLowerCase())
+    order.userName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDeleteOrder = async (orderId: string) => {
@@ -97,15 +97,15 @@ const OrdersPage: React.FC = () => {
   return (
     <div>
       <div className="flex rounded-lg mx-6 mr-2">
-      <div className="relative mr-4 flex flex-grow items-center">
-      <Search className="absolute left-3 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search Customer Order ID"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="w-full rounded border p-2 pl-10"
-        />
+        <div className="relative mr-4 flex flex-grow items-center">
+          <Search className="absolute left-3 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by User Name"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            className="w-full rounded border p-2 pl-10"
+          />
         </div>
       </div>
       <div className="flex flex-grow">
@@ -132,6 +132,12 @@ const OrdersPage: React.FC = () => {
                       CUSTOMER ID
                     </th>
                     <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
+                      USER NAME
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
+                      STATUS
+                    </th>
+                    <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
                       ACTION
                     </th>
                   </tr>
@@ -143,13 +149,26 @@ const OrdersPage: React.FC = () => {
                         {order.orderId}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-center">
-                        {new Date(order.orderDate).toLocaleDateString()}
+                        {new Intl.DateTimeFormat('vi-VN', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        }).format(new Date(order.orderDate))}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-center">
-                        {order.totalPrice}
+                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-center">
                         {order.id}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-4 text-center">
+                        {order.userName}
+                      </td>
+                      <td className="whitespace-nowrap px-4 py-4 text-center">
+                        {order.status === 0 ? 'Pending' : 'Completed'}
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-center">
                         <button
@@ -186,7 +205,6 @@ const OrdersPage: React.FC = () => {
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                    {/* Heroicon name: exclamation */}
                     <svg
                       className="h-6 w-6 text-red-600"
                       xmlns="http://www.w3.org/2000/svg"
