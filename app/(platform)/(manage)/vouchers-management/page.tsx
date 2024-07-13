@@ -58,24 +58,32 @@ const VouchersPage: React.FC = () => {
     }
   };
 
-  const handleAddVoucher = async (newVoucher: Omit<Voucher, 'voucherId'>) => {
+  const handleAddVoucher = async (newVoucher: Omit<Voucher, 'voucherId' | 'vouchersStatus'>) => {
     try {
+      const voucherToAdd = {
+        ...newVoucher,
+        voucherId: 0, // API expects this field
+        vouchersStatus: 0 // Automatically set to 0 (inactive) when adding
+      };
+
+      console.log('Sending new voucher:', JSON.stringify(voucherToAdd, null, 2));
+
       const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/CreateVouchers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          vouchersDTO: {
-            ...newVoucher,
-            voucherId: 0 // API expects this field
-          }
-        }),
+        body: JSON.stringify(voucherToAdd),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add voucher');
+        const errorText = await response.text();
+        console.error('Error response:', response.status, errorText);
+        throw new Error(`Failed to add voucher: ${response.status} ${errorText}`);
       }
+
+      const result = await response.json();
+      console.log('Add successful:', result);
 
       await fetchVouchers(); // Refresh the voucher list
       setShowAddModal(false);
@@ -183,7 +191,7 @@ const VouchersPage: React.FC = () => {
         <table className="min-w-full leading-normal">
           <thead>
             <tr>
-              <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Voucher ID
               </th>
               <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
