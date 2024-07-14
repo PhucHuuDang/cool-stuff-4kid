@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PaginationButton from "./pagination";
@@ -88,6 +87,7 @@ export const Details: React.FC = () => {
     }
   });
 
+  // Tính toán trang hiện tại và dữ liệu hiển thị
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedData.slice(
@@ -95,20 +95,27 @@ export const Details: React.FC = () => {
     indexOfFirstItem + itemsPerPage,
   );
 
+  // Tổng số trang
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+  // Xử lý khi chuyển trang
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
 
+  // Xử lý khi thay đổi bộ lọc
   const handleFilterChange = (status: string) => {
     setFilterStatus(status);
     setCurrentPage(1);
   };
 
+  // Xử lý khi thay đổi thứ tự sắp xếp
   const handleSortOrderChange = (order: string) => {
     setSortOrder(order);
     setCurrentPage(1);
   };
 
+  // Xử lý khi thay đổi trường tìm kiếm
   const handleSearchQueryChange = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -116,6 +123,7 @@ export const Details: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Mapp hóa trạng thái số với chuỗi trạng thái
   const statusMap: Record<number, StatusType> = {
     0: "Processing",
     1: "Delivering",
@@ -197,12 +205,14 @@ export const Details: React.FC = () => {
           ))}
         </TableBody>
       </Table>
-      <PaginationButton
-        data={filteredData}
-        itemsPerPage={itemsPerPage}
-        currentPage={currentPage}
-        onPageChange={onPageChange}
-      />
+      {totalPages > 1 && (
+        <PaginationButton
+          data={filteredData}
+          itemsPerPage={itemsPerPage}
+          currentPage={currentPage}
+          onPageChange={onPageChange}
+        />
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import {
   Package,
   ShoppingCart,
   SquareGanttChart,
+  TicketCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -48,12 +49,19 @@ export const Navigation = () => {
             Feedback
           </Link>
           <Link
+            href="/vouchers"
+            className={`flex rounded-r-3xl p-4 text-black ${getLinkClass("/vouchers")}`}
+          >
+            <TicketCheck className="mr-1" />
+            Vouchers
+          </Link>
+          {/* <Link
             href="/accounts"
             className={`flex rounded-r-3xl p-4 text-black ${getLinkClass("/accounts")}`}
           >
             <CircleUserRound className="mr-1" />
             Accounts
-          </Link>
+          </Link> */}
         </nav>
       </aside>
     </div>

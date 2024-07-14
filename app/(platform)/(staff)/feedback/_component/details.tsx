@@ -23,7 +23,7 @@ interface Comment {
 export const Details = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 3;
+  const commentsPerPage = 4;
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -61,7 +61,6 @@ export const Details = () => {
 
   return (
     <div>
-      <div className="flex justify-between"></div>
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
@@ -99,19 +98,29 @@ export const Details = () => {
           ))}
         </TableBody>
       </Table>
-      <div className="mt-2 flex items-center justify-center space-x-4">
-        <Button onClick={handlePrevious} disabled={currentPage === 1}>
-          Previous
-        </Button>
-        <Button
-          onClick={handleNext}
-          disabled={
-            currentPage === Math.ceil(comments.length / commentsPerPage)
-          }
-        >
-          Next
-        </Button>
-      </div>
+      {comments.length > commentsPerPage && (
+        <div className="mb-4 flex items-center justify-center text-center">
+          <Button
+            onClick={handlePrevious}
+            disabled={currentPage === 1}
+            className="w-[100px]"
+          >
+            Previous
+          </Button>
+          <span className="mx-2 text-lg">
+            Page {currentPage} of {Math.ceil(comments.length / commentsPerPage)}
+          </span>
+          <Button
+            className="w-[100px]"
+            onClick={handleNext}
+            disabled={
+              currentPage === Math.ceil(comments.length / commentsPerPage)
+            }
+          >
+            Next
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
