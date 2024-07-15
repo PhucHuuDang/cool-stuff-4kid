@@ -108,6 +108,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
   const [state, dispatch] = useReducer(reducer, initialState);
   const [form] = Form.useForm();
   const [currentTab, setCurrentTab] = useState(activeTab);
+  const [discountWarning, setDiscountWarning] = useState('');
 
   useEffect(() => {
     setCurrentTab(activeTab);
@@ -162,6 +163,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
     dispatch({ type: "SET_LOCATION_NAME", payload: "" });
     dispatch({ type: "SET_LOCATION_ADDRESS", payload: "" });
     dispatch({ type: "SET_ORIGIN_NAME", payload: "" });
+    setDiscountWarning('');
   };
 
   const handleFileChange = (newFileChange: string | string[]) => {
@@ -219,6 +221,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       message.success("Product created successfully");
       setIsOpen(false);
       form.resetFields();
+      setDiscountWarning('');
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         message.error(
@@ -406,7 +409,22 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="discountPercent" label="Discount Percent">
+                <Form.Item 
+                  name="discountPercent" 
+                  label="Discount Percent"
+                  rules={[
+                    {
+                      validator: async (_, value) => {
+                        if (value >= 50) {
+                          setDiscountWarning('Warning: Discount is 50% or higher!');
+                        } else {
+                          setDiscountWarning('');
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <InputNumber
                     className="w-full"
                     prefix={
@@ -417,6 +435,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                     max={100}
                   />
                 </Form.Item>
+                {discountWarning && <div style={{color: 'orange'}}>{discountWarning}</div>}
               </Col>
             </Row>
             <Row gutter={24}>
@@ -459,68 +478,68 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                   <Select placeholder="Select a location">
                     {state.locations.map((location) => (
                       <Option key={location.locationId} value={location.locationId}>
-                      {location.locationName}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item
-            name="productDescription"
-            rules={[
-              { required: true, message: "Please input product description" },
-            ]}
-            label="Product Description"
-          >
-            <div className="flex items-start">
-              <List
-                className="mr-2 mt-2 flex-shrink-0 text-purple-500"
-                size={18}
-              />
-              <Input.TextArea
-                placeholder="Enter product description"
-                rows={4}
-                className="flex-grow"
-              />
-            </div>
-          </Form.Item>
-          <Form.Item
-            name="image"
-            rules={[{ required: true, message: "Please select image" }]}
-            label="Product Image"
-          >
-            <UploadImageProduct
-              onFileChange={handleFileChange}
-              initialImage={state.formValues.image}
-            />
-          </Form.Item>
-          <Form.Item
-            name="imagesCarousel"
-            label="Product Images Carousel"
-          >
-            <UploadImageProduct
-              onFileChange={(urls) => {
-                if (Array.isArray(urls)) {
-                  handleImagesCarouselChange(urls);
-                }
-              }}
-              initialImages={state.formValues.imagesCarousel}
-              multiple={true}
-              maxCount={5}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddProduct}
-              loading={state.isConfirmLoading}
+                        {location.locationName}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item
+              name="productDescription"
+              rules={[
+                { required: true, message: "Please input product description" },
+              ]}
+              label="Product Description"
             >
-              Add Product
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
+              <div className="flex items-start">
+                <List
+                  className="mr-2 mt-2 flex-shrink-0 text-purple-500"
+                  size={18}
+                />
+                <Input.TextArea
+                  placeholder="Enter product description"
+                  rows={4}
+                  className="flex-grow"
+                />
+              </div>
+            </Form.Item>
+            <Form.Item
+              name="image"
+              rules={[{ required: true, message: "Please select image" }]}
+              label="Product Image"
+            >
+              <UploadImageProduct
+                onFileChange={handleFileChange}
+                initialImage={state.formValues.image}
+              />
+            </Form.Item>
+            <Form.Item
+              name="imagesCarousel"
+              label="Product Images Carousel"
+            >
+              <UploadImageProduct
+                onFileChange={(urls) => {
+                  if (Array.isArray(urls)) {
+                    handleImagesCarouselChange(urls);
+                  }
+                }}
+                initialImages={state.formValues.imagesCarousel}
+                multiple={true}
+                maxCount={5}
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddProduct}
+                loading={state.isConfirmLoading}
+              >
+                Add Product
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
         <TabPane tab="Add Category" key="2">
           <Form layout="vertical" className="p-4">
             <Form.Item
