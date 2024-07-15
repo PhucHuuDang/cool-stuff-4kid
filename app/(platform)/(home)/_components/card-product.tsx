@@ -99,7 +99,7 @@ export const CardProduct = forwardRef<HTMLDivElement, CardProductProps>(
                 </>
               ) : (
                 <div className="flex flex-row items-center gap-2">
-                  <div className="font-bold text-[#ed9080]">
+                  <div className="font-bold text-[#ff6347]">
                     {/* {formattedPrice(data?.originalPrice as number)} */}
                     {formatCurrency(product.price)}
                   </div>{" "}

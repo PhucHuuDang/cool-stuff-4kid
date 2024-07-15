@@ -231,5 +231,10 @@ export type ProductDetailProps = {
 
 export type CardCarouselPropsPicked = Pick<
   ProductApiProps,
-  "productId" | "price" | "discountPercent" | "productName" | "image"
+  | "productId"
+  | "price"
+  | "discountPercent"
+  | "productName"
+  | "image"
+  | "discountPrice"
 >;

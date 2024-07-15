@@ -14,6 +14,8 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { CardCarouselPropsPicked } from "@/interface";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
+import { handleRouter } from "@/lib/handle-router";
+import { useRouter } from "next/navigation";
 
 interface CardCarouselProps {
   titleCard: string;
@@ -24,13 +26,6 @@ interface CardCarouselProps {
   classNameCarouselItem?: string;
 }
 
-// interface CarouselItemProps {
-//   url: string;
-//   rating: number;
-//   title: string;
-//   price: number;
-// }
-
 export const CardCarousel = ({
   titleCard = "Sản phẩm tương tự",
   carouselItems,
@@ -39,6 +34,8 @@ export const CardCarousel = ({
   loop = true,
   classNameCarouselItem,
 }: CardCarouselProps) => {
+  const router = useRouter();
+
   return (
     <Card>
       <CardHeader>
@@ -65,6 +62,9 @@ export const CardCarousel = ({
                   "md:basis-1/3 lg:basis-1/5",
                   classNameCarouselItem,
                 )}
+                onClick={() =>
+                  handleRouter(product.productName, product.productId, router)
+                }
               >
                 <div className="flex cursor-pointer flex-col justify-center gap-y-2 p-2 transition hover:scale-105">
                   <Image
@@ -78,13 +78,43 @@ export const CardCarousel = ({
                   <div>
                     <h1 className="truncate text-lg">{product.productName}</h1>
                     <span>{product.discountPercent}</span>
-                    <h2 className="text-xl font-bold">
+                    {/* <h2 className="text-xl font-bold">
                       {formatCurrency(
                         product.discountPercent > 0
                           ? product.discountPercent
                           : product.price,
                       )}
-                    </h2>
+                    </h2> */}
+                    <div className="text-md mt-3 flex flex-row items-center gap-1">
+                      {product.discountPercent &&
+                      product.discountPercent > 0 ? (
+                        <>
+                          <div className="flex flex-row items-center gap-2">
+                            <del className="font-light text-[#ed9080]">
+                              {/* {formattedPrice(data?.originalPrice as number)} */}
+                              {formatCurrency(product.price)}
+                            </del>{" "}
+                          </div>
+
+                          <h1 className="text-xl font-semibold text-neutral-500">
+                            |
+                          </h1>
+
+                          <div className="flex flex-row items-center gap-2">
+                            <span className="font-bold text-[#ff6347]">
+                              {formatCurrency(product.discountPrice)}
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="flex flex-row items-center gap-2">
+                          <div className="font-bold text-[#ff6347]">
+                            {/* {formattedPrice(data?.originalPrice as number)} */}
+                            {formatCurrency(product.price)}
+                          </div>{" "}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CarouselItem>

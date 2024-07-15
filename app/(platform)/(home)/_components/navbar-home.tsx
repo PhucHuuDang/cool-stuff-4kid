@@ -57,15 +57,6 @@ const NavbarHome = ({ isAuthenticate, products }: NavbarHomeProps) => {
     router.refresh();
   };
 
-  const handleRoute = (title: string) => {
-    const titleTransformed = removeMarks(title);
-
-    // setInputValue("");
-    setDebounceInputValue("");
-
-    router.push(`/${titleTransformed}`);
-  };
-
   useEffect(() => {
     setDebounceInputValue(inputValue);
   }, [inputValue]);

@@ -33,7 +33,7 @@ const ProductDetailPage = async ({
   // console.log({ productsCarousel });
 
   return (
-    <div className="2xl:max-w-screen pt-28">
+    <div className="2xl:max-w-screen pt-20">
       <div className="space-y-8 px-20 py-10">
         <ProductInformationDetail productDetail={getProductDetailInformation} />
 
