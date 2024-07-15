@@ -51,7 +51,7 @@ export const DashboardData = () => {
       </div>
       <div className="">
         <div>
-          <div>
+          <div className="mb-2 shadow-lg">
             <Card>
               <CardHeader>
                 <CardTitle>Orders</CardTitle>
@@ -97,7 +97,7 @@ export const DashboardData = () => {
           </div>
         </div>
         <div className="flex justify-between">
-          <div>
+          <div className="w-[500px]">
             <Card>
               <CardHeader>
                 <CardTitle>Feedback</CardTitle>
@@ -141,7 +141,7 @@ export const DashboardData = () => {
               </CardFooter>
             </Card>
           </div>
-          <div>
+          <div className="w-[500px]">
             <Card>
               <CardHeader>
                 <CardTitle>Vouchers</CardTitle>

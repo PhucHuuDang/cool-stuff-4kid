@@ -2,7 +2,15 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { routes } from "../routes/routes";
-import { Activity, LayoutDashboard, ListOrdered, PackageSearch, Settings, TicketPercent, Users } from "lucide-react";
+import {
+  Activity,
+  LayoutDashboard,
+  ListOrdered,
+  PackageSearch,
+  Settings,
+  TicketPercent,
+  Users,
+} from "lucide-react";
 
 const SideBar: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
@@ -13,13 +21,15 @@ const SideBar: React.FC = () => {
 
   const getLinkClassName = (page: string) => {
     return `flex p-4 items-center transition-colors duration-200
-      ${currentPage === page 
-        ? "bg-pink-600 text-white rounded-l-lg" 
-        : "text-slate-700 hover:bg-red-200"}`;
+      ${
+        currentPage === page
+          ? "bg-pink-600 text-white rounded-l-lg"
+          : "text-slate-700 hover:bg-red-200"
+      }`;
   };
 
   return (
-    <aside className="w-64 h-screen bg-slate-500/10">
+    <aside className="h-screen w-64 bg-slate-500/10">
       <nav className="space-y-1">
         <Link
           href={routes.dashboard}
@@ -34,8 +44,8 @@ const SideBar: React.FC = () => {
           className={getLinkClassName("staffManagement")}
           onClick={() => handlePageChange("staffManagement")}
         >
-           <Users className="mr-2" />
-           <span>Staff</span>
+          <Users className="mr-2" />
+          <span>Staff</span>
         </Link>
         <Link
           href={routes.orders}
@@ -58,8 +68,8 @@ const SideBar: React.FC = () => {
           className={getLinkClassName("productManagement")}
           onClick={() => handlePageChange("productManagement")}
         >
-           <PackageSearch className="mr-2" />
-           <span>Products</span>
+          <PackageSearch className="mr-2" />
+          <span>Products</span>
         </Link>
         <Link
           href={routes.vouchers}
@@ -74,8 +84,8 @@ const SideBar: React.FC = () => {
           className={getLinkClassName("adminAccount")}
           onClick={() => handlePageChange("adminAccount")}
         >
-           <Settings className="mr-2" />
-           <span>Account</span>
+          <Settings className="mr-2" />
+          <span>Account</span>
         </Link>
       </nav>
     </aside>

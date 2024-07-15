@@ -74,16 +74,19 @@ export const VoucherManagement = () => {
   };
 
   const handleDelete = async (id: number) => {
-    try {
-      await axios.delete(
-        `https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/DeleteVouchers/${id}`,
-      );
-      setVouchers((prevVouchers) =>
-        prevVouchers.filter((voucher) => voucher.voucherId !== id),
-      );
-    } catch (error) {
-      console.error("Error deleting voucher:", error);
-      // Handle error state if necessary
+    const confirmDelete = window.confirm("Are you sure you want to delete?");
+    if (confirmDelete) {
+      try {
+        await axios.delete(
+          `https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/DeleteVouchers/${id}`,
+        );
+        setVouchers((prevVouchers) =>
+          prevVouchers.filter((voucher) => voucher.voucherId !== id),
+        );
+      } catch (error) {
+        console.error("Error deleting voucher:", error);
+        // Handle error state if necessary
+      }
     }
   };
 
@@ -151,9 +154,9 @@ export const VoucherManagement = () => {
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
-            <TableHead>ID</TableHead>
-            <TableHead>Code</TableHead>
-            <TableHead className="flex items-center space-x-1">
+            <TableHead className="text-black">ID</TableHead>
+            <TableHead className="text-black">Code</TableHead>
+            <TableHead className="flex items-center space-x-1 text-black">
               Discount Percent
               <button
                 onClick={sortVouchersByDiscount}
@@ -166,8 +169,8 @@ export const VoucherManagement = () => {
                 )}
               </button>
             </TableHead>
-            <TableHead>Quantity</TableHead>
-            <TableHead className="relative">
+            <TableHead className="text-black">Quantity</TableHead>
+            <TableHead className="relative text-black">
               <div className="flex items-center pr-4">
                 <span className="mr-2">Status:</span>
                 <select
@@ -184,8 +187,8 @@ export const VoucherManagement = () => {
                 </select>
               </div>
             </TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="text-black">Date</TableHead>
+            <TableHead className="text-black">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
