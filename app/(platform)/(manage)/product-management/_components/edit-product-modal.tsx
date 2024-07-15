@@ -42,7 +42,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const fetchCategories = async () => {
     try {
       const response = await axios.get<Category[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys"
+        "https://milkapplicationapi.azurewebsites.net/api/Category/GetAllCategorys"
       );
       setCategories(response.data);
       console.log("Categories fetched:", response.data);
@@ -55,7 +55,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const fetchLocations = async () => {
     try {
       const response = await axios.get<Location[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Location/GetAllLocation"
+        "https://milkapplicationapi.azurewebsites.net/api/Location/GetAllLocation"
       );
       setLocations(response.data);
       console.log("Locations fetched:", response.data);
@@ -68,7 +68,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   const fetchOrigins = async () => {
     try {
       const response = await axios.get<Origin[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/GetAllOrigins"
+        "https://milkapplicationapi.azurewebsites.net/api/Origin/GetAllOrigins"
       );
       setOrigins(response.data);
       console.log("Origins fetched:", response.data);
@@ -130,7 +130,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
     try {
       console.log("Sending update request for product:", editedProduct);
       const response = await axios.put<ProductProps>(
-        `https://milkapplication20240705013352.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
+        `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
         editedProduct
       );
 

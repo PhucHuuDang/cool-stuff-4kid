@@ -11,6 +11,7 @@ interface StaffMember {
   fullName: string;
   userName: string;
   email: string;
+  status: number;
 }
 
 interface AddStaffModalProps {
@@ -26,6 +27,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
     userName: '',
     email: '',
     password: '',
+    status: 1
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +37,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Users/CreateStaff', {
+      const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/CreateStaff', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,6 +51,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
           fullName: formData.fullName,
           userName: formData.userName,
           email: formData.email,
+          status: formData.status
         };
         onAddStaff(newStaff);
         toast.success('Nhân viên mới đã được thêm thành công!');

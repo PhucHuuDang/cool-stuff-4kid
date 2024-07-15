@@ -96,17 +96,22 @@ const reducer = (state: State, action: ProductManagementAction): State => {
   }
 };
 
-const AddProductModal: React.FC<AddModalProps> = ({
+const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
   setIsOpen,
   isOpen,
   onProductAdd,
   onCategoryAdd = () => Promise.resolve(),
   onLocationAdd = () => Promise.resolve(),
   onOriginAdd = () => Promise.resolve(),
+  activeTab
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [form] = Form.useForm();
-  const [activeTab, setActiveTab] = useState("1");
+  const [currentTab, setCurrentTab] = useState(activeTab);
+
+  useEffect(() => {
+    setCurrentTab(activeTab);
+  }, [activeTab]);
 
   useEffect(() => {
     fetchCategories();
@@ -117,7 +122,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchCategories = async () => {
     try {
       const response = await axios.get<Category[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys"
+        "https://milkapplicationapi.azurewebsites.net/api/Category/GetAllCategorys"
       );
       dispatch({ type: "SET_CATEGORIES", payload: response.data });
     } catch (error) {
@@ -129,7 +134,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchOrigins = async () => {
     try {
       const response = await axios.get<Origin[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/GetAllOrigins"
+        "https://milkapplicationapi.azurewebsites.net/api/Origin/GetAllOrigins"
       );
       dispatch({ type: "SET_ORIGINS", payload: response.data });
     } catch (error) {
@@ -141,7 +146,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchLocations = async () => {
     try {
       const response = await axios.get<Location[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Location/GetAllLocation"
+        "https://milkapplicationapi.azurewebsites.net/api/Location/GetAllLocation"
       );
       dispatch({ type: "SET_LOCATIONS", payload: response.data });
     } catch (error) {
@@ -206,7 +211,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
       };
 
       const response = await axios.post<AddProduct>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
+        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
         productData
       );
 
@@ -233,7 +238,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Category>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/CreateCategorys",
+        "https://milkapplicationapi.azurewebsites.net/api/Category/CreateCategorys",
         {
           categoryId: 0,
           categoryName: state.categoryName,
@@ -262,7 +267,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Location>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Location/CreateLocation",
+        "https://milkapplicationapi.azurewebsites.net/api/Location/CreateLocation",
         {
           locationId: 0,
           locationName: state.locationName,
@@ -293,7 +298,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Origin>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/CreateOrigins",
+        "https://milkapplicationapi.azurewebsites.net/api/Origin/CreateOrigins",
         {
           originId: 0,
           originName: state.originName,
@@ -332,7 +337,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
       className="add-product-modal"
     >
       <Divider />
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
+      <Tabs activeKey={currentTab} onChange={setCurrentTab}>
         <TabPane tab="Add Product" key="1">
           <Form
             form={form}
@@ -516,104 +521,104 @@ const AddProductModal: React.FC<AddModalProps> = ({
           </Form.Item>
         </Form>
       </TabPane>
-      <TabPane tab="Add Category" key="2">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Category Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<Folder className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter category name"
-              value={state.categoryName}
-              onChange={(e) =>
-                dispatch({ type: "SET_CATEGORY_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddCategory}
-              loading={state.isConfirmLoading}
+        <TabPane tab="Add Category" key="2">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Category Name"
+              required
+              tooltip="This is a required field"
             >
-              Add Category
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-      <TabPane tab="Add Location" key="3">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Location Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<MapPin className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter location name"
-              value={state.locationName}
-              onChange={(e) =>
-                dispatch({ type: "SET_LOCATION_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label="Address"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<MapPin className="site-form-item-icon mr-2 text-green-500" />}
-              placeholder="Enter address"
-              value={state.locationAddress}
-              onChange={(e) =>
-                dispatch({ type: "SET_LOCATION_ADDRESS", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddLocation}
-              loading={state.isConfirmLoading}
+              <Input
+                prefix={<Folder className="site-form-item-icon mr-2 text-blue-500" />}
+                placeholder="Enter category name"
+                value={state.categoryName}
+                onChange={(e) =>
+                  dispatch({ type: "SET_CATEGORY_NAME", payload: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddCategory}
+                loading={state.isConfirmLoading}
+              >
+                Add Category
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+        <TabPane tab="Add Location" key="3">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Location Name"
+              required
+              tooltip="This is a required field"
             >
-              Add Location
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-      <TabPane tab="Add Origin" key="4">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Origin Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<Globe className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter origin name"
-              value={state.originName}
-              onChange={(e) =>
-                dispatch({ type: "SET_ORIGIN_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddOrigin}
-              loading={state.isConfirmLoading}
+              <Input
+                prefix={<MapPin className="site-form-item-icon mr-2 text-blue-500" />}
+                placeholder="Enter location name"
+                value={state.locationName}
+                onChange={(e) =>
+                  dispatch({ type: "SET_LOCATION_NAME", payload: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              label="Address"
+              required
+              tooltip="This is a required field"
             >
-              Add Origin
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-    </Tabs>
-  </Modal>
-);
+              <Input
+                prefix={<MapPin className="site-form-item-icon mr-2 text-green-500" />}
+                placeholder="Enter address"
+                value={state.locationAddress}
+                onChange={(e) =>
+                  dispatch({ type: "SET_LOCATION_ADDRESS", payload: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddLocation}
+                loading={state.isConfirmLoading}
+              >
+                Add Location
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+        <TabPane tab="Add Origin" key="4">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Origin Name"
+              required
+              tooltip="This is a required field"
+            >
+              <Input
+                prefix={<Globe className="site-form-item-icon mr-2 text-blue-500" />}
+                placeholder="Enter origin name"
+                value={state.originName}
+                onChange={(e) =>
+                  dispatch({ type: "SET_ORIGIN_NAME", payload: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddOrigin}
+                loading={state.isConfirmLoading}
+              >
+                Add Origin
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+      </Tabs>
+    </Modal>
+  );
 };
 
 export { AddProductModal };

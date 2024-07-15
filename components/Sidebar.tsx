@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { routes } from "../routes/routes";
 import {
@@ -12,21 +12,8 @@ import {
   Users,
 } from "lucide-react";
 
-interface SideBarProps {
-  decodedInfo: {
-    role?: string;
-  }
-}
-
-const SideBar: React.FC<SideBarProps> = ({ decodedInfo }) => {
+const SideBar: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
-  const [role, setRole] = useState<string>('default');
-
-  useEffect(() => {
-    if (decodedInfo?.role) {
-      setRole(decodedInfo.role);
-    }
-  }, [decodedInfo]);
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);
@@ -40,10 +27,6 @@ const SideBar: React.FC<SideBarProps> = ({ decodedInfo }) => {
           : "text-slate-700 hover:rounded-sm hover:bg-slate-500/10"
       }`;
   };
-
-  if (role.toLowerCase() !== "admin") {
-    return null; // Không hiển thị sidebar nếu không phải Admin
-  }
 
   return (
     <aside className="h-screen w-64 bg-slate-500/10 sm:rounded-lg">

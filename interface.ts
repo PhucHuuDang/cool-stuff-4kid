@@ -20,7 +20,8 @@ export interface Voucher {
   code: string;
   discountPercent: number;
   quantity: number;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
   vouchersStatus: number;
 }
 
@@ -79,6 +80,15 @@ export interface Order {
   id: string;
   userName: string;
   status: number;
+  voucherId: number;
+  orderItems: OrderItem[];
+}
+
+export interface OrderItem {
+  orderItemId: number;
+  quantity: number;
+  productId: number;
+  productName: string;
 }
 
 
@@ -103,6 +113,21 @@ export interface State {
   categories: Category[];
   origins: Origin[];
   locations: Location[];
+}
+
+export interface ApiUser {
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+}
+
+export interface StaffMember {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  status: number;
 }
 
 export interface EditProductModalProps {
@@ -159,7 +184,7 @@ export type ProductManagementAction =
   | { type: "SET_CATEGORIES"; payload: Category[] }
   | { type: "SET_ORIGINS"; payload: Origin[] }
   | { type: "SET_LOCATIONS"; payload: Location[] }
-  | { type: "SET_IMAGES_CAROUSEL"; payload: string[] };
+  | { type: "SET_IMAGES_CAROUSEL"; payload: string[] }
   
 
 export type OrderManagementAction =
@@ -168,7 +193,9 @@ export type OrderManagementAction =
   | { type: "FETCH_FAILURE"; payload: string }
   | { type: "DELETE_ORDER"; payload: string }
   | { type: "SET_ORDER_TO_DELETE"; payload: Order }
-  | { type: "CLOSE_DELETE_MODAL" };
+  | { type: "CLOSE_DELETE_MODAL" }
+  | { type: "SET_ORDER_DETAILS"; payload: Order }
+  | { type: "CLOSE_DETAILS_MODAL" };
 
 export interface ProductTableProps {
   currentProducts: ProductProps[];
@@ -231,6 +258,18 @@ export type ProductDetailProps = {
   locationId: number;
   quantityOrder?: number;
 };
+
+export interface DecodedToken {
+  nameid: string;
+  email: string;
+  name: string;
+  unique_name: string;
+  role: string;
+  jti: string;
+  exp: number;
+  iss: string;
+  aud: string;
+}
 
 export type CardCarouselPropsPicked = Pick<
   ProductApiProps,
