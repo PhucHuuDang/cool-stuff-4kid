@@ -1,6 +1,6 @@
 "use client";
 
-import Autoplay from "embla-carousel-autoplay";
+import Autoplay, { AutoplayOptionsType } from "embla-carousel-autoplay";
 
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
@@ -54,7 +54,7 @@ export const CardCarousel = ({
             Autoplay({
               delay: delay,
               stopOnInteraction: stopOnInteraction,
-            }),
+            }) as any,
           ]}
         >
           <CarouselContent>

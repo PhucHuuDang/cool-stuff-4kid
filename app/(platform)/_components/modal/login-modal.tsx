@@ -45,7 +45,6 @@ export const LoginModal = () => {
       toast.success("Login successfully");
       await createCookie(data);
       loginModal.onClose();
-      router.push("/dash-board")
       if (drawerCart.isOpen) {
         drawerCart.onClose();
         router.push("/checkout");

@@ -26,10 +26,10 @@ export const RegisterModal = () => {
   const inputRef = useRef<ElementRef<"input">>(null);
 
   useEffect(() => {
-    if (loginModal.isOpen && inputRef.current) {
+    if (registerModal.isOpen && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [loginModal.isOpen]);
+  }, [registerModal.isOpen]);
 
   const { execute, fieldErrors } = useAction(registerAccount, {
     onSuccess: (data) => {
@@ -86,7 +86,6 @@ export const RegisterModal = () => {
         id="userName"
         label="User Name"
         disabled={pending}
-        ref={inputRef}
         placeholder="nguyenvanloc"
         className="h-12"
         labelClassName="text-neutral-700"
@@ -101,7 +100,6 @@ export const RegisterModal = () => {
         id="email"
         label="Email"
         disabled={pending}
-        ref={inputRef}
         placeholder="Email address"
         className="h-12"
         labelClassName="text-neutral-700"

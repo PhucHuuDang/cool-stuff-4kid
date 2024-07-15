@@ -28,12 +28,16 @@ import { DataProducts } from "@/db";
 import { SearchNavbar } from "./search-navbar";
 import { removeAccent } from "@/lib/remove-accent";
 import { removeMarks } from "@/handle-transform/remove-marks";
+import { ProductApiProps } from "@/interface";
+import { Separator } from "@/components/ui/separator";
+import { handleRouter } from "@/lib/handle-router";
 
 interface NavbarHomeProps {
   isAuthenticate: boolean;
+  products: ProductApiProps[];
 }
 
-const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
+const NavbarHome = ({ isAuthenticate, products }: NavbarHomeProps) => {
   const drawerCart = useDrawerCart();
   const cart = useFromStore(useCartStore, (state) => state.cart);
   const loginModal = useLoginModal();
@@ -66,9 +70,9 @@ const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
     setDebounceInputValue(inputValue);
   }, [inputValue]);
 
-  const filteredProducts = DataProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     const removedAccentSearch = removeAccent(debounceInputValue);
-    const removedAccentProduct = removeAccent(product.title);
+    const removedAccentProduct = removeAccent(product.productName);
 
     return (
       debounceInputValue !== "" &&
@@ -102,13 +106,22 @@ const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
               ) : (
                 filteredProducts.map((product) => {
                   return (
-                    <div
-                      onClick={() => handleRoute(product.title)}
-                      key={product.id}
-                      className="cursor-pointer rounded-lg bg-slate-400/35 p-2 text-base font-bold duration-200 hover:bg-slate-300"
-                    >
-                      {product.title}
-                    </div>
+                    <>
+                      <div
+                        onClick={() =>
+                          handleRouter(
+                            product.productName,
+                            product.productId,
+                            router,
+                          )
+                        }
+                        key={product.productId}
+                        className="cursor-pointer truncate rounded-lg p-3 text-base font-bold duration-200 hover:bg-slate-500/10"
+                      >
+                        {product.productName}
+                      </div>
+                      <Separator className="bg-neutral-700/50" />
+                    </>
                   );
                 })
               )}
@@ -157,7 +170,7 @@ const NavbarHome = ({ isAuthenticate }: NavbarHomeProps) => {
             <div className="flex items-center gap-x-2">
               <Button
                 variant="book"
-                className="h-10 rounded-xl"
+                className="h-10 w-20 rounded-lg"
                 onClick={openLoginModal}
               >
                 Login

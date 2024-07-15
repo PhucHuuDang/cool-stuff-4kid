@@ -43,7 +43,7 @@ export const CardCarouselHome = ({
   loop = true,
   classNameCarouselItem,
 }: CardCarouselProps) => {
-  const [api, setApi] = useState<CarouselApi>();
+  const [api, setApi] = useState<CarouselApi | any>();
   const [current, setCurrent] = useState(0);
   const [count, setCount] = useState(0);
   const { onDotButtonClick, scrollSnaps, selectedIndex } = useDotButton(api);
@@ -74,13 +74,15 @@ export const CardCarouselHome = ({
             loop: loop,
             containScroll: false,
           }}
-          plugins={[
-            Autoplay({
-              delay: delay,
-              stopOnInteraction: stopOnInteraction,
-            }),
-            Fade(),
-          ]}
+          plugins={
+            [
+              Autoplay({
+                delay: delay,
+                stopOnInteraction: stopOnInteraction,
+              }),
+              Fade(),
+            ] as any
+          }
         >
           <CarouselContent>
             {carouselItems.map((product) => (
