@@ -21,6 +21,9 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
     dateTo: ''
   });
   const [showDiscountWarning, setShowDiscountWarning] = useState(false);
+  const [isExpirationDateChanged, setIsExpirationDateChanged] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isEditingExpirationDate, setIsEditingExpirationDate] = useState(false);
 
   useEffect(() => {
     setEditedVoucher(voucher);
@@ -33,6 +36,8 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
     const maxDate = new Date(currentDate.getTime() + durationInDays * 24 * 60 * 60 * 1000);
     setMaxExpirationDate(maxDate.toISOString().split('T')[0]);
     setMinExpirationDate(currentDate.toISOString().split('T')[0]);
+    setIsExpirationDateChanged(false);
+    setIsEditingExpirationDate(false);
   }, [voucher]);
 
   const validateCode = (code: string) => {
@@ -61,11 +66,13 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
         }
         break;
       case 'dateTo':
-        const selectedDate = new Date(value as string);
-        const maxDate = new Date(maxExpirationDate);
-        const minDate = new Date(minExpirationDate);
-        if (selectedDate > maxDate || selectedDate < minDate) {
-          error = 'Invalid expiration date';
+        if (isEditingExpirationDate) {
+          const selectedDate = new Date(value as string);
+          const maxDate = new Date(maxExpirationDate);
+          const minDate = new Date(minExpirationDate);
+          if (selectedDate > maxDate || selectedDate < minDate) {
+            error = 'Invalid expiration date';
+          }
         }
         break;
     }
@@ -84,13 +91,14 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
         updatedValue = Math.min(Math.max(Number(value), 1), 80);
         setShowDiscountWarning(Number(updatedValue) >= 50);
       }
-    } else if (name === 'dateTo') {
+    } else if (name === 'dateTo' && isEditingExpirationDate) {
       const selectedDate = new Date(value);
       const maxDate = new Date(maxExpirationDate);
       const minDate = new Date(minExpirationDate);
       
       if (selectedDate <= maxDate && selectedDate >= minDate) {
         updatedValue = new Date(value).toISOString();
+        setIsExpirationDateChanged(true);
       } else {
         return; // Don't update if the date is invalid
       }
@@ -108,7 +116,7 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
       code: validateField('code', editedVoucher.code),
       discountPercent: validateField('discountPercent', editedVoucher.discountPercent),
       quantity: validateField('quantity', editedVoucher.quantity),
-      dateTo: validateField('dateTo', editedVoucher.dateTo)
+      dateTo: isEditingExpirationDate ? validateField('dateTo', editedVoucher.dateTo) : ''
     };
 
     setErrors(formErrors);
@@ -117,6 +125,15 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
       return;
     }
 
+    if (isEditingExpirationDate && isExpirationDateChanged) {
+      setShowConfirmModal(true);
+    } else {
+      onUpdate(editedVoucher);
+    }
+  };
+
+  const handleConfirmUpdate = () => {
+    setShowConfirmModal(false);
     onUpdate(editedVoucher);
   };
 
@@ -197,6 +214,14 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
           </div>
           
           <div>
+            <label className="flex items-center space-x-2 mb-2">
+              <input
+                type="checkbox"
+                checked={isEditingExpirationDate}
+                onChange={(e) => setIsEditingExpirationDate(e.target.checked)}
+              />
+              <span>Edit expiration date</span>
+            </label>
             <label htmlFor="dateTo" className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
             <div className="relative">
               <input
@@ -209,13 +234,16 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
                 max={maxExpirationDate}
                 className={`pl-10 pr-3 py-3 w-full border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out ${errors.dateTo ? 'border-red-500' : 'border-gray-300'}`}
                 required
+                disabled={!isEditingExpirationDate}
               />
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-indigo-400" size={18} />
             </div>
             {errors.dateTo && <p className="mt-1 text-sm text-red-600">{errors.dateTo}</p>}
-            <p className="mt-1 text-sm text-gray-500">
-              You can adjust the expiration date between {minExpirationDate} and {maxExpirationDate} (within {originalDuration} days from the start date)
-            </p>
+            {isEditingExpirationDate && (
+              <p className="mt-1 text-sm text-gray-500">
+                You can adjust the expiration date between {minExpirationDate} and {maxExpirationDate} (within {originalDuration} days from the start date)
+              </p>
+            )}
           </div>
 
           <div>
@@ -252,6 +280,29 @@ const EditVoucherModal: React.FC<EditVoucherModalProps> = ({ isOpen, onClose, on
           </div>
         </form>
       </div>
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl">
+            <h3 className="text-lg font-semibold mb-4">Xác nhận thay đổi</h3>
+            <p className="mb-6">Bạn có chắc là sẽ thay đổi ngày hết hạn chứ, việc này sẽ không thể hoàn tác</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleConfirmUpdate}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              >
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

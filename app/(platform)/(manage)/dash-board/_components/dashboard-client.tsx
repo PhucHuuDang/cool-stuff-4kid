@@ -1,89 +1,145 @@
 "use client"
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from "next/image";
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import dynamic from 'next/dynamic';
+import ProductCategoryPieChart from '@/components/pie-chart';
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+const AreaChart = dynamic(() => import('@/components/area-chart').then((mod) => mod.AreaChart), {
+  ssr: false
+});
 
 const calculatePercentChange = (current: number, previous: number) => {
   return ((current - previous) / previous) * 100;
 };
 
+interface StaffMember {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  status: number;
+}
+
 const DashboardClient: React.FC = () => {
-  // Data cho biểu đồ doanh thu
-  const revenueData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-    datasets: [
-      {
-        label: 'Doanh thu',
-        data: [65, 59, 80, 81, 56, 55],
-        fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1
-      }
-    ]
-  };
+  const [totalRevenue, setTotalRevenue] = useState(0);
+  const [revenueChange, setRevenueChange] = useState(0);
+  const [categoryData, setCategoryData] = useState<{ name: string; value: number }[]>([]);
+  const [productCount, setProductCount] = useState(0);
+  const [totalQuantity, setTotalQuantity] = useState(0);
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
+  const [totalStaff, setTotalStaff] = useState(0);
 
-  // Options cho biểu đồ
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          maxTicksLimit: 5,
+  useEffect(() => {
+    const fetchTotalRevenue = async () => {
+      try {
+        const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Payment/totalAmountsForLast12Months');
+        const data: { [key: string]: number } = await response.json();
+        const total = Object.values(data).reduce((sum, value) => sum + value, 0);
+        setTotalRevenue(total);
+
+        const months = Object.keys(data).sort();
+        const lastMonth = data[months[months.length - 1]];
+        const secondLastMonth = data[months[months.length - 2]];
+        const change = calculatePercentChange(lastMonth, secondLastMonth);
+        setRevenueChange(change);
+      } catch (error) {
+        console.error('Error fetching total revenue:', error);
+      }
+    };
+
+    const fetchCategoryData = async () => {
+      try {
+        const categoriesResponse = await fetch('https://milkapplicationapi.azurewebsites.net/api/Category/GetAllCategorys');
+        const categories = await categoriesResponse.json();
+
+        const productsResponse = await fetch('https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts');
+        const products = await productsResponse.json();
+
+        setProductCount(products.length);
+        setTotalQuantity(products.reduce((sum: number, product: any) => sum + (product.quantity || 0), 0));
+
+        const categoryCounts = categories.reduce((acc: { [key: string]: number }, category: any) => {
+          acc[category.categoryId] = 0;
+          return acc;
+        }, {});
+
+        products.forEach((product: any) => {
+          if (categoryCounts.hasOwnProperty(product.categoryId)) {
+            categoryCounts[product.categoryId]++;
+          }
+        });
+
+        const chartData = categories.map((category: any) => ({
+          name: category.categoryName,
+          value: categoryCounts[category.categoryId]
+        }));
+
+        setCategoryData(chartData);
+      } catch (error) {
+        console.error('Error fetching category and product data:', error);
+      }
+    };
+
+    const fetchStaffMembers = async () => {
+      try {
+        const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/GetAllStaff');
+        const data = await response.json();
+
+        if (data.isSucceed) {
+          const allStaff = data.data.map((user: any) => ({
+            id: user.id,
+            fullName: user.fullName,
+            userName: user.userName,
+            email: user.email,
+            status: user.status
+          }));
+
+          setTotalStaff(allStaff.length);
+          setStaffMembers(allStaff.slice(0, 5));
         }
+      } catch (error) {
+        console.error('Error fetching staff members:', error);
       }
-    },
-    plugins: {
-      legend: {
-        display: false,
-      }
-    }
-  };
+    };
 
-  // Tính toán sự thay đổi doanh thu
-  const latestRevenue = revenueData.datasets[0].data[revenueData.datasets[0].data.length - 1];
-  const previousRevenue = revenueData.datasets[0].data[revenueData.datasets[0].data.length - 2];
-  const revenueChange = calculatePercentChange(latestRevenue, previousRevenue);
+    fetchTotalRevenue();
+    fetchCategoryData();
+    fetchStaffMembers();
+  }, []);
 
-  // Dữ liệu thống kê
   const stats = [
     { 
+      title: "Revenue", 
+      current: totalRevenue, 
+      change: revenueChange, 
+      bgColor: "bg-pink-600", 
+      textColor: "text-white" 
+    },
+    { 
       title: "Staff", 
-      current: 54, 
-      previous: 50, 
+      current: totalStaff, 
+      previous: totalStaff - 2,
       bgColor: "bg-purple-200" 
     },
     { 
       title: "Products", 
-      current: 79, 
-      previous: 75, 
+      current: productCount, 
+      previous: productCount - 4,
       bgColor: "bg-yellow-200" 
     },
     { 
-      title: "Orders", 
-      current: 124, 
-      previous: 110, 
+      title: "Total Quantity", 
+      current: totalQuantity, 
+      previous: totalQuantity - 100,
       bgColor: "bg-blue-200" 
-    },
-    { 
-      title: "Income", 
-      current: 239000, 
-      previous: 220000, 
-      bgColor: "bg-pink-600", 
-      textColor: "text-white" 
     },
   ];
 
   const statsWithChanges = stats.map(stat => ({
     ...stat,
-    change: calculatePercentChange(stat.current, stat.previous),
+    change: stat.change !== undefined ? stat.change : calculatePercentChange(stat.current, stat.previous!),
   }));
 
-  // Danh sách thông báo
   const notifications = [
     { id: 1, message: "Đơn hàng mới #1234 đã được tạo", time: "5 phút trước" },
     { id: 2, message: "Nhân viên Nguyễn Văn A đã hoàn thành mục tiêu tháng", time: "1 giờ trước" },
@@ -99,7 +155,7 @@ const DashboardClient: React.FC = () => {
               {statsWithChanges.map((stat, index) => (
                 <div key={index} className={`rounded-lg ${stat.bgColor} p-4 shadow-md ${stat.textColor || ''}`}>
                   <div className="text-2xl font-bold">
-                    {stat.title === "Income" ? `$${stat.current / 1000}k` : stat.current}
+                    {stat.title === "Revenue" ? `$${(stat.current / 1000).toFixed(2)}k` : stat.current}
                   </div>
                   <div className={stat.textColor ? "text-gray-200" : "text-gray-500"}>{stat.title}</div>
                   <div className={`text-sm font-semibold ${stat.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -109,20 +165,25 @@ const DashboardClient: React.FC = () => {
               ))}
             </div>
 
-            {/* Biểu đồ doanh thu */}
-            <div className="mb-4 rounded-lg bg-white p-6 shadow-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold">Biểu đồ doanh thu</h2>
-                <div className={`text-sm font-semibold ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {revenueChange >= 0 ? '▲' : '▼'} {Math.abs(revenueChange).toFixed(2)}%
+            <div className="mb-4 grid grid-cols-2 gap-4">
+              <div className="rounded-lg bg-white p-6 shadow-md">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold">Biểu đồ doanh thu</h2>
+                  <div className={`text-sm font-semibold ${revenueChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {revenueChange >= 0 ? '▲' : '▼'} {Math.abs(revenueChange).toFixed(2)}%
+                  </div>
+                </div>
+                <div style={{ height: '300px' }}>
+                  <AreaChart />
                 </div>
               </div>
-              <div style={{ height: '200px' }}>
-                <Line data={revenueData} options={options} />
+
+              <div className="rounded-lg bg-white p-6 shadow-md">
+                <h2 className="text-xl font-bold mb-4">Sản phẩm theo danh mục</h2>
+                <ProductCategoryPieChart data={categoryData} />
               </div>
             </div>
 
-            {/* Thông báo */}
             <div className="mb-4 rounded-lg bg-white p-6 shadow-md">
               <h2 className="mb-4 text-xl font-bold">Thông báo mới nhất</h2>
               <ul>
@@ -197,73 +258,28 @@ const DashboardClient: React.FC = () => {
                     See all
                   </button>
                 </div>
-                <ul>
-                  <li className="mb-4 flex items-center">
-                    <Image
-                      src="https://via.placeholder.com/40"
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-bold">Đặng Hữu Phúc</div>
-                      <div className="text-gray-500">Full-Stack</div>
-                    </div>
-                  </li>
-                  <li className="mb-4 flex items-center">
-                    <Image
-                      src="https://via.placeholder.com/40"
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-bold">Vũ Minh Quân</div>
-                      <div className="text-gray-500">FE</div>
-                    </div>
-                  </li>
-                  <li className="mb-4 flex items-center">
-                    <Image
-                      src="https://via.placeholder.com/40"
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-bold">Lê Ngọc Phú</div>
-                      <div className="text-gray-500">FE</div>
-                    </div>
-                  </li>
-                  <li className="mb-4 flex items-center">
-                    <Image
-                      src="https://via.placeholder.com/40"
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-bold">Lê Bá Trung</div>
-                      <div className="text-gray-500">BE</div>
-                    </div>
-                  </li>
-                  <li className="mb-4 flex items-center">
-                    <Image
-                      src="https://via.placeholder.com/40"
-                      alt="Avatar"
-                      width={40}
-                      height={40}
-                      className="h-10 w-10 rounded-full"
-                    />
-                    <div className="ml-4">
-                      <div className="font-bold">Nguyễn Hoàng Nam</div>
-                      <div className="text-gray-500">BE</div>
-                    </div>
-                  </li>
-                </ul>
+                <table className="w-full">
+                  <thead>
+                    <tr>
+                      <th className="text-left">Full Name</th>
+                      <th className="text-left">Username</th>
+                      <th className="text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {staffMembers.map((staff) => (
+                      <tr key={staff.id}>
+                        <td>{staff.fullName}</td>
+                        <td>{staff.userName}</td>
+                        <td>
+                          <span className={staff.status === 1 ? "text-green-600" : "text-red-600"}>
+                            {staff.status === 1 ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </main>

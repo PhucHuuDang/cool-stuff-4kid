@@ -22,6 +22,8 @@ const VouchersManagementClient: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedVoucher, setSelectedVoucher] = useState<Voucher | null>(null);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [voucherToDelete, setVoucherToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     fetchVouchers();
@@ -109,9 +111,16 @@ const VouchersManagementClient: React.FC = () => {
     }
   };
 
-  const handleDeleteVoucher = async (voucherId: number) => {
+  const handleDeleteClick = (voucherId: number) => {
+    setVoucherToDelete(voucherId);
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (voucherToDelete === null) return;
+
     try {
-      const response = await fetch(`https://milkapplicationapi.azurewebsites.net/api/Vouchers/DeleteVouchers/${voucherId}`, {
+      const response = await fetch(`https://milkapplicationapi.azurewebsites.net/api/Vouchers/DeleteVouchers/${voucherToDelete}`, {
         method: 'DELETE',
       });
 
@@ -124,6 +133,9 @@ const VouchersManagementClient: React.FC = () => {
     } catch (error) {
       console.error('Error deleting voucher:', error);
       setError('Failed to delete voucher. Please try again.');
+    } finally {
+      setShowConfirmModal(false);
+      setVoucherToDelete(null);
     }
   };
 
@@ -237,7 +249,7 @@ const VouchersManagementClient: React.FC = () => {
                         <Edit className="mr-2 h-4 w-4" />
                         <span>Edit</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDeleteVoucher(voucher.voucherId)}>
+                      <DropdownMenuItem onClick={() => handleDeleteClick(voucher.voucherId)}>
                         <Trash className="mr-2 h-4 w-4" />
                         <span>Delete</span>
                       </DropdownMenuItem>
@@ -263,6 +275,29 @@ const VouchersManagementClient: React.FC = () => {
           onUpdate={handleUpdateVoucher}
           voucher={selectedVoucher}
         />
+      )}
+
+      {/* Confirm Delete Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p className="mb-4">Are you sure you want to delete this voucher this can't be undo?</p>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
