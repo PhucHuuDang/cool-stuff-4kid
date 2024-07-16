@@ -45,6 +45,17 @@ export interface ProductProps {
   imagesCarousel?: string[];
 }
 
+export type ProductsInCategoryProps = {
+  categoryId: number;
+  categoryName: string;
+  product: FilterProductProps[];
+};
+
+export type FilterProductProps = Pick<
+  ProductApiProps,
+  "productId" | "productName" | "image" | "status"
+>;
+
 export interface Category {
   categoryId: number;
   categoryName: string;
@@ -90,7 +101,6 @@ export interface OrderItem {
   productId: number;
   productName: string;
 }
-
 
 export interface State {
   isConfirmLoading: boolean;
@@ -144,7 +154,6 @@ export interface AddModalProps {
   onCategoryAdd: (category: Category) => Promise<void>;
   onLocationAdd?: (location: Location) => Promise<void>;
   onOriginAdd?: (origin: Origin) => Promise<void>;
-  
 }
 
 export interface ProductDetailsModalProps {
@@ -176,7 +185,7 @@ export type ProductManagementAction =
   | { type: "TOGGLE_MODAL" }
   | { type: "SET_SUBMITTING"; payload: boolean }
   | { type: "SET_CONFIRM_LOADING"; payload: boolean }
-  | { type: "SET_FORM_VALUES"; payload: Partial<State['formValues']> }
+  | { type: "SET_FORM_VALUES"; payload: Partial<State["formValues"]> }
   | { type: "SET_CATEGORY_NAME"; payload: string }
   | { type: "SET_LOCATION_NAME"; payload: string }
   | { type: "SET_LOCATION_ADDRESS"; payload: string }
@@ -184,8 +193,7 @@ export type ProductManagementAction =
   | { type: "SET_CATEGORIES"; payload: Category[] }
   | { type: "SET_ORIGINS"; payload: Origin[] }
   | { type: "SET_LOCATIONS"; payload: Location[] }
-  | { type: "SET_IMAGES_CAROUSEL"; payload: string[] }
-  
+  | { type: "SET_IMAGES_CAROUSEL"; payload: string[] };
 
 export type OrderManagementAction =
   | { type: "FETCH_INIT" }
@@ -273,5 +281,10 @@ export interface DecodedToken {
 
 export type CardCarouselPropsPicked = Pick<
   ProductApiProps,
-  "productId" | "price" | "discountPercent" | "productName" | "image"
+  | "productId"
+  | "price"
+  | "discountPercent"
+  | "productName"
+  | "image"
+  | "discountPrice"
 >;
