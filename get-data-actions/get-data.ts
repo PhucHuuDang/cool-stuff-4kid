@@ -11,7 +11,7 @@ export const getData = async (url: string) => {
   return data;
 };
 
-export const getDataInClient = async(url: string) => {
+export const getDataInClient = async (url: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
     cache: "no-store",
   });
@@ -19,8 +19,7 @@ export const getDataInClient = async(url: string) => {
   if (!response.ok) throw new Error(`Failed to fetch ${url}`);
   const data = await response.json();
   return data;
-
-}
+};
 
 export const infiniteData = async (url: string) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {

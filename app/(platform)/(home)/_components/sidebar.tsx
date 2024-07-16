@@ -63,10 +63,6 @@ const Sidebar = () => {
     queryFn: () => getDataInClient("/Category/GetProductInCategory"),
   });
 
-  console.log({ products });
-  console.log({ isLoading });
-  console.log({ isFetching });
-
   return (
     <div className="w-64">
       <div className="fixed z-50 h-full w-64 rounded-lg bg-slate-500/10 2xl:h-screen">

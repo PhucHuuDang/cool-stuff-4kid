@@ -1,3 +1,5 @@
+import { JwtPayload } from "jwt-decode";
+
 export interface Product {
   productId: string;
   productName: string;
@@ -238,3 +240,36 @@ export type CardCarouselPropsPicked = Pick<
   | "image"
   | "discountPrice"
 >;
+
+export type InformationDecoded = JwtPayload & {
+  name: string;
+  email: string;
+  nameid: string;
+  role: string;
+  exp: number;
+  iat: number;
+  iss: string;
+};
+
+export type UserInformationDetail = {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  status: number;
+  addresses: Address[];
+};
+
+export type Address = {
+  addressId: string;
+  addressName: string;
+  street: string;
+  phone: string;
+  city: string;
+  country: string;
+  id: string;
+};
+
+export type UserInformationDetailProps = {
+  data: UserInformationDetail;
+};

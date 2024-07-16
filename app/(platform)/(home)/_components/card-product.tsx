@@ -7,6 +7,7 @@ import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { removeMarks } from "@/handle-transform/remove-marks";
 import { useCartStore } from "@/hooks/use-cart-store";
 import { Product, ProductApiProps } from "@/interface";
+import { handleRouter } from "@/lib/handle-router";
 import { ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -29,23 +30,12 @@ export const CardProduct = forwardRef<HTMLDivElement, CardProductProps>(
       addToCart(product);
     };
 
-    const handleRoute = (title: string, id: string) => {
-      const titleTransformed = removeMarks(title);
-
-      const params = {
-        titleTransformed,
-        id,
-      };
-
-      console.log({ params });
-
-      router.push(`/${params.titleTransformed}/${params.id}`);
-    };
-
     return (
       <div
         className="group col-span-1 cursor-pointer"
-        onClick={() => handleRoute(product.productName, product.productId)}
+        onClick={() =>
+          handleRouter(product.productName, product.productId, router)
+        }
         ref={ref}
       >
         <div className="relative flex w-full flex-col gap-2">
