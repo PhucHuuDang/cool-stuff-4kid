@@ -166,7 +166,7 @@ const StaffManagementClient: React.FC = () => {
 
 const StaffCard: React.FC<{ staff: StaffMember; onStatusChange: (userId: string, newStatus: number) => void }> = ({ staff, onStatusChange }) => {
   return (
-    <div className="relative flex flex-col items-center rounded-lg bg-white p-4 shadow">
+    <div className={`relative flex flex-col items-center rounded-lg p-4 shadow ${staff.status === 0 ? 'bg-gray-300' : 'bg-white'}`}>
       {staff.status === 0 && (
         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center pointer-events-none">
           <div className="rotate-45 text-red-600 border-8 border-red-600 rounded-full p-4 text-xl font-bold opacity-70">

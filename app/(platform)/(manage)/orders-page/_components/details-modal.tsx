@@ -1,5 +1,5 @@
 import React from 'react';
-import { Order } from '@/interface';
+import { Order, OrderDetail } from '@/interface';
 
 interface DetailsModalProps {
   isOpen: boolean;
@@ -10,22 +10,77 @@ interface DetailsModalProps {
 const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) => {
   if (!isOpen || !order) return null;
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString('vi-VN');
+  };
+
   return (
-    <div className="fixed inset-0 z-10 overflow-y-auto">
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-white rounded-lg p-8 m-4 max-w-xl w-full">
-          <h2 className="text-2xl font-bold mb-4">Order Details</h2>
-          <p><strong>Order ID:</strong> {order.orderId}</p>
-          <p><strong>Order Date:</strong> {new Date(order.orderDate).toLocaleString()}</p>
-          <p><strong>Total Price:</strong> {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}</p>
-          <p><strong>Customer ID:</strong> {order.id}</p>
-          <p><strong>User Name:</strong> {order.userName}</p>
-          <p><strong>Status:</strong> {order.status === 0 ? 'Pending' : 'Completed'}</p>
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full m-4 p-6">
+        <div className="flex justify-between items-center border-b pb-4 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">Chi tiết đơn hàng</h2>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition duration-150">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 text-gray-700 mb-8">
+          <div className="col-span-2 sm:col-span-1">
+            <p className="mb-2"><span className="font-semibold">Mã đơn hàng:</span> {order.orderId}</p>
+            <p className="mb-2"><span className="font-semibold">Ngày đặt hàng:</span> {formatDate(order.orderDate)}</p>
+            <p className="mb-2"><span className="font-semibold">Tổng tiền:</span> {formatCurrency(order.totalPrice)}</p>
+          </div>
+          <div className="col-span-2 sm:col-span-1">
+            <p className="mb-2"><span className="font-semibold">Mã khách hàng:</span> {order.id}</p>
+            <p className="mb-2"><span className="font-semibold">Tên khách hàng:</span> {order.userName}</p>
+            <p className="mb-2">
+              <span className="font-semibold">Trạng thái:</span>
+              <span className={`ml-2 px-2 py-1 rounded-full text-xs ${order.status === 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
+                {order.status === 0 ? 'Đang xử lý' : 'Hoàn thành'}
+              </span>
+            </p>
+          </div>
+          {order.voucherId !== 0 && (
+            <p className="col-span-2"><span className="font-semibold">Mã voucher:</span> {order.voucherId}</p>
+          )}
+        </div>
+
+        <h3 className="text-2xl font-semibold mb-4 text-gray-800">Chi tiết sản phẩm</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-3 text-left font-semibold">Sản phẩm</th>
+                <th className="border p-3 text-left font-semibold">Số lượng</th>
+                <th className="border p-3 text-left font-semibold">Giá</th>
+                <th className="border p-3 text-left font-semibold">Tổng</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.orderDetails.map((detail: OrderDetail) => (
+                <tr key={detail.orderDetailId} className="hover:bg-gray-50">
+                  <td className="border p-3">{detail.product.productName}</td>
+                  <td className="border p-3">{detail.quantity}</td>
+                  <td className="border p-3">{formatCurrency(detail.product.discountPrice || detail.product.price)}</td>
+                  <td className="border p-3">{formatCurrency((detail.product.discountPrice || detail.product.price) * detail.quantity)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex justify-end mt-8">
           <button
             onClick={onClose}
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:-translate-y-1"
           >
-            Close
+            Đóng
           </button>
         </div>
       </div>

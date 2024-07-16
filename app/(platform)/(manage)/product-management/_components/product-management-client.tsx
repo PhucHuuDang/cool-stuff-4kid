@@ -265,6 +265,14 @@ const ProductManagementClient: React.FC = () => {
     if (!sortField) return products;
 
     return [...products].sort((a, b) => {
+      if (sortField === 'quantity') {
+        const aValue = a.quantity ?? 0;
+        const bValue = b.quantity ?? 0;
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      if (sortField === 'price') {
+        return sortDirection === 'asc' ? a.price - b.price : b.price - a.price;
+      }
       if (sortField === 'discountPrice') {
         const aValue = a.discountPrice ?? Number.MAX_VALUE;
         const bValue = b.discountPrice ?? Number.MAX_VALUE;
@@ -452,8 +460,22 @@ const ProductTable: React.FC<{
       <TableHeader text="ID" />
       <TableHeader text="Product Image" />
       <TableHeader text="Product Name" />
-      <TableHeader text="Quantity" />
-      <TableHeader text="Origin Price" />
+      <TableHeader 
+        text="Quantity" 
+        sortable 
+        field="quantity" 
+        currentSortField={sortField} 
+        currentSortDirection={sortDirection} 
+        onSort={handleSort} 
+      />
+      <TableHeader 
+        text="Origin Price" 
+        sortable 
+        field="price" 
+        currentSortField={sortField} 
+        currentSortDirection={sortDirection} 
+        onSort={handleSort} 
+      />
       <TableHeader 
         text="Discount Price" 
         sortable 

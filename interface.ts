@@ -93,6 +93,14 @@ export interface Order {
   status: number;
   voucherId: number;
   orderItems: OrderItem[];
+  voucher: any | null;
+  orderDetails: OrderDetail[];
+}
+export interface OrderDetail {
+  orderDetailId: number;
+  quantity: number;
+  productId: number;
+  product: Product;
 }
 
 export interface OrderItem {

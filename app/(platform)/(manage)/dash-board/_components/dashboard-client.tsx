@@ -112,7 +112,7 @@ const DashboardClient: React.FC = () => {
       title: "Revenue", 
       current: totalRevenue, 
       change: revenueChange, 
-      bgColor: "bg-pink-600", 
+      bgColor: "bg-green-600", 
       textColor: "text-white" 
     },
     { 
@@ -155,7 +155,7 @@ const DashboardClient: React.FC = () => {
               {statsWithChanges.map((stat, index) => (
                 <div key={index} className={`rounded-lg ${stat.bgColor} p-4 shadow-md ${stat.textColor || ''}`}>
                   <div className="text-2xl font-bold">
-                    {stat.title === "Revenue" ? `$${(stat.current / 1000).toFixed(2)}k` : stat.current}
+                    {stat.title === "Revenue" ? `VND ${(stat.current / 1000).toFixed(2)}` : stat.current}
                   </div>
                   <div className={stat.textColor ? "text-gray-200" : "text-gray-500"}>{stat.title}</div>
                   <div className={`text-sm font-semibold ${stat.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
