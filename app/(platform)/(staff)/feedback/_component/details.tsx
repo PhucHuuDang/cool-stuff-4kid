@@ -1,4 +1,6 @@
+// Details.tsx
 "use client";
+// Details.tsx
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -9,8 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import axios from "axios";
+import { format } from "date-fns";
+import ProductDetailPopup from "./ProductDetailDialog";
 
 interface Comment {
   commentId: number;
@@ -18,11 +22,18 @@ interface Comment {
   rating: number;
   date: string;
   productId: number;
+  id: string;
+  productName: string;
+  userName: string;
 }
 
-export const Details = () => {
+const Details = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(
+    null,
+  );
   const commentsPerPage = 4;
 
   useEffect(() => {
@@ -59,25 +70,47 @@ export const Details = () => {
     }
   };
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    } else {
+      return text;
+    }
+  };
+
+  const handleViewProductDetail = (productId: number) => {
+    setSelectedProductId(productId);
+    setShowPopup(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    setSelectedProductId(null);
+  };
+
   return (
     <div>
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
-            <TableHead className="w-[100px] text-base font-bold text-black">
-              ID
+            <TableHead className="text-base font-bold text-black">ID</TableHead>
+            <TableHead className="text-base font-bold text-black">
+              User Name
             </TableHead>
             <TableHead className="text-base font-bold text-black">
               Product Name
             </TableHead>
-            <TableHead className="w-[450px] text-base font-bold text-black">
+            <TableHead className="text-base font-bold text-black">
               Comments
             </TableHead>
-            <TableHead className="text-base font-bold text-black">
+            <TableHead className="w-[100px] text-base font-bold text-black">
               Rate
             </TableHead>
             <TableHead className="text-center text-base font-bold text-black">
               Date
+            </TableHead>
+            <TableHead className="text-center text-base font-bold text-black">
+              Action
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -86,18 +119,47 @@ export const Details = () => {
             <TableRow key={comment.commentId}>
               <TableCell className="font-bold">{comment.commentId}</TableCell>
               <TableCell className="font-semibold">
-                <ProductName productId={comment.productId} />
+                {comment.userName}
               </TableCell>
-              <TableCell>{comment.commentDetail}</TableCell>
-              <TableCell className="flex w-[200px] text-xl text-yellow-400">
-                <Star className="mr-1" />
-                {comment.rating}
+              <TableCell className="font-semibold">
+                {truncateText(comment.productName, 30)}
               </TableCell>
-              <TableCell className="text-center">{comment.date}</TableCell>
+              <TableCell className="font-semibold">
+                {truncateText(comment.commentDetail, 30)}
+              </TableCell>
+              <TableCell className="flex w-[150px] text-yellow-400">
+                {Array.from({ length: comment.rating }).map((_, index) => (
+                  <Star key={index} className="mr-1" />
+                ))}
+              </TableCell>
+              <TableCell className="w-[180px] text-center">
+                <span className="text-blue-500">
+                  {format(new Date(comment.date), "HH:mm")}
+                </span>
+                {format(new Date(comment.date), ", dd-MM-yyyy")}
+              </TableCell>
+              <TableCell className="text-center">
+                <button
+                  onClick={() => handleViewProductDetail(comment.productId)}
+                  className="text-blue-500 hover:underline"
+                >
+                  View
+                </button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
+
+      {showPopup && selectedProductId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <ProductDetailPopup
+            productId={selectedProductId}
+            onClose={handleClosePopup}
+          />
+        </div>
+      )}
+
       {comments.length > commentsPerPage && (
         <div className="mb-4 flex items-center justify-center text-center">
           <Button
@@ -125,23 +187,4 @@ export const Details = () => {
   );
 };
 
-const ProductName: React.FC<{ productId: number }> = ({ productId }) => {
-  const [productName, setProductName] = useState("");
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get<{ productName: string }>(
-          `hhttps://milkapplicationapi.azurewebsites.net/Product/GetProductsById/${productId}`,
-        );
-        setProductName(response.data.productName);
-      } catch (error) {
-        console.error(`Error fetching product ${productId}:`, error);
-      }
-    };
-
-    fetchProduct();
-  }, [productId]);
-
-  return <>{productName}</>;
-};
+export default Details;

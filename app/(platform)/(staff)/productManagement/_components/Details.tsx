@@ -1,8 +1,22 @@
 "use client";
 
 import React, { useReducer, useEffect, useCallback, useState } from "react";
-import { Search } from "lucide-react";
+import {
+  Search,
+  ArrowUpDown,
+  ArrowDown,
+  ArrowUp,
+  ChevronDown,
+  Globe,
+  MapPin,
+  FolderPlus,
+  PlusCircle,
+} from "lucide-react";
 import axios from "axios";
+import { AddProductModal } from "./add-product-modal";
+import { EditProductModal } from "./edit-product-modal";
+import { ProductDetailsModal } from "./product-details-modal";
+import { DeleteProductModal } from "./delete-product-modal";
 import {
   ProductProps,
   ProductManagementAction,
@@ -10,11 +24,6 @@ import {
   Location,
   Origin,
 } from "@/interface";
-import { ProductDetailsModal } from "./product-details-modal";
-import { DeleteProductModal } from "./delete-product-modal";
-import { AddProductModal } from "./add-product-modal";
-import EditProductModal from "./edit-product-modal";
-import { Button } from "@/components/ui/button";
 
 interface State {
   products: ProductProps[];
@@ -71,7 +80,95 @@ const reducer = (state: State, action: ProductManagementAction): State => {
   }
 };
 
-const ProductManagementPage: React.FC = () => {
+const DropdownMenu: React.FC<{
+  onSelect: (tab: string) => void;
+}> = ({ onSelect }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="relative inline-block text-left">
+      <div>
+        <button
+          type="button"
+          className="inline-flex w-full items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition duration-150 ease-in-out hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="mr-2">Action</span>
+          <ChevronDown className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div
+            className="py-1"
+            role="menu"
+            aria-orientation="vertical"
+            aria-labelledby="options-menu"
+          >
+            <ActionMenuItem
+              icon={<PlusCircle className="mr-3 h-5 w-5 text-indigo-500" />}
+              text="Add Product"
+              onClick={() => {
+                onSelect("1");
+                setIsOpen(false);
+              }}
+            />
+            <ActionMenuItem
+              icon={<FolderPlus className="mr-3 h-5 w-5 text-green-500" />}
+              text="Add Category"
+              onClick={() => {
+                onSelect("2");
+                setIsOpen(false);
+              }}
+            />
+            <ActionMenuItem
+              icon={<MapPin className="mr-3 h-5 w-5 text-blue-500" />}
+              text="Add Location"
+              onClick={() => {
+                onSelect("3");
+                setIsOpen(false);
+              }}
+            />
+            <ActionMenuItem
+              icon={<Globe className="mr-3 h-5 w-5 text-purple-500" />}
+              text="Add Origin"
+              onClick={() => {
+                onSelect("4");
+                setIsOpen(false);
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ActionMenuItem: React.FC<{
+  icon: React.ReactNode;
+  text: string;
+  onClick: () => void;
+}> = ({ icon, text, onClick }) => (
+  <button
+    type="button"
+    className="flex w-full items-center px-4 py-2 text-sm text-gray-700 transition duration-150 ease-in-out hover:bg-gray-50 hover:text-gray-900"
+    onClick={onClick}
+  >
+    {icon}
+    <span className="ml-3">{text}</span>
+  </button>
+);
+
+const formatVND = (price: number | null | undefined): string => {
+  if (price === null || price === undefined) return "N/A";
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(price);
+};
+
+const ProductManagementClient: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
   const [editingProduct, setEditingProduct] = useState<ProductProps | null>(
@@ -86,6 +183,9 @@ const ProductManagementPage: React.FC = () => {
   >([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedStatus, setSelectedStatus] = useState<string>("");
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [activeModalTab, setActiveModalTab] = useState<string>("1");
   const itemsPerPage = 7;
 
   const fetchProducts = useCallback(async () => {
@@ -222,23 +322,51 @@ const ProductManagementPage: React.FC = () => {
     setSelectedStatus(e.target.value);
   };
 
-  const filteredProducts = state.products.filter(
-    (product) =>
-      product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
-      (selectedCategory === "" ||
-        product.categoryId.toString() === selectedCategory) &&
-      (selectedStatus === "" ||
-        (selectedStatus === "In Stock" && product.status === 1) ||
-        (selectedStatus === "Out Of Stock" && product.status === 0)),
+  const sortProducts = (products: ProductProps[]) => {
+    if (!sortField) return products;
+
+    return [...products].sort((a, b) => {
+      if (sortField === "quantity") {
+        const aValue = a.quantity ?? 0;
+        const bValue = b.quantity ?? 0;
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      if (sortField === "price") {
+        return sortDirection === "asc" ? a.price - b.price : b.price - a.price;
+      }
+      if (sortField === "discountPrice") {
+        const aValue = a.discountPrice ?? Number.MAX_VALUE;
+        const bValue = b.discountPrice ?? Number.MAX_VALUE;
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      if (sortField === "discountPercent") {
+        const aValue = a.discountPercent ?? 0;
+        const bValue = b.discountPercent ?? 0;
+        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
+  };
+
+  const filteredAndSortedProducts = sortProducts(
+    state.products.filter(
+      (product) =>
+        product.productName.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        (selectedCategory === "" ||
+          product.categoryId.toString() === selectedCategory) &&
+        (selectedStatus === "" ||
+          (selectedStatus === "Active" && product.status === 1) ||
+          (selectedStatus === "Inactive" && product.status === 0)),
+    ),
   );
 
   const indexOfLastProduct = state.currentPage * itemsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - itemsPerPage;
-  const currentProducts = filteredProducts.slice(
+  const currentProducts = filteredAndSortedProducts.slice(
     indexOfFirstProduct,
     indexOfLastProduct,
   );
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
 
   const handleClick = useCallback((pageNumber: number) => {
     dispatch({ type: "SET_CURRENT_PAGE", payload: pageNumber });
@@ -247,6 +375,15 @@ const ProductManagementPage: React.FC = () => {
   const toggleDropdown = useCallback((productId: number) => {
     dispatch({ type: "TOGGLE_DROPDOWN", payload: productId });
   }, []);
+
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -282,21 +419,21 @@ const ProductManagementPage: React.FC = () => {
                   ))}
                 </select>
                 <select
-                  title="a"
+                  title="b"
                   className="mr-4 rounded border p-2"
                   value={selectedStatus}
                   onChange={handleStatusChange}
                 >
-                  <option value="">All</option>
-                  <option value="In Stock">In Stock</option>
-                  <option value="Out Of Stock">Out Of Stock</option>
+                  <option value="">Select Status</option>
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
                 </select>
-                <Button
-                  className="ml-auto rounded-3xl border bg-blue-500 p-2 text-white hover:bg-blue-600"
-                  onClick={handleAddProduct}
-                >
-                  Add Product
-                </Button>
+                <DropdownMenu
+                  onSelect={(tab) => {
+                    setActiveModalTab(tab);
+                    dispatch({ type: "TOGGLE_MODAL" });
+                  }}
+                />
               </div>
               <div className="overflow-x-auto">
                 <ProductTable
@@ -306,6 +443,9 @@ const ProductManagementPage: React.FC = () => {
                   handleProductDelete={handleProductDelete}
                   handleEditClick={handleEditClick}
                   handleViewDetails={handleViewDetails}
+                  sortField={sortField}
+                  sortDirection={sortDirection}
+                  handleSort={handleSort}
                 />
               </div>
               <Pagination
@@ -331,6 +471,7 @@ const ProductManagementPage: React.FC = () => {
           onOriginAdd={async (origin: Origin) => {
             console.log("Adding origin:", origin);
           }}
+          activeTab={activeModalTab}
         />
       )}
       {editingProduct && (
@@ -369,6 +510,9 @@ const ProductTable: React.FC<{
   handleProductDelete: (productId: number) => void;
   handleEditClick: (product: ProductProps) => void;
   handleViewDetails: (productId: number) => void;
+  sortField: string | null;
+  sortDirection: "asc" | "desc";
+  handleSort: (field: string) => void;
 }> = ({
   currentProducts,
   dropdownVisible,
@@ -376,26 +520,58 @@ const ProductTable: React.FC<{
   handleProductDelete,
   handleEditClick,
   handleViewDetails,
+  sortField,
+  sortDirection,
+  handleSort,
 }) => (
   <table className="min-w-full table-fixed divide-y divide-gray-200">
-    <thead className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
-      <tr>
-        <TableHeader text="ID" />
-        <TableHeader text="Image" />
-        <TableHeader text="Product Name" />
-        <TableHeader text="Quantity" />
-        <TableHeader text="Price" />
-        <TableHeader text="Discount Price" />
-        <TableHeader text="Discount Percent" />
-        <TableHeader text="Status" />
-        {/* <TableHeader text="Link" /> */}
-        <TableHeader text="Action" />
-      </tr>
+    <thead className="bg-gray-50">
+      <TableHeader text="ID" />
+      <TableHeader text="Product Image" />
+      <TableHeader text="Product Name" />
+      <TableHeader
+        text="Quantity"
+        sortable
+        field="quantity"
+        currentSortField={sortField}
+        currentSortDirection={sortDirection}
+        onSort={handleSort}
+        color="text-[#28a745]"
+      />
+      <TableHeader
+        text="Origin Price"
+        sortable
+        field="price"
+        currentSortField={sortField}
+        currentSortDirection={sortDirection}
+        onSort={handleSort}
+        color="text-[#dc3545]"
+      />
+      <TableHeader
+        text="Discount Price"
+        sortable
+        field="discountPrice"
+        currentSortField={sortField}
+        currentSortDirection={sortDirection}
+        onSort={handleSort}
+        color="text-[#007bff]"
+      />
+      <TableHeader
+        text="Discount Percent"
+        sortable
+        field="discountPercent"
+        currentSortField={sortField}
+        currentSortDirection={sortDirection}
+        onSort={handleSort}
+        color="text-[#fd7e14]"
+      />
+      <TableHeader text="Status" />
+      <TableHeader text="Action" />
     </thead>
     <tbody className="divide-y divide-gray-200 bg-white">
       {currentProducts.map((product) => (
         <tr key={product.productId}>
-          <TableCell text={product.productId.toString()} isSemi />
+          <TableCell text={product.productId.toString()} />
           <td className="flex justify-center whitespace-nowrap px-6 py-4 text-sm text-gray-500">
             <img
               src={product.image}
@@ -405,53 +581,37 @@ const ProductTable: React.FC<{
           </td>
           <TableCell text={product.productName} isProductName={true} />
           <TableCell text={product.quantity?.toString() ?? "0"} />
-          <TableCell text={product.price.toString()} />
-          <TableCell
-            text={
-              product.discountPrice !== null
-                ? product.discountPrice.toString()
-                : "0"
-            }
-          />
+          <TableCell text={formatVND(product.price)} />
+          <TableCell text={formatVND(product.discountPrice)} />
           <TableCell
             text={
               product.discountPercent !== null && product.discountPercent !== 0
                 ? `${product.discountPercent}%`
-                : "0"
+                : "N/A"
             }
           />
-          <TableCell
-            text={product.status === 1 ? "In Stock" : "Out Of Stock"}
-            isSemi
-          />
-          {/* <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              View
-            </a>
-          </td> */}
+          <StatusCell status={product.status} />
           <td className="relative whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
-            <Button
+            <button
               onClick={() => toggleDropdown(product.productId)}
-              className="bg-white text-black hover:bg-white"
+              className="focus:outline-none"
             >
               ...
-            </Button>
+            </button>
             {dropdownVisible === product.productId && (
-              <div className="absolute right-0 z-10 mt-2 w-48 rounded border shadow-xl">
+              <div className="absolute right-0 z-10 mt-2 w-48 rounded border border-gray-300 bg-white shadow-lg">
                 <DropdownItem
+                  text="Product Details"
                   onClick={() => handleViewDetails(product.productId)}
-                >
-                  View Details
-                </DropdownItem>
-                <DropdownItem onClick={() => handleEditClick(product)}>
-                  Edit
-                </DropdownItem>
+                />
                 <DropdownItem
-                  className="text-red-600"
+                  text="Edit Product"
+                  onClick={() => handleEditClick(product)}
+                />
+                <DropdownItem
+                  text="Stop Selling"
                   onClick={() => handleProductDelete(product.productId)}
-                >
-                  Delete
-                </DropdownItem>
+                />
               </div>
             )}
           </td>
@@ -466,13 +626,13 @@ const Pagination: React.FC<{
   totalPages: number;
   handleClick: (pageNumber: number) => void;
 }> = ({ currentPage, totalPages, handleClick }) => (
-  <div className="mt-4 flex items-center justify-center text-center">
+  <div className="mt-4 flex items-center justify-between">
     <PaginationButton
       onClick={() => handleClick(currentPage - 1)}
       disabled={currentPage === 1}
       text="Previous"
     />
-    <div className="font mx-3 text-sm text-gray-700">
+    <div className="text-sm text-gray-700">
       Page {currentPage} of {totalPages}
     </div>
     <PaginationButton
@@ -483,39 +643,71 @@ const Pagination: React.FC<{
   </div>
 );
 
-const TableHeader: React.FC<{ text: string }> = ({ text }) => (
+const TableHeader: React.FC<{
+  text: string;
+  sortable?: boolean;
+  field?: string;
+  currentSortField?: string | null;
+  currentSortDirection?: "asc" | "desc";
+  onSort?: (field: string) => void;
+  color?: string;
+}> = ({
+  text,
+  sortable,
+  field,
+  currentSortField,
+  currentSortDirection,
+  onSort,
+  color,
+}) => (
   <th
     scope="col"
-    className="px-6 text-center text-base font-bold tracking-wider"
+    className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${color || "text-gray-500"} ${
+      sortable ? "cursor-pointer hover:bg-gray-100" : ""
+    }`}
+    onClick={() => sortable && field && onSort && onSort(field)}
   >
-    {text}
+    <div className="flex items-center justify-center">
+      {text}
+      {sortable && (
+        <span className="ml-1">
+          {currentSortField === field ? (
+            currentSortDirection === "asc" ? (
+              <ArrowUp className="h-4 w-4" />
+            ) : (
+              <ArrowDown className="h-4 w-4" />
+            )
+          ) : (
+            <ArrowUpDown className="h-4 w-4 text-gray-400" />
+          )}
+        </span>
+      )}
+    </div>
   </th>
 );
 
-const TableCell: React.FC<{
-  text: string;
-  isProductName?: boolean;
-  isSemi?: boolean;
-}> = ({ text, isProductName, isSemi }) => (
+const TableCell: React.FC<{ text: string; isProductName?: boolean }> = ({
+  text,
+  isProductName,
+}) => (
   <td
-    className={`px-6 py-4 text-center text-sm ${
+    className={`px-6 py-4 text-center text-sm text-gray-500 ${
       isProductName ? "max-w-xs break-words" : "whitespace-nowrap"
-    } ${isSemi ? "font-semibold" : ""} ${isSemi ? "px-0" : ""}`}
+    }`}
   >
     {text}
   </td>
 );
 
-const DropdownItem: React.FC<{
-  onClick: () => void;
-  children: React.ReactNode;
-  className?: string;
-}> = ({ onClick, children, className }) => (
+const DropdownItem: React.FC<{ text: string; onClick?: () => void }> = ({
+  text,
+  onClick,
+}) => (
   <button
-    className={`block w-full rounded-none bg-white px-4 py-2 text-left text-sm text-black hover:bg-gray-400 ${className}`}
     onClick={onClick}
+    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
   >
-    {children}
+    {text}
   </button>
 );
 
@@ -524,15 +716,28 @@ const PaginationButton: React.FC<{
   disabled: boolean;
   text: string;
 }> = ({ onClick, disabled, text }) => (
-  <Button
+  <button
     onClick={onClick}
     disabled={disabled}
-    className={`hover w-[100px] rounded bg-blue-500 hover:bg-blue-600 ${
+    className={`rounded bg-gray-200 px-4 py-2 ${
       disabled ? "cursor-not-allowed opacity-50" : "hover:bg-gray-300"
     }`}
   >
     {text}
-  </Button>
+  </button>
 );
 
-export default ProductManagementPage;
+const StatusCell: React.FC<{ status: number }> = ({ status }) => {
+  const statusText = status === 1 ? "Active" : "Inactive";
+  const statusColor = status === 1 ? "text-green-600" : "text-red-600";
+
+  return (
+    <td
+      className={`whitespace-nowrap px-6 py-4 text-center text-sm ${statusColor}`}
+    >
+      {statusText}
+    </td>
+  );
+};
+
+export default ProductManagementClient;

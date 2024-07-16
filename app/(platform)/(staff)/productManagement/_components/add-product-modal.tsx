@@ -27,7 +27,7 @@ import { UploadImageProduct } from "./upload-image-product";
 import {
   State,
   AddModalProps,
-  Product,
+  AddProduct,
   ProductManagementAction,
   Category,
   Location,
@@ -47,7 +47,7 @@ const initialState: State = {
     price: 0,
     discountPercent: 0,
     productDescription: "",
-    quantity: 0,
+    quantity: 1,
     image: "",
     categoryId: undefined,
     originId: undefined,
@@ -96,17 +96,23 @@ const reducer = (state: State, action: ProductManagementAction): State => {
   }
 };
 
-const AddProductModal: React.FC<AddModalProps> = ({
+const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
   setIsOpen,
   isOpen,
   onProductAdd,
   onCategoryAdd = () => Promise.resolve(),
   onLocationAdd = () => Promise.resolve(),
   onOriginAdd = () => Promise.resolve(),
+  activeTab,
 }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [form] = Form.useForm();
-  const [activeTab, setActiveTab] = useState("1");
+  const [currentTab, setCurrentTab] = useState(activeTab);
+  const [discountWarning, setDiscountWarning] = useState("");
+
+  useEffect(() => {
+    setCurrentTab(activeTab);
+  }, [activeTab]);
 
   useEffect(() => {
     fetchCategories();
@@ -157,6 +163,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     dispatch({ type: "SET_LOCATION_NAME", payload: "" });
     dispatch({ type: "SET_LOCATION_ADDRESS", payload: "" });
     dispatch({ type: "SET_ORIGIN_NAME", payload: "" });
+    setDiscountWarning("");
   };
 
   const handleFileChange = (newFileChange: string | string[]) => {
@@ -184,39 +191,17 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const handleAddProduct = async () => {
     try {
       const values = await form.validateFields();
-      dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
 
-      const imagesCarousel = Array.isArray(values.imagesCarousel)
-        ? values.imagesCarousel
-        : values.imagesCarousel
-          ? [values.imagesCarousel]
-          : [];
-
-      const productData = {
-        productId: 0,
-        productName: values.productName,
-        price: values.price,
-        discountPrice: values.price * (1 - (values.discountPercent || 0) / 100),
-        discountPercent: values.discountPercent || 0,
-        productDescription: values.productDescription,
-        image: values.image,
-        imagesCarousel: imagesCarousel,
-        quantity: values.quantity,
-        status: 1,
-        categoryId: values.categoryId,
-        originId: values.originId,
-        locationId: values.locationId,
-      };
-
-      const response = await axios.post<Product>(
-        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
-        productData,
-      );
-
-      await onProductAdd(response.data);
-      message.success("Product created successfully");
-      setIsOpen(false);
-      form.resetFields();
+      if (values.discountPercent >= 50 && values.discountPercent <= 80) {
+        Modal.confirm({
+          title: "Confirm High Discount",
+          content: `You want to add product with ${values.discountPercent}% discount?`,
+          onOk: () => submitProduct(values),
+          onCancel: () => {},
+        });
+      } else {
+        await submitProduct(values);
+      }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         message.error(
@@ -227,6 +212,48 @@ const AddProductModal: React.FC<AddModalProps> = ({
       } else {
         message.error("Failed to create product");
       }
+    }
+  };
+
+  const submitProduct = async (values: any) => {
+    dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
+
+    const imagesCarousel = Array.isArray(values.imagesCarousel)
+      ? values.imagesCarousel
+      : values.imagesCarousel
+        ? [values.imagesCarousel]
+        : [];
+
+    const productData = {
+      productId: 0,
+      productName: values.productName,
+      price: values.price,
+      discountPrice: values.price * (1 - (values.discountPercent || 0) / 100),
+      discountPercent: values.discountPercent || 0,
+      productDescription: values.productDescription,
+      image: values.image,
+      imagesCarousel: imagesCarousel,
+      quantity: values.quantity,
+      status: 1,
+      categoryId: values.categoryId,
+      originId: values.originId,
+      locationId: values.locationId,
+      id: "29876198-d271-4a9e-b1cb-8266cb503a39",
+    };
+
+    try {
+      const response = await axios.post<AddProduct>(
+        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
+        productData,
+      );
+
+      await onProductAdd(response.data);
+      message.success("Product created successfully");
+      setIsOpen(false);
+      form.resetFields();
+      setDiscountWarning("");
+    } catch (error) {
+      throw error;
     } finally {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: false });
     }
@@ -234,17 +261,18 @@ const AddProductModal: React.FC<AddModalProps> = ({
 
   const handleAddCategory = async () => {
     try {
+      const values = await form.validateFields(["categoryName"]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Category>(
         "https://milkapplicationapi.azurewebsites.net/api/Category/CreateCategorys",
         {
           categoryId: 0,
-          categoryName: state.categoryName,
+          categoryName: values.categoryName,
         },
       );
       await onCategoryAdd(response.data);
       message.success("Category created successfully");
-      dispatch({ type: "SET_CATEGORY_NAME", payload: "" });
+      form.resetFields(["categoryName"]);
       fetchCategories();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -263,19 +291,22 @@ const AddProductModal: React.FC<AddModalProps> = ({
 
   const handleAddLocation = async () => {
     try {
+      const values = await form.validateFields([
+        "locationName",
+        "locationAddress",
+      ]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Location>(
         "https://milkapplicationapi.azurewebsites.net/api/Location/CreateLocation",
         {
           locationId: 0,
-          locationName: state.locationName,
-          address: state.locationAddress,
+          locationName: values.locationName,
+          address: values.locationAddress,
         },
       );
       await onLocationAdd(response.data);
       message.success("Location created successfully");
-      dispatch({ type: "SET_LOCATION_NAME", payload: "" });
-      dispatch({ type: "SET_LOCATION_ADDRESS", payload: "" });
+      form.resetFields(["locationName", "locationAddress"]);
       fetchLocations();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -294,17 +325,18 @@ const AddProductModal: React.FC<AddModalProps> = ({
 
   const handleAddOrigin = async () => {
     try {
+      const values = await form.validateFields(["originName"]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Origin>(
         "https://milkapplicationapi.azurewebsites.net/api/Origin/CreateOrigins",
         {
           originId: 0,
-          originName: state.originName,
+          originName: values.originName,
         },
       );
       await onOriginAdd(response.data);
       message.success("Origin created successfully");
-      dispatch({ type: "SET_ORIGIN_NAME", payload: "" });
+      form.resetFields(["originName"]);
       fetchOrigins();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -335,7 +367,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
       className="add-product-modal"
     >
       <Divider />
-      <Tabs activeKey={activeTab} onChange={setActiveTab}>
+      <Tabs activeKey={currentTab} onChange={setCurrentTab}>
         <TabPane tab="Add Product" key="1">
           <Form
             form={form}
@@ -369,7 +401,14 @@ const AddProductModal: React.FC<AddModalProps> = ({
               <Col span={12}>
                 <Form.Item
                   name="quantity"
-                  rules={[{ required: true, message: "Please input quantity" }]}
+                  rules={[
+                    { required: true, message: "Please input quantity" },
+                    {
+                      type: "number",
+                      min: 1,
+                      message: "Quantity must be greater than 0",
+                    },
+                  ]}
                   label="Quantity"
                 >
                   <InputNumber
@@ -378,7 +417,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
                       <SquarePlus className="site-form-item-icon mr-2 text-green-500" />
                     }
                     placeholder="Enter quantity"
-                    min={0}
+                    min={1}
                   />
                 </Form.Item>
               </Col>
@@ -387,7 +426,20 @@ const AddProductModal: React.FC<AddModalProps> = ({
               <Col span={12}>
                 <Form.Item
                   name="price"
-                  rules={[{ required: true, message: "Please input price" }]}
+                  rules={[
+                    { required: true, message: "Please input price" },
+                    {
+                      validator: async (_, value) => {
+                        if (value === 0) {
+                          return Promise.reject("Price can't be 0");
+                        }
+                        if (value < 1) {
+                          return Promise.reject("Price must be at least 1");
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
                   label="Price"
                 >
                   <InputNumber
@@ -404,7 +456,30 @@ const AddProductModal: React.FC<AddModalProps> = ({
                 </Form.Item>
               </Col>
               <Col span={12}>
-                <Form.Item name="discountPercent" label="Discount Percent">
+                <Form.Item
+                  name="discountPercent"
+                  label="Discount Percent"
+                  rules={[
+                    {
+                      validator: async (_, value) => {
+                        if (value > 80) {
+                          alert("Discount percent cannot exceed 80%");
+                          return Promise.reject(
+                            "Discount percent cannot exceed 80%",
+                          );
+                        }
+                        if (value >= 50) {
+                          setDiscountWarning(
+                            "Warning: Discount is 50% or higher!",
+                          );
+                        } else {
+                          setDiscountWarning("");
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
                   <InputNumber
                     className="w-full"
                     prefix={
@@ -412,9 +487,12 @@ const AddProductModal: React.FC<AddModalProps> = ({
                     }
                     placeholder="Enter discount %"
                     min={0}
-                    max={100}
+                    max={80}
                   />
                 </Form.Item>
+                {discountWarning && (
+                  <div className="text-orange-300">{discountWarning}</div>
+                )}
               </Col>
             </Row>
             <Row gutter={24}>
@@ -497,7 +575,12 @@ const AddProductModal: React.FC<AddModalProps> = ({
             </Form.Item>
             <Form.Item
               name="image"
-              rules={[{ required: true, message: "Please select image" }]}
+              rules={[
+                {
+                  required: true,
+                  message: "Please select an image for the product",
+                },
+              ]}
               label="Product Image"
             >
               <UploadImageProduct
@@ -505,7 +588,22 @@ const AddProductModal: React.FC<AddModalProps> = ({
                 initialImage={state.formValues.image}
               />
             </Form.Item>
-            <Form.Item name="imagesCarousel" label="Product Images Carousel">
+            <Form.Item
+              name="imagesCarousel"
+              label="Product Images Carousel"
+              rules={[
+                {
+                  validator: async (_, value) => {
+                    if (!value || value.length < 3) {
+                      return Promise.reject(
+                        "Please upload at least 3 images for the carousel",
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                },
+              ]}
+            >
               <UploadImageProduct
                 onFileChange={(urls) => {
                   if (Array.isArray(urls)) {
@@ -529,31 +627,40 @@ const AddProductModal: React.FC<AddModalProps> = ({
           </Form>
         </TabPane>
         <TabPane tab="Add Category" key="2">
-          <Form layout="vertical" className="p-4">
+          <Form
+            form={form}
+            layout="vertical"
+            className="p-4"
+            onFinish={handleAddCategory}
+          >
             <Form.Item
+              name="categoryName"
               label="Category Name"
-              required
-              tooltip="This is a required field"
+              rules={[
+                { required: true, message: "Please input category name" },
+                {
+                  min: 2,
+                  message: "Category name must be at least 2 characters",
+                },
+                {
+                  max: 100,
+                  message: "Category name cannot exceed 100 characters",
+                },
+              ]}
             >
               <Input
                 prefix={
                   <Folder className="site-form-item-icon mr-2 text-blue-500" />
                 }
                 placeholder="Enter category name"
-                value={state.categoryName}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_CATEGORY_NAME",
-                    payload: e.target.value,
-                  })
-                }
               />
             </Form.Item>
             <Form.Item>
               <Button
                 type="primary"
-                onClick={handleAddCategory}
+                htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddCategory}
               >
                 Add Category
               </Button>
@@ -561,50 +668,59 @@ const AddProductModal: React.FC<AddModalProps> = ({
           </Form>
         </TabPane>
         <TabPane tab="Add Location" key="3">
-          <Form layout="vertical" className="p-4">
+          <Form
+            form={form}
+            layout="vertical"
+            className="p-4"
+            onFinish={handleAddLocation}
+          >
             <Form.Item
+              name="locationName"
               label="Location Name"
-              required
-              tooltip="This is a required field"
+              rules={[
+                { required: true, message: "Please input location name" },
+                {
+                  min: 2,
+                  message: "Location name must be at least 2 characters",
+                },
+                {
+                  max: 100,
+                  message: "Location name cannot exceed 100 characters",
+                },
+              ]}
             >
               <Input
                 prefix={
                   <MapPin className="site-form-item-icon mr-2 text-blue-500" />
                 }
                 placeholder="Enter location name"
-                value={state.locationName}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_LOCATION_NAME",
-                    payload: e.target.value,
-                  })
-                }
               />
             </Form.Item>
             <Form.Item
+              name="locationAddress"
               label="Address"
-              required
-              tooltip="This is a required field"
+              rules={[
+                { required: true, message: "Please input address" },
+                { min: 5, message: "Address must be at least 5 characters" },
+                {
+                  max: 100,
+                  message: "Origin name cannot exceed 100 characters",
+                },
+              ]}
             >
               <Input
                 prefix={
                   <MapPin className="site-form-item-icon mr-2 text-green-500" />
                 }
                 placeholder="Enter address"
-                value={state.locationAddress}
-                onChange={(e) =>
-                  dispatch({
-                    type: "SET_LOCATION_ADDRESS",
-                    payload: e.target.value,
-                  })
-                }
               />
             </Form.Item>
             <Form.Item>
               <Button
                 type="primary"
-                onClick={handleAddLocation}
+                htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddLocation}
               >
                 Add Location
               </Button>
@@ -612,28 +728,40 @@ const AddProductModal: React.FC<AddModalProps> = ({
           </Form>
         </TabPane>
         <TabPane tab="Add Origin" key="4">
-          <Form layout="vertical" className="p-4">
+          <Form
+            form={form}
+            layout="vertical"
+            className="p-4"
+            onFinish={handleAddOrigin}
+          >
             <Form.Item
+              name="originName"
               label="Origin Name"
-              required
-              tooltip="This is a required field"
+              rules={[
+                { required: true, message: "Please input origin name" },
+                {
+                  min: 2,
+                  message: "Origin name must be at least 2 characters",
+                },
+                {
+                  max: 100,
+                  message: "Origin name cannot exceed 100 characters",
+                },
+              ]}
             >
               <Input
                 prefix={
                   <Globe className="site-form-item-icon mr-2 text-blue-500" />
                 }
                 placeholder="Enter origin name"
-                value={state.originName}
-                onChange={(e) =>
-                  dispatch({ type: "SET_ORIGIN_NAME", payload: e.target.value })
-                }
               />
             </Form.Item>
             <Form.Item>
               <Button
                 type="primary"
-                onClick={handleAddOrigin}
+                htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddOrigin}
               >
                 Add Origin
               </Button>

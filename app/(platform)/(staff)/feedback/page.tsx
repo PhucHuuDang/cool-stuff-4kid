@@ -1,5 +1,5 @@
 import { Header } from "../_component/Header";
-import { Details } from "./_component/details";
+import Details from "./_component/details";
 import SideBar from "../_component/sidebar";
 
 const Feedback = () => {

@@ -27,11 +27,11 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange }) => {
         className="rounded border border-gray-300 p-2"
       >
         <option value="">All</option>
-        <option value="Delivered">Delivered</option>
-        <option value="Processing">Processing</option>
-        <option value="Delivering">Delivering</option>
-        <option value="Refunded">Refunded</option>
-        <option value="Canceled">Canceled</option>
+        <option value="Delivered">UnPaid</option>
+        <option value="Processing">Paid</option>
+        <option value="Delivering">Processing</option>
+        <option value="Refunded">Delivering</option>
+        <option value="Canceled">Delivered</option>
       </select>
     </div>
   );

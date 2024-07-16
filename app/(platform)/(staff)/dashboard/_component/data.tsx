@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -7,42 +8,138 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { format } from "date-fns";
+
+interface Order {
+  userName: string;
+  orderId: number;
+  orderDate: string;
+  status: number;
+  totalPrice: number;
+  voucherId: number;
+  id: string;
+  paymentUrl: string | null;
+  orderDetails: OrderDetail[];
+  fullName: string | null;
+  email: string | null;
+  voucher: Voucher | null;
+}
+
+interface OrderDetail {
+  orderDetailId: number;
+  quantity: number;
+  productId: number;
+  product: Product;
+}
+
+interface Product {
+  productId: number;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  imagesCarousel: string[];
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
+  id: string;
+}
+
+interface Voucher {
+  voucherId: number;
+  code: string;
+  discountPercent: number;
+  quantity: number;
+  dateFrom: string;
+  dateTo: string;
+  vouchersStatus: number;
+}
+
+interface Feedback {
+  commentId: number;
+  commentDetail: string;
+  rating: number;
+  date: string;
+  productId: number;
+  id: string;
+  userName: string;
+}
 
 export const DashboardData = () => {
-  // Dữ liệu giả cho các bảng
-  const feedbackData = [
-    { user: "User A", rate: "Rated", comment: "Leave a comment" },
-    { user: "User B", rate: "Unrated", comment: "No comment" },
-    { user: "User C", rate: "Rated", comment: "Leave a comment" },
-  ];
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [vouchers, setVouchers] = useState<Voucher[]>([]);
+  console.log("order", orders);
+  console.log("feedback", feedbacks);
+  console.log("voucher", vouchers);
 
-  const ordersData = [
-    { userName: "User A", productName: "Product X", totalAmount: "$50" },
-    { userName: "User B", productName: "Product Y", totalAmount: "$120" },
-    { userName: "User C", productName: "Product Z", totalAmount: "$80" },
-  ];
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axios.get<Order[]>(
+          "https://milkapplicationapi.azurewebsites.net/api/Order/GetAllOrder",
+        );
+        setOrders(response.data);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
 
-  const voucherData = [
-    { code: "VOUCHER10", discount: "10%", quantity: 5 },
-    { code: "VOUCHER20", discount: "20%", quantity: 3 },
-    { code: "VOUCHER15", discount: "15%", quantity: 7 },
-  ];
+    const fetchFeedbacks = async () => {
+      try {
+        const response = await axios.get<Feedback[]>(
+          "https://milkapplicationapi.azurewebsites.net/api/Comment/GetAllComment",
+        );
+        setFeedbacks(response.data);
+      } catch (error) {
+        console.error("Error fetching feedbacks:", error);
+      }
+    };
+
+    const fetchVouchers = async () => {
+      try {
+        const response = await axios.get<Voucher[]>(
+          "https://milkapplicationapi.azurewebsites.net/api/Vouchers/GetAllVouchers",
+        );
+        setVouchers(response.data);
+      } catch (error) {
+        console.error("Error fetching vouchers:", error);
+      }
+    };
+
+    fetchOrders();
+    fetchFeedbacks();
+    fetchVouchers();
+  }, []);
+
+  // Function to format number to currency format (VND)
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
   return (
     <div>
       <div className="mb-4 grid grid-cols-4 gap-4">
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <div className="text-2xl font-bold">54</div>
+          <div className="text-2xl font-bold">{feedbacks.length}</div>
           <div className="text-gray-500">Feedback</div>
         </div>
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <div className="text-2xl font-bold">79</div>
-          <div className="text-gray-500">Products</div>
+          <div className="text-2xl font-bold">{orders.length}</div>
+          <div className="text-gray-500">Orders</div>
         </div>
         <div className="rounded-lg bg-white p-4 shadow-md">
-          <div className="text-2xl font-bold">124</div>
-          <div className="text-gray-500">Orders</div>
+          <div className="text-2xl font-bold">{vouchers.length}</div>
+          <div className="text-gray-500">Vouchers</div>
         </div>
         <div className="rounded-lg bg-pink-600 p-4 text-white shadow-md">
           <div className="text-2xl font-bold">$239k</div>
@@ -69,19 +166,27 @@ export const DashboardData = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Total Amount
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Date
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {ordersData.map((item, index) => (
-                      <tr key={index}>
+                    {orders.slice(0, 3).map((order) => (
+                      <tr key={order.id}>
                         <td className="whitespace-nowrap px-6 py-4 font-semibold">
-                          {item.userName}
+                          {order.userName}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.productName}
+                          {order.orderDetails[0].product.productName.length > 30
+                            ? `${order.orderDetails[0].product.productName.substring(0, 30)}...`
+                            : order.orderDetails[0].product.productName}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.totalAmount}
+                          {formatCurrency(order.totalPrice)}
+                        </td>
+                        <td className="whitespace-nowrap px-6 py-4">
+                          {format(new Date(order.orderDate), "dd/MM/yyyy")}
                         </td>
                       </tr>
                     ))}
@@ -118,16 +223,19 @@ export const DashboardData = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {feedbackData.map((item, index) => (
-                      <tr key={index}>
+                    {feedbacks.slice(0, 3).map((feedback) => (
+                      <tr key={feedback.id}>
                         <td className="whitespace-nowrap px-6 py-4 font-semibold">
-                          {item.user}
+                          {/* Update with actual user field if available */}
+                          {feedback.userName}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.rate}
+                          {feedback.rating}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.comment}
+                          {feedback.commentDetail.length > 30
+                            ? `${feedback.commentDetail.substring(0, 30)}...`
+                            : feedback.commentDetail}
                         </td>
                       </tr>
                     ))}
@@ -154,7 +262,7 @@ export const DashboardData = () => {
                         Code
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                        Discount
+                        Discount Percent
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                         Quantity
@@ -162,16 +270,16 @@ export const DashboardData = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 bg-white">
-                    {voucherData.map((item, index) => (
-                      <tr key={index}>
+                    {vouchers.slice(0, 3).map((voucher) => (
+                      <tr key={voucher.voucherId}>
                         <td className="whitespace-nowrap px-6 py-4 font-semibold">
-                          {item.code}
+                          {voucher.code}
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.discount}
+                          {voucher.discountPercent}%
                         </td>
                         <td className="whitespace-nowrap px-6 py-4">
-                          {item.quantity}
+                          {voucher.quantity}
                         </td>
                       </tr>
                     ))}
