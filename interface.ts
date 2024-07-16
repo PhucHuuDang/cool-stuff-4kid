@@ -95,6 +95,8 @@ export interface Order {
   orderItems: OrderItem[];
   voucher: any | null;
   orderDetails: OrderDetail[];
+  fullName: string;
+  email: string;
 }
 export interface OrderDetail {
   orderDetailId: number;

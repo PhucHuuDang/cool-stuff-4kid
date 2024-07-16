@@ -56,9 +56,9 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
 
   return (
     <div className="flex flex-grow">
-      <main className="flex-grow overflow-y-auto bg-gray-100 p-6">
+      <main className="flex-grow overflow-y-auto bg-gray-100 p-6 relative">
         <div className="overflow-hidden bg-white shadow sm:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
+          <table className="min-w-full divide-y divide-gray-200 ">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
@@ -101,24 +101,27 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
                       {getStatusLabel(order.status)}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-center relative">
-                    <button onClick={() => toggleExpandRow(order.orderId)} className="text-gray-500 hover:text-gray-700">
-                      ...
+                  <td className="whitespace-nowrap px-4 py-4 text-center">
+                    <button 
+                      onClick={() => toggleExpandRow(order.orderId)} 
+                      className="text-gray-500 hover:text-gray-700 font-bold"
+                    >
+                      &#8942; {/* Dấu ba chấm dọc */}
                     </button>
                     {expandedRow === order.orderId && (
-                      <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                      <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
                         <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                           <button
                             onClick={() => onOpenDetails(order)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full text-left"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-900 w-full text-left transition duration-150 ease-in-out"
                           >
-                            Details
+                            <i className="fas fa-info-circle mr-2"></i> Details
                           </button>
                           <button
                             onClick={() => onOpenDelete(order)}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full text-left"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-red-100 hover:text-red-900 w-full text-left transition duration-150 ease-in-out"
                           >
-                            Delete
+                            <i className="fas fa-trash-alt mr-2"></i> Delete
                           </button>
                         </div>
                       </div>

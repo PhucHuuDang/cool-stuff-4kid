@@ -60,10 +60,12 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
             <p className="mb-2"><span className="font-semibold">Mã đơn hàng:</span> {order.orderId}</p>
             <p className="mb-2"><span className="font-semibold">Ngày đặt hàng:</span> {formatDate(order.orderDate)}</p>
             <p className="mb-2"><span className="font-semibold">Tổng tiền:</span> {formatCurrency(order.totalPrice)}</p>
+            <p className="mb-2"><span className="font-semibold">Họ và tên:</span> {order.fullName}</p>
           </div>
           <div className="col-span-2 sm:col-span-1">
             <p className="mb-2"><span className="font-semibold">Mã khách hàng:</span> {order.id}</p>
             <p className="mb-2"><span className="font-semibold">Tên khách hàng:</span> {order.userName}</p>
+            <p className="mb-2"><span className="font-semibold">Email:</span> {order.email}</p>
             <p className="mb-2">
               <span className="font-semibold">Trạng thái:</span>
               <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
@@ -72,7 +74,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
             </p>
           </div>
           {order.voucherId !== 0 && (
-            <p className="col-span-2"><span className="font-semibold">Mã voucher:</span> {order.voucherId}</p>
+            <p className="col-span-2"><span className="font-semibold">Mã voucher:</span> {order.voucher?.code || 'Không có'}</p>
           )}
         </div>
 
