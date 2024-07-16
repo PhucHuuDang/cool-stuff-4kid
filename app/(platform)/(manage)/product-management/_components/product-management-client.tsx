@@ -121,6 +121,11 @@ const ActionMenuItem: React.FC<{ icon: React.ReactNode; text: string; onClick: (
   </button>
 );
 
+const formatVND = (price: number | null | undefined): string => {
+  if (price === null || price === undefined) return 'N/A';
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+};
+
 const ProductManagementClient: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
@@ -497,7 +502,6 @@ const ProductTable: React.FC<{
         color="text-[#fd7e14]"
       />
       <TableHeader text="Status" />
-      <TableHeader text="Link" />
       <TableHeader text="Action" />
     </thead>
     <tbody className="divide-y divide-gray-200 bg-white">
@@ -513,15 +517,10 @@ const ProductTable: React.FC<{
           </td>
           <TableCell text={product.productName} isProductName={true} />
           <TableCell text={product.quantity?.toString() ?? '0'} />
-          <TableCell text={product.price.toString()} />
-          <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
+          <TableCell text={formatVND(product.price)} />
+          <TableCell text={formatVND(product.discountPrice)} />
           <TableCell text={product.discountPercent !== null && product.discountPercent !== 0 ? `${product.discountPercent}%` : 'N/A'} />
           <StatusCell status={product.status} />
-          <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
-            <a href="#" target="_blank" rel="noopener noreferrer">
-              View
-            </a>
-          </td>
           <td className="relative whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
             <button
               onClick={() => toggleDropdown(product.productId)}

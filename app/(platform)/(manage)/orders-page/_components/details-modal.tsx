@@ -15,7 +15,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('vi-VN');
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear().toString()}`;
   };
 
   const getStatusLabel = (status: number) => {

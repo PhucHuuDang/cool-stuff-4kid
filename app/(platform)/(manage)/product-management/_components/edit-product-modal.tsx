@@ -82,21 +82,23 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
-
+  
     if (!editedProduct.productName.trim()) {
       newErrors.productName = "Product name is required";
     }
-
+  
     if (!editedProduct.price || editedProduct.price < 1) {
       newErrors.price = "Price must be 1 or greater";
     }
-
+  
     if (editedProduct.discountPercent !== null && editedProduct.discountPercent !== undefined) {
-      if (editedProduct.discountPercent > 80) {
+      if (editedProduct.discountPercent < 0) {
+        newErrors.discountPercent = "Discount percent cannot be less than 0%";
+      } else if (editedProduct.discountPercent > 80) {
         newErrors.discountPercent = "Discount percent cannot be greater than 80%";
       }
     }
-
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -156,9 +158,13 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 
     try {
       console.log("Sending update request for product:", editedProduct);
+      const updatedProductData = {
+        ...editedProduct,
+        id: "34f40b90-f47e-446d-b2b7-18bb0c8465c6"
+      };
       const response = await axios.put<ProductProps>(
         `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
-        editedProduct
+        updatedProductData
       );
 
       console.log("Update response received:", response);

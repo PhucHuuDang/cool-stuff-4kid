@@ -47,7 +47,7 @@ const initialState: State = {
     price: 0,
     discountPercent: 0,
     productDescription: "",
-    quantity: 0,
+    quantity: 1,
     image: "",
     categoryId: undefined,
     originId: undefined,
@@ -191,10 +191,10 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
   const handleAddProduct = async () => {
     try {
       const values = await form.validateFields();
-      
+
       if (values.discountPercent >= 50 && values.discountPercent <= 80) {
         Modal.confirm({
-          title: 'Confirm High Discount',
+          title: "Confirm High Discount",
           content: `You want to add product with ${values.discountPercent}% discount?`,
           onOk: () => submitProduct(values),
           onCancel: () => {},
@@ -238,6 +238,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       categoryId: values.categoryId,
       originId: values.originId,
       locationId: values.locationId,
+      id: "34f40b90-f47e-446d-b2b7-18bb0c8465c6",
     };
 
     try {
@@ -260,7 +261,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
 
   const handleAddCategory = async () => {
     try {
-      const values = await form.validateFields(['categoryName']);
+      const values = await form.validateFields(["categoryName"]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Category>(
         "https://milkapplicationapi.azurewebsites.net/api/Category/CreateCategorys",
@@ -271,7 +272,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       );
       await onCategoryAdd(response.data);
       message.success("Category created successfully");
-      form.resetFields(['categoryName']);
+      form.resetFields(["categoryName"]);
       fetchCategories();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -290,7 +291,10 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
 
   const handleAddLocation = async () => {
     try {
-      const values = await form.validateFields(['locationName', 'locationAddress']);
+      const values = await form.validateFields([
+        "locationName",
+        "locationAddress",
+      ]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Location>(
         "https://milkapplicationapi.azurewebsites.net/api/Location/CreateLocation",
@@ -302,7 +306,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       );
       await onLocationAdd(response.data);
       message.success("Location created successfully");
-      form.resetFields(['locationName', 'locationAddress']);
+      form.resetFields(["locationName", "locationAddress"]);
       fetchLocations();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -321,7 +325,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
 
   const handleAddOrigin = async () => {
     try {
-      const values = await form.validateFields(['originName']);
+      const values = await form.validateFields(["originName"]);
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Origin>(
         "https://milkapplicationapi.azurewebsites.net/api/Origin/CreateOrigins",
@@ -332,7 +336,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       );
       await onOriginAdd(response.data);
       message.success("Origin created successfully");
-      form.resetFields(['originName']);
+      form.resetFields(["originName"]);
       fetchOrigins();
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -397,7 +401,14 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               <Col span={12}>
                 <Form.Item
                   name="quantity"
-                  rules={[{ required: true, message: "Please input quantity" }]}
+                  rules={[
+                    { required: true, message: "Please input quantity" },
+                    {
+                      type: "number",
+                      min: 1,
+                      message: "Quantity must be greater than 0",
+                    },
+                  ]}
                   label="Quantity"
                 >
                   <InputNumber
@@ -406,7 +417,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                       <SquarePlus className="site-form-item-icon mr-2 text-green-500" />
                     }
                     placeholder="Enter quantity"
-                    min={0}
+                    min={1}
                   />
                 </Form.Item>
               </Col>
@@ -627,11 +638,20 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               label="Category Name"
               rules={[
                 { required: true, message: "Please input category name" },
-                { min: 2, message: "Category name must be at least 2 characters" }
+                {
+                  min: 2,
+                  message: "Category name must be at least 2 characters",
+                },
+                {
+                  max: 100,
+                  message: "Category name cannot exceed 100 characters",
+                },
               ]}
             >
               <Input
-                prefix={<Folder className="site-form-item-icon mr-2 text-blue-500" />}
+                prefix={
+                  <Folder className="site-form-item-icon mr-2 text-blue-500" />
+                }
                 placeholder="Enter category name"
               />
             </Form.Item>
@@ -640,6 +660,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                 type="primary"
                 htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddCategory}
               >
                 Add Category
               </Button>
@@ -658,11 +679,20 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               label="Location Name"
               rules={[
                 { required: true, message: "Please input location name" },
-                { min: 2, message: "Location name must be at least 2 characters" }
+                {
+                  min: 2,
+                  message: "Location name must be at least 2 characters",
+                },
+                {
+                  max: 100,
+                  message: "Location name cannot exceed 100 characters",
+                },
               ]}
             >
               <Input
-                prefix={<MapPin className="site-form-item-icon mr-2 text-blue-500" />}
+                prefix={
+                  <MapPin className="site-form-item-icon mr-2 text-blue-500" />
+                }
                 placeholder="Enter location name"
               />
             </Form.Item>
@@ -671,11 +701,14 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               label="Address"
               rules={[
                 { required: true, message: "Please input address" },
-                { min: 5, message: "Address must be at least 5 characters" }
+                { min: 5, message: "Address must be at least 5 characters" },
+                { max: 100, message: "Origin name cannot exceed 100 characters" },
               ]}
             >
               <Input
-                prefix={<MapPin className="site-form-item-icon mr-2 text-green-500" />}
+                prefix={
+                  <MapPin className="site-form-item-icon mr-2 text-green-500" />
+                }
                 placeholder="Enter address"
               />
             </Form.Item>
@@ -684,6 +717,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                 type="primary"
                 htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddLocation}
               >
                 Add Location
               </Button>
@@ -702,11 +736,17 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               label="Origin Name"
               rules={[
                 { required: true, message: "Please input origin name" },
-                { min: 2, message: "Origin name must be at least 2 characters" }
+                {
+                  min: 2,
+                  message: "Origin name must be at least 2 characters",
+                },
+                { max: 100, message: "Origin name cannot exceed 100 characters" }
               ]}
             >
               <Input
-                prefix={<Globe className="site-form-item-icon mr-2 text-blue-500" />}
+                prefix={
+                  <Globe className="site-form-item-icon mr-2 text-blue-500" />
+                }
                 placeholder="Enter origin name"
               />
             </Form.Item>
@@ -715,6 +755,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                 type="primary"
                 htmlType="submit"
                 loading={state.isConfirmLoading}
+                onClick={handleAddOrigin}
               >
                 Add Origin
               </Button>

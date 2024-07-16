@@ -1,6 +1,56 @@
+"use client"
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
+interface Product {
+  productId: number;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  imagesCarousel: string[];
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
+  id: string;
+}
+
+interface Activity {
+  action: string;
+  timestamp: string;
+}
+
+async function fetchProducts(): Promise<Product[]> {
+  const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts');
+  const data = await response.json();
+  return data;
+}
+
 const AdminAccountPage: React.FC = () => {
+  const [activities, setActivities] = useState<Activity[]>([]);
+
+  useEffect(() => {
+    async function loadActivities() {
+      try {
+        const products = await fetchProducts();
+        const lastFiveProducts = products.slice(-5).reverse();
+        const newActivities = lastFiveProducts.map(product => ({
+          action: `'${product.id}' add new a '${product.productName}'`,
+          timestamp: new Date().toLocaleString()
+        }));
+        setActivities(newActivities);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    }
+  
+    loadActivities();
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-grow">
@@ -43,17 +93,13 @@ const AdminAccountPage: React.FC = () => {
             </div>
             <div className="flex mt-6">
               <div className="w-1/2 bg-white p-4 rounded shadow mr-6">
-                <h2 className="font-bold mb-4">Your Activities</h2>
-                <div className="text-sm text-gray-600 mb-2">You added a role 'Event-Staff'</div>
-                <div className="text-xs text-gray-500 mb-4">11/02/2024 10:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You assigned task 'Organizing a promotion program at Go Vap branch on February 12, 2024' to a role 'Staff-Event - Go Vap'</div>
-                <div className="text-xs text-gray-500 mb-4">12/02/2024 09:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You assigned task 'Check inventory at District 1 branch on February 19, 2024' to a role 'Warehouse-Staff - District 1'</div>
-                <div className="text-xs text-gray-500 mb-4">19/02/2024 10:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You fired sales staff at Go Vap branch February 19, 2024 (reason: Lack of respect among customers)</div>
-                <div className="text-xs text-gray-500 mb-4">19/02/2024 09:40:55 AM</div>
-                <div className="text-sm text-gray-600 mb-2">You revoked the Fox 2 Saler role February 19, 2024 (reason: Lack of respect among customers)</div>
-                <div className="text-xs text-gray-500 mb-4">19/02/2024 09:40:55 AM</div>
+                <h2 className="font-bold mb-4">Your Recent Activities</h2>
+                {activities.map((activity, index) => (
+                  <div key={index}>
+                    <div className="text-sm text-gray-600 mb-2">{activity.action}</div>
+                    <div className="text-xs text-gray-500 mb-4">{activity.timestamp}</div>
+                  </div>
+                ))}
               </div>
               <div className="w-1/2 bg-white p-4 rounded shadow overflow-y-auto" style={{ maxHeight: '300px' }}>
                 <h2 className="font-bold mb-4">Recent Activities</h2>
@@ -67,9 +113,6 @@ const AdminAccountPage: React.FC = () => {
             </div>
           </div>
         </main>
-        {/* <div className="fixed bottom-0 left-64 right-0 bg-white shadow-md z-10">
-          <Footer />
-        </div> */}
       </div>
     </div>
   );

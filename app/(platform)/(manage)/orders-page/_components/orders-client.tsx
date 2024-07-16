@@ -86,7 +86,26 @@ const OrdersClient: React.FC = () => {
   );
 
   const handleDeleteOrder = async (orderId: string) => {
-    // ... (paste the handleDeleteOrder function here)
+    try {
+      const response = await fetch(`https://milkapplicationapi.azurewebsites.net/api/Order/DeleteOrder/${orderId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete order');
+      }
+
+      dispatch({ type: "DELETE_ORDER", payload: orderId });
+  
+      alert('Order deleted successfully');
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      
+      alert('Failed to delete order. Please try again.');
+    }
   };
 
   const handleOpenDeleteModal = (order: Order) => {

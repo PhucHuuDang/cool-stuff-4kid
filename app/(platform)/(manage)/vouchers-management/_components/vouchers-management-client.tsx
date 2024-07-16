@@ -139,6 +139,18 @@ const VouchersManagementClient: React.FC = () => {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).replace(/\//g, '-');
+  };
+
   if (loading) return (
     <div className="flex justify-center items-center h-screen">
       <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
@@ -217,10 +229,10 @@ const VouchersManagementClient: React.FC = () => {
                   <p className="text-gray-900 whitespace-no-wrap">{voucher.quantity}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <p className="text-gray-900 whitespace-no-wrap">{new Date(voucher.dateFrom).toLocaleString()}</p>
+                  <p className="text-gray-900 whitespace-no-wrap">{formatDate(voucher.dateFrom)}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                  <p className="text-gray-900 whitespace-no-wrap">{new Date(voucher.dateTo).toLocaleString()}</p>
+                  <p className="text-gray-900 whitespace-no-wrap">{formatDate(voucher.dateTo)}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                   <span
@@ -281,7 +293,7 @@ const VouchersManagementClient: React.FC = () => {
       {showConfirmModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <p className="mb-4">Are you sure you want to delete this voucher this can't be undo?</p>
+            <p className="mb-4">Are you sure you want to delete this voucher? This can't be undone.</p>
             <div className="flex justify-end space-x-2">
               <button
                 onClick={() => setShowConfirmModal(false)}

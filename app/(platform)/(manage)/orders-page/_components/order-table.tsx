@@ -40,6 +40,17 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date).replace(/\//g, '-');
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -60,9 +71,6 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
                   TOTAL PRICE
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
-                  CUSTOMER ID
-                </th>
-                <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
                   USER NAME
                 </th>
                 <th className="px-4 py-3 text-center text-xs font-bold uppercase tracking-wider text-black">
@@ -80,20 +88,10 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
                     {order.orderId}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-center">
-                    {new Intl.DateTimeFormat('vi-VN', {
-                      year: 'numeric',
-                      month: '2-digit',
-                      day: '2-digit',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    }).format(new Date(order.orderDate))}
+                    {formatDate(order.orderDate)}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-center">
                     {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalPrice)}
-                  </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-center">
-                    {order.id}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-center">
                     {order.userName}
