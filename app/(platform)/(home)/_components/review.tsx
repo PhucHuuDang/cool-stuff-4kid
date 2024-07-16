@@ -8,9 +8,16 @@ import { SendHorizontal } from "lucide-react";
 import { ElementRef, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { IconType } from "react-icons";
+import { Rating } from "react-simple-star-rating";
 import { useEventListener } from "usehooks-ts";
+import { ReviewDialog } from "../[...productDetail]/_components/review-dialog";
+import { ProductDetailProps } from "@/interface";
 
-export const Review = () => {
+export const Review = ({
+  productDetail,
+}: {
+  productDetail: ProductDetailProps;
+}) => {
   const inputRef = useRef<ElementRef<"input">>(null);
   const formRef = useRef<ElementRef<"form">>(null);
   const { pending } = useFormStatus();
@@ -31,27 +38,25 @@ export const Review = () => {
     }
   };
 
+  const tooltipArray = [
+    "Rất tệ 🙁",
+    "Tệ 😐",
+    "Tạm được 👍",
+    "Tốt 🙂",
+    "Rất tốt 👏",
+  ];
+
   useEventListener("keydown", handleKeydown);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Hỏi đáp</CardTitle>
+        <CardTitle>Hỏi đáp & Đánh giá sản phẩm</CardTitle>
       </CardHeader>
       <CardContent className="rounded-lg p-5">
-        <form action={onSubmit} ref={formRef}>
-          <FormInput
-            placeholder="Nhập câu hỏi của bạn"
-            disabled={pending}
-            className="mb-8 h-12"
-            ref={inputRef}
-            id="question"
-            icon={SendHorizontal as IconType}
-            // iconClassName="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
-          />
-        </form>
+        <ReviewDialog productDetail={productDetail} />
 
-        <div className="flex gap-x-2">
+        <div className="my-4 flex gap-x-2">
           <Avatar className="size-12">
             <AvatarImage className="" src="/images/tiny-home.webp" />
             <AvatarFallback />

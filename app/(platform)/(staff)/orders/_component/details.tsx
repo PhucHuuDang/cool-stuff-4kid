@@ -49,7 +49,7 @@ export const Details: React.FC = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "https://milkapplication20240705013352.azurewebsites.net/api/Order/GetAllOrder",
+          "https://milkapplicationapi.azurewebsites.net/api/Order/GetAllOrder",
         );
         setData(
           response.data.map((order: any) => ({

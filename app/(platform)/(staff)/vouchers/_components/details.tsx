@@ -17,13 +17,10 @@ import {
   SearchIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  MoreVerticalIcon,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button, Dropdown, Menu } from "antd";
 
 interface Voucher {
   voucherId: number;
@@ -31,7 +28,8 @@ interface Voucher {
   discountPercent: number;
   quantity: number;
   vouchersStatus: number;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 export const VoucherManagement = () => {
@@ -42,7 +40,8 @@ export const VoucherManagement = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [sortByDiscount, setSortByDiscount] = useState<"asc" | "desc">("asc");
-  const [filterStatus, setFilterStatus] = useState<number | null>(null); // State cho việc lọc theo trạng thái
+  const [sortByQuantity, setSortByQuantity] = useState<"asc" | "desc">("asc");
+  const [filterStatus, setFilterStatus] = useState<number | null>(null);
 
   useEffect(() => {
     fetchVouchers();
@@ -52,7 +51,7 @@ export const VoucherManagement = () => {
     setLoading(true);
     try {
       const response = await axios.get<Voucher[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/GetAllVouchers",
+        "https://milkapplicationapi.azurewebsites.net/api/Vouchers/GetAllVouchers",
       );
       setVouchers(response.data);
     } catch (error) {
@@ -78,14 +77,13 @@ export const VoucherManagement = () => {
     if (confirmDelete) {
       try {
         await axios.delete(
-          `https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/DeleteVouchers/${id}`,
+          `https://milkapplicationapi.azurewebsites.net//api/Vouchers/DeleteVouchers/${id}`,
         );
         setVouchers((prevVouchers) =>
           prevVouchers.filter((voucher) => voucher.voucherId !== id),
         );
       } catch (error) {
         console.error("Error deleting voucher:", error);
-        // Handle error state if necessary
       }
     }
   };
@@ -109,17 +107,28 @@ export const VoucherManagement = () => {
     }
     setVouchers(sortedVouchers);
   };
+  const sortVouchersByQuantity = () => {
+    const sortedVouchers = [...vouchers];
+    if (sortByQuantity === "asc") {
+      sortedVouchers.sort((a, b) => a.quantity - b.quantity);
+      setSortByQuantity("desc");
+    } else {
+      sortedVouchers.sort((a, b) => b.quantity - a.quantity);
+      setSortByQuantity("asc");
+    }
+    setVouchers(sortedVouchers);
+  };
 
   const handleFilterStatus = (status: string) => {
     if (status === "all") {
-      setFilterStatus(null); // Chọn "All" thì filterStatus là null
+      setFilterStatus(null);
     } else {
-      setFilterStatus(parseInt(status)); // Chọn Active hoặc Inactive
+      setFilterStatus(parseInt(status));
     }
   };
 
   const filteredVouchers = vouchers.filter((voucher) => {
-    const code = voucher.code || ""; // Handle case where voucher.code might be undefined
+    const code = voucher.code || "";
     return (
       code.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (filterStatus === null || voucher.vouchersStatus === filterStatus)
@@ -155,12 +164,12 @@ export const VoucherManagement = () => {
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
             <TableHead className="text-black">ID</TableHead>
-            <TableHead className="text-black">Code</TableHead>
-            <TableHead className="flex items-center space-x-1 text-black">
+            <TableHead className="w-[200px] text-black">Code</TableHead>
+            <TableHead className="w-[140px] items-center space-x-1 text-black">
               Discount Percent
               <button
                 onClick={sortVouchersByDiscount}
-                className="flex items-center text-blue-500 hover:text-blue-700"
+                className="items-center text-blue-500 hover:text-blue-700"
               >
                 {sortByDiscount === "asc" ? (
                   <ChevronUpIcon className="ml-1 h-4 w-4" />
@@ -169,9 +178,21 @@ export const VoucherManagement = () => {
                 )}
               </button>
             </TableHead>
-            <TableHead className="text-black">Quantity</TableHead>
-            <TableHead className="relative text-black">
-              <div className="flex items-center pr-4">
+            <TableHead className="pace-x-1 w-[120px] text-black">
+              Quantity
+              <button
+                onClick={sortVouchersByQuantity}
+                className="items-center text-blue-500 hover:text-blue-700"
+              >
+                {sortByQuantity === "asc" ? (
+                  <ChevronUpIcon className="ml-1 h-4 w-4" />
+                ) : (
+                  <ChevronDownIcon className="ml-1 h-4 w-4" />
+                )}
+              </button>
+            </TableHead>
+            <TableHead className="relative w-[50px] text-black">
+              <div className="flex items-center">
                 <span className="mr-2">Status:</span>
                 <select
                   title="a"
@@ -187,7 +208,8 @@ export const VoucherManagement = () => {
                 </select>
               </div>
             </TableHead>
-            <TableHead className="text-black">Date</TableHead>
+            <TableHead className="text-black">Date Start</TableHead>
+            <TableHead className="text-black">Date End</TableHead>
             <TableHead className="text-black">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -200,36 +222,47 @@ export const VoucherManagement = () => {
               <TableCell>{voucher.quantity}</TableCell>
               <TableCell>{getStatus(voucher.vouchersStatus)}</TableCell>
               <TableCell>
-                {new Date(voucher.date).toLocaleDateString()}
+                {new Date(voucher.dateFrom).toLocaleDateString()}
               </TableCell>
               <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <button title="a">...</button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <button
-                      title="edit"
-                      onClick={() => handleEdit(voucher)}
-                      className="text-blue-500 hover:text-blue-700"
-                    >
-                      <PencilIcon className="h-5 w-5" />
-                    </button>
-                    <button
-                      title="delete"
-                      onClick={() => handleDelete(voucher.voucherId)}
-                      className="ml-2 text-red-500 hover:text-red-700"
-                    >
-                      <TrashIcon className="h-5 w-5" />
-                    </button>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                {new Date(voucher.dateTo).toLocaleDateString()}
+              </TableCell>
+              <TableCell>
+                <Dropdown
+                  overlay={() => (
+                    <Menu>
+                      <Menu.Item key="edit">
+                        <Button
+                          type="text"
+                          onClick={() => handleEdit(voucher)}
+                          className="text-blue-500"
+                        >
+                          <PencilIcon />
+                          Edit
+                        </Button>
+                      </Menu.Item>
+                      <Menu.Item key="delete">
+                        <Button
+                          className="text-red-500"
+                          type="text"
+                          onClick={() => handleDelete(voucher.voucherId)}
+                        >
+                          <TrashIcon />
+                          Delete
+                        </Button>
+                      </Menu.Item>
+                    </Menu>
+                  )}
+                  placement="bottomLeft"
+                  trigger={["click"]}
+                >
+                  <Button type="text" icon={<MoreVerticalIcon />} />
+                </Dropdown>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-
       {editingVoucher && (
         <UpdateVoucherForm
           voucher={editingVoucher}
@@ -241,3 +274,5 @@ export const VoucherManagement = () => {
     </div>
   );
 };
+
+export default VoucherManagement;

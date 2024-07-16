@@ -91,7 +91,7 @@ const ProductManagementPage: React.FC = () => {
   const fetchProducts = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Product/GetAllProducts",
+        "https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts",
         { timeout: 10000 },
       );
       dispatch({ type: "SET_PRODUCTS", payload: response.data });
@@ -119,7 +119,7 @@ const ProductManagementPage: React.FC = () => {
   const fetchCategories = useCallback(async () => {
     try {
       const response = await axios.get(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys",
+        "https://milkapplicationapi.azurewebsites.net/api/Category/GetAllCategorys",
       );
       setCategories(response.data);
     } catch (error) {
@@ -141,7 +141,7 @@ const ProductManagementPage: React.FC = () => {
       dispatch({ type: "SET_SUBMITTING", payload: true });
       try {
         const response = await axios.post(
-          "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
+          "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
           {
             productName: product.productName,
             price: product.price,
@@ -184,7 +184,7 @@ const ProductManagementPage: React.FC = () => {
     async (updatedProduct: ProductProps) => {
       try {
         const response = await axios.put(
-          `https://milkapplication20240705013352.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
+          `https://milkapplicationapi.azurewebsites.net/api/Product/UpdateProducts/${updatedProduct.productId}`,
           updatedProduct,
         );
         dispatch({ type: "UPDATE_PRODUCT", payload: response.data });

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Alert } from "@/components/ui/alert";
+import { message } from "antd";
 
 interface Voucher {
   voucherId: number;
@@ -19,7 +20,8 @@ interface Voucher {
   discountPercent: number;
   quantity: number;
   vouchersStatus: number;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 interface CreateVoucherFormProps {
@@ -37,10 +39,16 @@ export const CreateVoucherForm: React.FC<CreateVoucherFormProps> = ({
     discountPercent: 1,
     quantity: 1,
     vouchersStatus: 1,
-    date: new Date().toISOString(),
+    dateFrom: new Date().toISOString().slice(0, 10),
+    dateTo: new Date().toISOString().slice(0, 10),
   });
 
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState({
+    code: null as string | null,
+    discountPercent: null as string | null,
+    quantity: null as string | null,
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -48,10 +56,52 @@ export const CreateVoucherForm: React.FC<CreateVoucherFormProps> = ({
     const { name, value } = e.target;
 
     let parsedValue: string | number = value;
-    if (name !== "code") {
+    if (name !== "code" && name !== "dateFrom" && name !== "dateTo") {
       parsedValue = parseInt(value, 10);
       if (isNaN(parsedValue)) {
         parsedValue = 0;
+      }
+    }
+
+    if (name === "code") {
+      if (value.length > 6 || !/^[a-zA-Z0-9]*$/.test(value)) {
+        setWarning((prev) => ({
+          ...prev,
+          code: "Code must be 4-6 alphanumeric characters without special characters.",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          code: null,
+        }));
+      }
+    } else if (name === "discountPercent" && typeof parsedValue === "number") {
+      if (parsedValue >= 50) {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "Discount percent is 50 or more. Please confirm.",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: null,
+        }));
+      }
+
+      if (parsedValue > 80) {
+        parsedValue = 80; // Ensure the value doesn't exceed 80
+      }
+    } else if (name === "quantity" && typeof parsedValue === "number") {
+      if (parsedValue < 1) {
+        setWarning((prev) => ({
+          ...prev,
+          quantity: "Quantity must be at least 1.",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          quantity: null,
+        }));
       }
     }
 
@@ -80,7 +130,7 @@ export const CreateVoucherForm: React.FC<CreateVoucherFormProps> = ({
 
     try {
       const response = await axios.post(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/CreateVouchers",
+        "https://milkapplicationapi.azurewebsites.net/api/Vouchers/CreateVouchers",
         { ...newVoucher, voucherId: 0 },
       );
 
@@ -92,9 +142,17 @@ export const CreateVoucherForm: React.FC<CreateVoucherFormProps> = ({
         discountPercent: 1,
         quantity: 1,
         vouchersStatus: 1,
-        date: new Date().toISOString(),
+        dateFrom: new Date().toISOString().slice(0, 10),
+        dateTo: new Date().toISOString().slice(0, 10),
       });
       setError(null);
+      setWarning({
+        code: null,
+        discountPercent: null,
+        quantity: null,
+      });
+
+      message.success("Voucher created successfully!");
     } catch (error) {
       console.error("Error creating voucher:", error);
       setError("Error creating voucher");
@@ -103,72 +161,108 @@ export const CreateVoucherForm: React.FC<CreateVoucherFormProps> = ({
 
   return (
     <Dialog>
-      <DialogTrigger className="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600">
+      <DialogTrigger className="transform rounded-md bg-blue-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-blue-600">
         Create Voucher
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="mx-auto max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <DialogHeader>
-          <DialogTitle>Create a New Voucher</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-xl font-semibold text-gray-800">
+            Create a New Voucher
+          </DialogTitle>
+          <DialogDescription className="text-sm text-gray-500">
             Fill out the form below to create a new voucher.
           </DialogDescription>
         </DialogHeader>
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mb-4">
             <span>{error}</span>
           </Alert>
         )}
-        <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-          <div>
-            <Label>Code</Label>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <Label
+              htmlFor="code"
+              className="mb-1 block text-sm font-medium text-gray-700"
+            >
+              Code
+            </Label>
             <input
               type="text"
               name="code"
+              id="code"
               value={newVoucher.code}
               onChange={handleChange}
               placeholder="Code"
-              className="rounded-md border border-gray-300 p-2"
+              className="w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
               minLength={4}
               maxLength={6}
               pattern="[a-zA-Z0-9]{4,6}"
-              title="Code must be 4-6 alphanumeric characters without special characters."
+              title="Code không được để trống, phải có 4 - 6 kí tự và không có kí tự đặc biệt."
             />
+            {warning.code && (
+              <div className="mt-1 text-sm text-yellow-500">{warning.code}</div>
+            )}
           </div>
-          <div>
-            <Label>Discount Percent</Label>
-            <input
-              type="number"
-              name="discountPercent"
-              value={newVoucher.discountPercent}
-              onChange={handleChange}
-              placeholder="Discount Percent"
-              className="rounded-md border border-gray-300 p-2"
-              required
-              min={1}
-            />
+          <div className="flex space-x-4">
+            <div className="w-1/2">
+              <Label
+                htmlFor="discountPercent"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Discount Percent
+              </Label>
+              <input
+                type="number"
+                name="discountPercent"
+                id="discountPercent"
+                value={newVoucher.discountPercent}
+                onChange={handleChange}
+                placeholder="Discount Percent"
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+                min={1}
+                max={80}
+              />
+              {warning.discountPercent && (
+                <div className="mt-1 text-sm text-yellow-500">
+                  {warning.discountPercent}
+                </div>
+              )}
+            </div>
+            <div className="w-1/2">
+              <Label
+                htmlFor="quantity"
+                className="mb-1 block text-sm font-medium text-gray-700"
+              >
+                Quantity
+              </Label>
+              <input
+                type="number"
+                name="quantity"
+                id="quantity"
+                value={newVoucher.quantity}
+                onChange={handleChange}
+                placeholder="Quantity"
+                className="w-full rounded-md border border-gray-300 p-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+                min={1}
+              />
+              {warning.quantity && (
+                <div className="mt-1 text-sm text-yellow-500">
+                  {warning.quantity}
+                </div>
+              )}
+            </div>
           </div>
-          <div>
-            <Label>Quantity</Label>
-            <input
-              type="number"
-              name="quantity"
-              value={newVoucher.quantity}
-              onChange={handleChange}
-              placeholder="Quantity"
-              className="rounded-md border border-gray-300 p-2"
-              required
-              min={1}
-            />
-          </div>
-          <DialogFooter className="col-span-2 mt-4">
+          <DialogFooter className="mt-6 flex justify-end space-x-4">
             <button
               type="submit"
-              className="mr-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+              className="transform rounded-md bg-blue-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-blue-600"
             >
               Create Voucher
             </button>
-            <DialogClose className="rounded-md bg-gray-500 px-4 py-2 text-white hover:bg-gray-600">
+            <DialogClose className="transform rounded-md bg-gray-500 px-4 py-2 text-white transition duration-200 ease-in-out hover:scale-105 hover:bg-gray-600">
               Cancel
             </DialogClose>
           </DialogFooter>

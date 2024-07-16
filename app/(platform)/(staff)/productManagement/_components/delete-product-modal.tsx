@@ -1,5 +1,5 @@
-import React from 'react';
-import axios from 'axios';
+import React from "react";
+import axios from "axios";
 
 interface DeleteProductModalProps {
   isOpen: boolean;
@@ -17,7 +17,7 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
   const handleDelete = async () => {
     try {
       await axios.delete(
-        `https://milkapplication20240705013352.azurewebsites.net/api/Product/DeleteProducts/${productId}`
+        `https://milkapplicationapi.azurewebsites.net/api/Product/DeleteProducts/${productId}`,
       );
       onProductDelete(productId);
       onClose();
@@ -31,34 +31,35 @@ export const DeleteProductModal: React.FC<DeleteProductModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto overflow-x-hidden outline-none focus:outline-none">
       <div className="fixed inset-0 bg-black opacity-50"></div>
-      <div className="relative w-auto max-w-sm mx-auto my-6 z-50">
-        <div className="relative flex flex-col w-full bg-white border-0 rounded-lg shadow-lg outline-none focus:outline-none">
-          <div className="flex items-start justify-between p-5 border-b border-solid border-gray-300 rounded-t">
+      <div className="relative z-50 mx-auto my-6 w-auto max-w-sm">
+        <div className="relative flex w-full flex-col rounded-lg border-0 bg-white shadow-lg outline-none focus:outline-none">
+          <div className="flex items-start justify-between rounded-t border-b border-solid border-gray-300 p-5">
             <h3 className="text-2xl font-semibold">Delete Product</h3>
             <button
-              className="p-1 ml-auto bg-transparent border-0 text-black float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+              className="float-right ml-auto border-0 bg-transparent p-1 text-3xl font-semibold leading-none text-black outline-none focus:outline-none"
               onClick={onClose}
             >
-              <span className="bg-transparent text-black h-6 w-6 text-2xl block outline-none focus:outline-none">
+              <span className="block h-6 w-6 bg-transparent text-2xl text-black outline-none focus:outline-none">
                 ×
               </span>
             </button>
           </div>
-          <div className="relative p-6 flex-auto">
-            <p className="my-4 text-gray-600 text-lg leading-relaxed">
-              Are you sure you want to delete this product? This action cannot be undone.
+          <div className="relative flex-auto p-6">
+            <p className="my-4 text-lg leading-relaxed text-gray-600">
+              Are you sure you want to delete this product? This action cannot
+              be undone.
             </p>
           </div>
-          <div className="flex items-center justify-end p-6 border-t border-solid border-gray-300 rounded-b">
+          <div className="flex items-center justify-end rounded-b border-t border-solid border-gray-300 p-6">
             <button
-              className="text-gray-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              className="background-transparent mb-1 mr-1 px-6 py-2 text-sm font-bold uppercase text-gray-500 outline-none transition-all duration-150 ease-linear focus:outline-none"
               type="button"
               onClick={onClose}
             >
               Cancel
             </button>
             <button
-              className="bg-red-500 text-white active:bg-red-600 font-bold uppercase text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              className="mb-1 mr-1 rounded bg-red-500 px-6 py-3 text-sm font-bold uppercase text-white shadow outline-none transition-all duration-150 ease-linear hover:shadow-lg focus:outline-none active:bg-red-600"
               type="button"
               onClick={handleDelete}
             >

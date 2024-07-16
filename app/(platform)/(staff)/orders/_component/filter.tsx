@@ -10,7 +10,7 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange }) => {
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setSelectedStatus(value); 
+    setSelectedStatus(value);
     onFilterChange(value);
   };
 
@@ -20,10 +20,11 @@ const Filter: React.FC<FilterProps> = ({ onFilterChange }) => {
         Filter by Status:
       </Label>
       <select
+        title="a"
         id="status-filter"
         value={selectedStatus}
         onChange={handleFilterChange}
-        className="p-2 border border-gray-300 rounded"
+        className="rounded border border-gray-300 p-2"
       >
         <option value="">All</option>
         <option value="Delivered">Delivered</option>

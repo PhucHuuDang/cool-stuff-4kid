@@ -8,20 +8,36 @@ import { storage } from "@/Config/firebase";
 type FileType = Exclude<UploadFile['originFileObj'], undefined>;
 
 interface UploadImageProductProps {
-  onFileChange: (url: string) => void;
+  onFileChange: (url: string | string[]) => void;
   initialImage?: string;
+  initialImages?: string[];
+  multiple?: boolean;
+  maxCount?: number;
 }
 
-const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, initialImage }) => {
+const UploadImageProduct: React.FC<UploadImageProductProps> = ({ 
+  onFileChange, 
+  initialImage, 
+  initialImages, 
+  multiple = false, 
+  maxCount = 1 
+}) => {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
-  const [file, setFile] = useState<UploadFile | null>(null);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
   useEffect(() => {
     if (initialImage) {
-      setPreviewImage(initialImage);
+      setFileList([{ uid: '-1', name: 'image.png', status: 'done', url: initialImage }]);
+    } else if (initialImages) {
+      setFileList(initialImages.map((url, index) => ({ 
+        uid: `-${index + 1}`, 
+        name: `image${index + 1}.png`, 
+        status: 'done', 
+        url 
+      })));
     }
-  }, [initialImage]);
+  }, [initialImage, initialImages]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -32,21 +48,26 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
   };
 
   const handleChange: UploadProps["onChange"] = async ({ fileList: newFileList }) => {
-    const newFile = newFileList[0];
-    setFile(newFile);
+    setFileList(newFileList);
 
-    if (newFile && newFile.originFileObj) {
-      try {
-        const storageRef = ref(storage, `products/${Date.now()}_${newFile.name}`);
-        const snapshot = await uploadBytes(storageRef, newFile.originFileObj);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        
-        setPreviewImage(downloadURL);
-        onFileChange(downloadURL);
-      } catch (error) {
-        console.error("Error uploading file:", error);
-        message.error("Failed to upload image to Firebase");
+    const uploadPromises = newFileList
+      .filter(file => file.originFileObj)
+      .map(async file => {
+        const storageRef = ref(storage, `products/${Date.now()}_${file.name}`);
+        const snapshot = await uploadBytes(storageRef, file.originFileObj as Blob);
+        return getDownloadURL(snapshot.ref);
+      });
+
+    try {
+      const uploadedUrls = await Promise.all(uploadPromises);
+      if (multiple) {
+        onFileChange(uploadedUrls);
+      } else {
+        onFileChange(uploadedUrls[0] || '');
       }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      message.error("Failed to upload image(s) to Firebase");
     }
   };
 
@@ -71,24 +92,25 @@ const UploadImageProduct: React.FC<UploadImageProductProps> = ({ onFileChange, i
     <>
       <Upload
         listType="picture-card"
-        fileList={file ? [file] : []}
+        fileList={fileList}
         onPreview={handlePreview}
         onChange={handleChange}
         accept="image/*"
-        beforeUpload={() => false} // Prevent auto upload
+        beforeUpload={() => false}
+        multiple={multiple}
+        maxCount={maxCount}
       >
-        {file ? null : uploadButton()}
+        {fileList.length >= maxCount ? null : uploadButton()}
       </Upload>
-      {previewImage && (
-        <Image
-          preview={{
-            visible: previewOpen,
-            onVisibleChange: (visible) => setPreviewOpen(visible),
-          }}
-          src={previewImage}
-          alt="Product Image"
-        />
-      )}
+      <Image
+        style={{ display: 'none' }}
+        preview={{
+          visible: previewOpen,
+          onVisibleChange: (visible) => setPreviewOpen(visible),
+        }}
+        src={previewImage}
+        alt="Product Image"
+      />
     </>
   );
 };

@@ -8,6 +8,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { message } from "antd";
 
 interface Voucher {
   voucherId: number;
@@ -15,7 +16,8 @@ interface Voucher {
   discountPercent: number;
   quantity: number;
   vouchersStatus: number;
-  date: string;
+  dateFrom: string;
+  dateTo: string;
 }
 
 interface UpdateVoucherFormProps {
@@ -34,6 +36,12 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
   const [updatedVoucher, setUpdatedVoucher] = useState<Voucher>({ ...voucher });
   const [error, setError] = useState<string>("");
 
+  const [warning, setWarning] = useState({
+    code: "",
+    discountPercent: "",
+    quantity: "",
+  });
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
@@ -43,11 +51,61 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
     const parsedValue =
       name === "code"
         ? value.replace(/[^\w]/g, "").slice(0, 6) // Remove special characters and limit length to 6 characters
-        : name === "vouchersStatus" ||
-            name === "quantity" ||
-            name === "discountPercent"
+        : name === "vouchersStatus" || name === "quantity"
           ? parseInt(value, 10)
-          : value;
+          : name === "discountPercent"
+            ? parseInt(value, 10) // Parse discount percent as integer
+            : value;
+
+    // Set warnings based on field validation
+    if (name === "code") {
+      if (value.length < 4 || value.length > 6) {
+        setWarning((prev) => ({
+          ...prev,
+          code: "Code must be between 4 and 6 characters",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          code: "",
+        }));
+      }
+    } else if (name === "discountPercent") {
+      const discountValue = parseInt(value, 10);
+      if (discountValue < 1) {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "Discount percent must be at least 1",
+        }));
+      } else if (discountValue >= 50 && discountValue <= 80) {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "Discount percent is 50 or more. Please confirm",
+        }));
+      } else if (discountValue > 80) {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "Discount percent must not exceed 80",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "",
+        }));
+      }
+    } else if (name === "quantity") {
+      if (parseInt(value, 10) < 1) {
+        setWarning((prev) => ({
+          ...prev,
+          quantity: "Quantity must be at least 1",
+        }));
+      } else {
+        setWarning((prev) => ({
+          ...prev,
+          quantity: "",
+        }));
+      }
+    }
 
     setUpdatedVoucher((prev) => ({ ...prev, [name]: parsedValue }));
   };
@@ -55,19 +113,15 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (updatedVoucher.code.length < 4 || updatedVoucher.code.length > 6) {
-      setError("Code must be between 4 and 6 characters");
-      return;
-    }
-
-    if (updatedVoucher.discountPercent < 1) {
-      setError("Discount percent must be at least 1");
+    // Check if there are any warnings before submitting
+    if (warning.code || warning.discountPercent || warning.quantity) {
+      setError("Please fix the fields with warnings before submitting.");
       return;
     }
 
     try {
       await axios.put(
-        `https://milkapplication20240705013352.azurewebsites.net/api/Vouchers/UpdateVouchers/${updatedVoucher.voucherId}`,
+        `https://milkapplicationapi.azurewebsites.net/api/Vouchers/UpdateVouchers/${updatedVoucher.voucherId}`,
         updatedVoucher,
       );
 
@@ -78,8 +132,12 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
       );
 
       onCancel();
+
+      // Display success message
+      message.success("Voucher updated successfully!");
     } catch (error) {
       console.error("Error updating voucher:", error);
+      setError("Error updating voucher");
     }
   };
 
@@ -90,8 +148,8 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
           <DialogTitle>Update Voucher</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="mt-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
+          <div className="">
+            <div className="mb-3">
               <Label>Code</Label>
               <input
                 type="text"
@@ -99,46 +157,59 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
                 value={updatedVoucher.code}
                 onChange={handleChange}
                 placeholder="Code"
-                className="rounded-md border border-gray-300 p-2"
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
                 required
               />
+              {warning.code && (
+                <p className="mt-1 text-yellow-500">{warning.code}</p>
+              )}
             </div>
+            <div className="flex">
+              <div>
+                <Label>Discount Percent</Label>
+                <input
+                  type="number"
+                  name="discountPercent"
+                  value={updatedVoucher.discountPercent}
+                  onChange={handleChange}
+                  placeholder="Discount Percent"
+                  className="mt-2 rounded-md border border-gray-300 p-2"
+                  min="1" // Set min value to 1
+                  required
+                />
+                {warning.discountPercent && (
+                  <p className="mt-1 text-yellow-500">
+                    {warning.discountPercent}
+                  </p>
+                )}
+              </div>
 
-            <div>
-              <Label>Discount Percent</Label>
-              <input
-                type="number"
-                name="discountPercent"
-                value={updatedVoucher.discountPercent}
-                onChange={handleChange}
-                placeholder="Discount Percent"
-                className="rounded-md border border-gray-300 p-2"
-                min="1" // Set min value to 1
-                required
-              />
+              <div>
+                <Label>Quantity</Label>
+                <input
+                  type="number"
+                  name="quantity"
+                  value={updatedVoucher.quantity}
+                  onChange={handleChange}
+                  placeholder="Quantity"
+                  className="mt-2 rounded-md border border-gray-300 p-2"
+                  required
+                />
+                {warning.quantity && (
+                  <p className="mt-1 text-yellow-500">{warning.quantity}</p>
+                )}
+              </div>
             </div>
-
-            <div>
-              <Label>Quantity</Label>
-              <input
-                type="number"
-                name="quantity"
-                value={updatedVoucher.quantity}
-                onChange={handleChange}
-                placeholder="Quantity"
-                className="rounded-md border border-gray-300 p-2"
-                required
-              />
-            </div>
-
-            <div>
-              <Label>Status</Label>
+            <div className="mt-3">
+              <div>
+                <Label>Status</Label>
+              </div>
               <select
                 title="a"
                 name="vouchersStatus"
                 value={updatedVoucher.vouchersStatus}
                 onChange={handleChange}
-                className="rounded-md border border-gray-300 p-2"
+                className="mt-2 rounded-md border border-gray-300 p-2"
                 required
               >
                 <option value={1}>Active</option>

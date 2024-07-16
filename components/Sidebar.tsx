@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { routes } from "../routes/routes";
 import {
@@ -12,8 +12,21 @@ import {
   Users,
 } from "lucide-react";
 
-const SideBar: React.FC = () => {
+interface SideBarProps {
+  decodedInfo: {
+    role?: string;
+  };
+}
+
+const SideBar: React.FC<SideBarProps> = ({ decodedInfo }) => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
+  const [role, setRole] = useState<string>("default");
+
+  useEffect(() => {
+    if (decodedInfo?.role) {
+      setRole(decodedInfo.role);
+    }
+  }, [decodedInfo]);
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);
@@ -23,13 +36,17 @@ const SideBar: React.FC = () => {
     return `flex p-4 items-center transition-colors duration-200
       ${
         currentPage === page
-          ? "bg-pink-600 text-white rounded-l-lg"
-          : "text-slate-700 hover:bg-red-200"
+          ? "text-slate-700 bg-slate-500/10 rounded-sm"
+          : "text-slate-700 hover:rounded-sm hover:bg-slate-500/10"
       }`;
   };
 
+  if (role.toLowerCase() !== "admin") {
+    return null; // Không hiển thị sidebar nếu không phải Admin
+  }
+
   return (
-    <aside className="h-screen w-64 bg-slate-500/10">
+    <aside className="h-screen w-64 bg-slate-500/10 sm:rounded-lg">
       <nav className="space-y-1">
         <Link
           href={routes.dashboard}

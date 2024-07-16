@@ -117,7 +117,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchCategories = async () => {
     try {
       const response = await axios.get<Category[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys"
+        "https://milkapplicationapi.azurewebsites.net/api/Category/GetAllCategorys",
       );
       dispatch({ type: "SET_CATEGORIES", payload: response.data });
     } catch (error) {
@@ -129,7 +129,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchOrigins = async () => {
     try {
       const response = await axios.get<Origin[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/GetAllOrigins"
+        "https://milkapplicationapi.azurewebsites.net/api/Origin/GetAllOrigins",
       );
       dispatch({ type: "SET_ORIGINS", payload: response.data });
     } catch (error) {
@@ -141,7 +141,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
   const fetchLocations = async () => {
     try {
       const response = await axios.get<Location[]>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Location/GetAllLocation"
+        "https://milkapplicationapi.azurewebsites.net/api/Location/GetAllLocation",
       );
       dispatch({ type: "SET_LOCATIONS", payload: response.data });
     } catch (error) {
@@ -161,7 +161,10 @@ const AddProductModal: React.FC<AddModalProps> = ({
 
   const handleFileChange = (newFileChange: string | string[]) => {
     if (Array.isArray(newFileChange)) {
-      dispatch({ type: "SET_FORM_VALUES", payload: { imagesCarousel: newFileChange } });
+      dispatch({
+        type: "SET_FORM_VALUES",
+        payload: { imagesCarousel: newFileChange },
+      });
       form.setFieldsValue({ imagesCarousel: newFileChange });
     } else {
       dispatch({ type: "SET_FORM_VALUES", payload: { image: newFileChange } });
@@ -183,10 +186,10 @@ const AddProductModal: React.FC<AddModalProps> = ({
       const values = await form.validateFields();
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
 
-      const imagesCarousel = Array.isArray(values.imagesCarousel) 
-        ? values.imagesCarousel 
-        : values.imagesCarousel 
-          ? [values.imagesCarousel] 
+      const imagesCarousel = Array.isArray(values.imagesCarousel)
+        ? values.imagesCarousel
+        : values.imagesCarousel
+          ? [values.imagesCarousel]
           : [];
 
       const productData = {
@@ -202,12 +205,12 @@ const AddProductModal: React.FC<AddModalProps> = ({
         status: 1,
         categoryId: values.categoryId,
         originId: values.originId,
-        locationId: values.locationId
+        locationId: values.locationId,
       };
 
       const response = await axios.post<Product>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Product/CreateProducts",
-        productData
+        "https://milkapplicationapi.azurewebsites.net/api/Product/CreateProducts",
+        productData,
       );
 
       await onProductAdd(response.data);
@@ -233,7 +236,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Category>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Category/CreateCategorys",
+        "https://milkapplicationapi.azurewebsites.net/api/Category/CreateCategorys",
         {
           categoryId: 0,
           categoryName: state.categoryName,
@@ -262,7 +265,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Location>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Location/CreateLocation",
+        "https://milkapplicationapi.azurewebsites.net/api/Location/CreateLocation",
         {
           locationId: 0,
           locationName: state.locationName,
@@ -293,7 +296,7 @@ const AddProductModal: React.FC<AddModalProps> = ({
     try {
       dispatch({ type: "SET_CONFIRM_LOADING", payload: true });
       const response = await axios.post<Origin>(
-        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/CreateOrigins",
+        "https://milkapplicationapi.azurewebsites.net/api/Origin/CreateOrigins",
         {
           originId: 0,
           originName: state.originName,
@@ -418,12 +421,17 @@ const AddProductModal: React.FC<AddModalProps> = ({
               <Col span={8}>
                 <Form.Item
                   name="categoryId"
-                  rules={[{ required: true, message: "Please select a category" }]}
+                  rules={[
+                    { required: true, message: "Please select a category" },
+                  ]}
                   label="Category"
                 >
                   <Select placeholder="Select a category">
                     {state.categories.map((category) => (
-                      <Option key={category.categoryId} value={category.categoryId}>
+                      <Option
+                        key={category.categoryId}
+                        value={category.categoryId}
+                      >
                         {category.categoryName}
                       </Option>
                     ))}
@@ -433,7 +441,9 @@ const AddProductModal: React.FC<AddModalProps> = ({
               <Col span={8}>
                 <Form.Item
                   name="originId"
-                  rules={[{ required: true, message: "Please select an origin" }]}
+                  rules={[
+                    { required: true, message: "Please select an origin" },
+                  ]}
                   label="Origin"
                 >
                   <Select placeholder="Select an origin">
@@ -448,172 +458,191 @@ const AddProductModal: React.FC<AddModalProps> = ({
               <Col span={8}>
                 <Form.Item
                   name="locationId"
-                  rules={[{ required: true, message: "Please select a location" }]}
+                  rules={[
+                    { required: true, message: "Please select a location" },
+                  ]}
                   label="Location"
                 >
                   <Select placeholder="Select a location">
                     {state.locations.map((location) => (
-                      <Option key={location.locationId} value={location.locationId}>
-                      {location.locationName}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Form.Item
-            name="productDescription"
-            rules={[
-              { required: true, message: "Please input product description" },
-            ]}
-            label="Product Description"
-          >
-            <div className="flex items-start">
-              <List
-                className="mr-2 mt-2 flex-shrink-0 text-purple-500"
-                size={18}
+                      <Option
+                        key={location.locationId}
+                        value={location.locationId}
+                      >
+                        {location.locationName}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item
+              name="productDescription"
+              rules={[
+                { required: true, message: "Please input product description" },
+              ]}
+              label="Product Description"
+            >
+              <div className="flex items-start">
+                <List
+                  className="mr-2 mt-2 flex-shrink-0 text-purple-500"
+                  size={18}
+                />
+                <Input.TextArea
+                  placeholder="Enter product description"
+                  rows={4}
+                  className="flex-grow"
+                />
+              </div>
+            </Form.Item>
+            <Form.Item
+              name="image"
+              rules={[{ required: true, message: "Please select image" }]}
+              label="Product Image"
+            >
+              <UploadImageProduct
+                onFileChange={handleFileChange}
+                initialImage={state.formValues.image}
               />
-              <Input.TextArea
-                placeholder="Enter product description"
-                rows={4}
-                className="flex-grow"
+            </Form.Item>
+            <Form.Item name="imagesCarousel" label="Product Images Carousel">
+              <UploadImageProduct
+                onFileChange={(urls) => {
+                  if (Array.isArray(urls)) {
+                    handleImagesCarouselChange(urls);
+                  }
+                }}
+                initialImages={state.formValues.imagesCarousel}
+                multiple={true}
+                maxCount={5}
               />
-            </div>
-          </Form.Item>
-          <Form.Item
-            name="image"
-            rules={[{ required: true, message: "Please select image" }]}
-            label="Product Image"
-          >
-            <UploadImageProduct
-              onFileChange={handleFileChange}
-              initialImage={state.formValues.image}
-            />
-          </Form.Item>
-          <Form.Item
-            name="imagesCarousel"
-            label="Product Images Carousel"
-          >
-            <UploadImageProduct
-              onFileChange={(urls) => {
-                if (Array.isArray(urls)) {
-                  handleImagesCarouselChange(urls);
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddProduct}
+                loading={state.isConfirmLoading}
+              >
+                Add Product
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+        <TabPane tab="Add Category" key="2">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Category Name"
+              required
+              tooltip="This is a required field"
+            >
+              <Input
+                prefix={
+                  <Folder className="site-form-item-icon mr-2 text-blue-500" />
                 }
-              }}
-              initialImages={state.formValues.imagesCarousel}
-              multiple={true}
-              maxCount={5}
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddProduct}
-              loading={state.isConfirmLoading}
+                placeholder="Enter category name"
+                value={state.categoryName}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_CATEGORY_NAME",
+                    payload: e.target.value,
+                  })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddCategory}
+                loading={state.isConfirmLoading}
+              >
+                Add Category
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+        <TabPane tab="Add Location" key="3">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Location Name"
+              required
+              tooltip="This is a required field"
             >
-              Add Product
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-      <TabPane tab="Add Category" key="2">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Category Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<Folder className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter category name"
-              value={state.categoryName}
-              onChange={(e) =>
-                dispatch({ type: "SET_CATEGORY_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddCategory}
-              loading={state.isConfirmLoading}
+              <Input
+                prefix={
+                  <MapPin className="site-form-item-icon mr-2 text-blue-500" />
+                }
+                placeholder="Enter location name"
+                value={state.locationName}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_LOCATION_NAME",
+                    payload: e.target.value,
+                  })
+                }
+              />
+            </Form.Item>
+            <Form.Item
+              label="Address"
+              required
+              tooltip="This is a required field"
             >
-              Add Category
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-      <TabPane tab="Add Location" key="3">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Location Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<MapPin className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter location name"
-              value={state.locationName}
-              onChange={(e) =>
-                dispatch({ type: "SET_LOCATION_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label="Address"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<MapPin className="site-form-item-icon mr-2 text-green-500" />}
-              placeholder="Enter address"
-              value={state.locationAddress}
-              onChange={(e) =>
-                dispatch({ type: "SET_LOCATION_ADDRESS", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddLocation}
-              loading={state.isConfirmLoading}
+              <Input
+                prefix={
+                  <MapPin className="site-form-item-icon mr-2 text-green-500" />
+                }
+                placeholder="Enter address"
+                value={state.locationAddress}
+                onChange={(e) =>
+                  dispatch({
+                    type: "SET_LOCATION_ADDRESS",
+                    payload: e.target.value,
+                  })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddLocation}
+                loading={state.isConfirmLoading}
+              >
+                Add Location
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+        <TabPane tab="Add Origin" key="4">
+          <Form layout="vertical" className="p-4">
+            <Form.Item
+              label="Origin Name"
+              required
+              tooltip="This is a required field"
             >
-              Add Location
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-      <TabPane tab="Add Origin" key="4">
-        <Form layout="vertical" className="p-4">
-          <Form.Item
-            label="Origin Name"
-            required
-            tooltip="This is a required field"
-          >
-            <Input
-              prefix={<Globe className="site-form-item-icon mr-2 text-blue-500" />}
-              placeholder="Enter origin name"
-              value={state.originName}
-              onChange={(e) =>
-                dispatch({ type: "SET_ORIGIN_NAME", payload: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item>
-            <Button
-              type="primary"
-              onClick={handleAddOrigin}
-              loading={state.isConfirmLoading}
-            >
-              Add Origin
-            </Button>
-          </Form.Item>
-        </Form>
-      </TabPane>
-    </Tabs>
-  </Modal>
-);
+              <Input
+                prefix={
+                  <Globe className="site-form-item-icon mr-2 text-blue-500" />
+                }
+                placeholder="Enter origin name"
+                value={state.originName}
+                onChange={(e) =>
+                  dispatch({ type: "SET_ORIGIN_NAME", payload: e.target.value })
+                }
+              />
+            </Form.Item>
+            <Form.Item>
+              <Button
+                type="primary"
+                onClick={handleAddOrigin}
+                loading={state.isConfirmLoading}
+              >
+                Add Origin
+              </Button>
+            </Form.Item>
+          </Form>
+        </TabPane>
+      </Tabs>
+    </Modal>
+  );
 };
 
 export { AddProductModal };

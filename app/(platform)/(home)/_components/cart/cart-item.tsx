@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-import { Product } from "@/interface";
+import { Product, ProductApiProps } from "@/interface";
 import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { useCartStore } from "@/hooks/use-cart-store";
 import { formatCurrency } from "@/handle-transform/formatCurrency";
 
 interface CartItemProps {
-  product: Product;
+  product: ProductApiProps;
 }
 
 export const CartItem: React.FC<CartItemProps> = ({ product }) => {
@@ -18,7 +18,7 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
   const removeFromCart = useCartStore((state) => state.removeFromCart);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
 
-  const handleDecreaseQuantity = (product: Product) => {
+  const handleDecreaseQuantity = (product: ProductApiProps) => {
     if (product.quantityOrder! > 1) {
       decreaseQuantity(product);
     }
@@ -38,9 +38,9 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
 
       <div>
         <h3 className="text-sm text-gray-900">
-          {product.title.length > MAX_LENGTH
-            ? product.title.slice(0, MAX_LENGTH)
-            : product.title}
+          {product.productName.length > MAX_LENGTH
+            ? product.productName.slice(0, MAX_LENGTH)
+            : product.productName}
         </h3>
 
         <dl className="mt-0.5 space-y-px text-[10px] text-gray-600">
@@ -56,11 +56,25 @@ export const CartItem: React.FC<CartItemProps> = ({ product }) => {
         </dl>
       </div>
 
-      <div className="mx-2 flex items-center gap-x-1 rounded-md p-1">
-        <span className="text-slate-600">Price: </span>
-        <span className="font-bold text-sky-400">
-          {formatCurrency(product.discountPrice * product.quantityOrder!)}
-        </span>
+      <div className="flex flex-col items-center">
+        <div className="mx-2 flex items-center gap-x-1 rounded-md p-1">
+          <span className="font-bold text-slate-600">Giá: </span>
+          <span className="font-bold text-sky-400">
+            {formatCurrency(
+              product.discountPrice > 0 ? product.discountPrice : product.price,
+            )}
+          </span>
+        </div>
+        <div className="mx-2 flex items-center gap-x-1 rounded-md p-1">
+          <span className="font-bold text-slate-600">Tổng: </span>
+          <span className="font-bold text-[#ff6347]">
+            {formatCurrency(
+              product.discountPrice > 0
+                ? product.discountPrice * product.quantityOrder!
+                : product.price * product.quantityOrder!,
+            )}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-1 items-center justify-end gap-2">

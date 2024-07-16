@@ -47,7 +47,7 @@ const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
     const fetchProductDetails = async (id: number) => {
       try {
         const response = await axios.get<ProductDetails>(
-          `https://milkapplication20240705013352.azurewebsites.net/api/Product/GetProductsById/${id}`,
+          `https://milkapplicationapi.azurewebsites.net/api/Product/GetProductsById/${id}`,
         );
         console.log("Product details:", response.data);
         setProduct(response.data);

@@ -29,7 +29,7 @@ export const Details = () => {
     const fetchComments = async () => {
       try {
         const response = await axios.get<Comment[]>(
-          "https://milkapplication20240705013352.azurewebsites.net/api/Comment/GetAllComment",
+          "https://milkapplicationapi.azurewebsites.net/api/Comment/GetAllComment",
         );
         setComments(response.data);
       } catch (error) {
@@ -132,7 +132,7 @@ const ProductName: React.FC<{ productId: number }> = ({ productId }) => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get<{ productName: string }>(
-          `https://milkapplication20240705013352.azurewebsites.net/api/Product/GetProductsById/${productId}`,
+          `hhttps://milkapplicationapi.azurewebsites.net/Product/GetProductsById/${productId}`,
         );
         setProductName(response.data.productName);
       } catch (error) {

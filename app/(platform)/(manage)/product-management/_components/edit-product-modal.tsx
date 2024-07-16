@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Package, DollarSign, Percent, LayoutGrid, FileText, Image as ImageIcon, ToggleLeft } from 'lucide-react';
+import { Package, DollarSign, Percent, LayoutGrid, FileText, Image as ImageIcon, ToggleLeft, Folder, MapPin, Globe } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,8 +12,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
-import { ProductProps, EditProductModalProps } from '@/interface';
+import { message } from 'antd';
+import { ProductProps, EditProductModalProps, Category, Location, Origin } from '@/interface';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDongSign } from '@fortawesome/free-solid-svg-icons';
@@ -26,11 +26,56 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
 }) => {
   const [editedProduct, setEditedProduct] = useState<ProductProps>(product);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [origins, setOrigins] = useState<Origin[]>([]);
 
   useEffect(() => {
+    console.log("EditProductModal mounted or product changed");
     setEditedProduct(product);
+    fetchCategories();
+    fetchLocations();
+    fetchOrigins();
   }, [product]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get<Category[]>(
+        "https://milkapplication20240705013352.azurewebsites.net/api/Category/GetAllCategorys"
+      );
+      setCategories(response.data);
+      console.log("Categories fetched:", response.data);
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+      message.error("Failed to load categories");
+    }
+  };
+
+  const fetchLocations = async () => {
+    try {
+      const response = await axios.get<Location[]>(
+        "https://milkapplication20240705013352.azurewebsites.net/api/Location/GetAllLocation"
+      );
+      setLocations(response.data);
+      console.log("Locations fetched:", response.data);
+    } catch (error) {
+      console.error("Failed to fetch locations:", error);
+      message.error("Failed to load locations");
+    }
+  };
+
+  const fetchOrigins = async () => {
+    try {
+      const response = await axios.get<Origin[]>(
+        "https://milkapplication20240705013352.azurewebsites.net/api/Origin/GetAllOrigins"
+      );
+      setOrigins(response.data);
+      console.log("Origins fetched:", response.data);
+    } catch (error) {
+      console.error("Failed to fetch origins:", error);
+      message.error("Failed to load origins");
+    }
+  };
 
   const handleInputChange = useCallback((
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -42,48 +87,53 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         ? parseFloat(value)
         : value,
     }));
+    console.log(`Input changed: ${name} = ${value}`);
   }, []);
 
-  const handleSelectChange = useCallback((value: string) => {
+  const handleSelectChange = useCallback((name: string, value: string) => {
     setEditedProduct((prev) => ({
       ...prev,
-      status: value === '1' ? 1 : 0,
+      [name]: name === 'status' ? (value === '1' ? 1 : 0) : parseInt(value, 10),
     }));
+    console.log(`Select changed: ${name} = ${value}`);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submitted");
     setIsSubmitting(true);
 
     try {
+      console.log("Sending update request for product:", editedProduct);
       const response = await axios.put<ProductProps>(
         `https://milkapplication20240705013352.azurewebsites.net/api/Product/UpdateProducts/${editedProduct.productId}`,
         editedProduct
       );
 
+      console.log("Update response received:", response);
+
       if (response.status === 200 || response.status === 204) {
+        console.log("Product updated successfully");
         await onProductUpdate(response.data || editedProduct);
+        
+        message.success("Product updated successfully");
+        
+        console.log("Closing modal");
         onClose();
-        toast({
-          title: "Success",
-          description: "Product updated successfully",
-        });
       } else {
         throw new Error(`Unexpected response status: ${response.status}`);
       }
     } catch (error) {
       console.error('Error updating product:', error);
-      toast({
-        title: "Error",
-        description: axios.isAxiosError(error)
-          ? error.response?.data?.message || "An error occurred while updating the product."
-          : "An unexpected error occurred.",
-        variant: "destructive",
-      });
+      message.error(axios.isAxiosError(error)
+        ? error.response?.data?.message || "An error occurred while updating the product."
+        : "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  console.log("Rendering EditProductModal", { isOpen, product: editedProduct });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -165,9 +215,63 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               />
             </div>
             <div className="flex items-center space-x-4">
+              <Folder className="h-5 w-5 text-blue-600" />
+              <Select 
+                onValueChange={(value) => handleSelectChange('categoryId', value)}
+                defaultValue={editedProduct.categoryId?.toString()}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.categoryId} value={category.categoryId.toString()}>
+                      {category.categoryName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-4">
+              <MapPin className="h-5 w-5 text-green-600" />
+              <Select 
+                onValueChange={(value) => handleSelectChange('locationId', value)}
+                defaultValue={editedProduct.locationId?.toString()}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent>
+                  {locations.map((location) => (
+                    <SelectItem key={location.locationId} value={location.locationId.toString()}>
+                      {location.locationName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Globe className="h-5 w-5 text-yellow-600" />
+              <Select 
+                onValueChange={(value) => handleSelectChange('originId', value)}
+                defaultValue={editedProduct.originId?.toString()}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select origin" />
+                </SelectTrigger>
+                <SelectContent>
+                  {origins.map((origin) => (
+                    <SelectItem key={origin.originId} value={origin.originId.toString()}>
+                      {origin.originName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-4">
               <ToggleLeft className="h-5 w-5 text-gray-600" />
               <Select 
-                onValueChange={handleSelectChange}
+                onValueChange={(value) => handleSelectChange('status', value)}
                 defaultValue={editedProduct.status === 1 ? '1' : '0'}
               >
                 <SelectTrigger className="flex-1">
