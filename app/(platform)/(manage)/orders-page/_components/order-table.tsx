@@ -1,15 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Order } from '@/interface';
 
 interface OrderTableProps {
-  orders: Order[];
+  orders?: Order[];
   loading: boolean;
   error: string | null;
   onOpenDelete: (order: Order) => void;
   onOpenDetails: (order: Order) => void;
 }
 
-const OrderTable: React.FC<OrderTableProps> = ({ orders, loading, error, onOpenDelete, onOpenDetails }) => {
+const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, onOpenDelete, onOpenDetails }) => {
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
+
+  const toggleExpandRow = (orderId: number) => {
+    setExpandedRow(expandedRow === orderId ? null : orderId);
+  };
+
+  const getStatusLabel = (status: number) => {
+    switch (status) {
+      case 0: return 'Chưa thanh toán';
+      case 1: return 'Đã thanh toán';
+      case 2: return 'Đang xử lý';
+      case 3: return 'Đang vận chuyển';
+      case 4: return 'Hoàn thành';
+      case 5: return 'Đã hủy';
+      default: return 'Không rõ';
+    }
+  };
+
+  const getStatusColor = (status: number) => {
+    switch (status) {
+      case 0: return 'bg-yellow-100 text-yellow-800';
+      case 1: return 'bg-blue-100 text-blue-800';
+      case 2: return 'bg-purple-100 text-purple-800';
+      case 3: return 'bg-indigo-100 text-indigo-800';
+      case 4: return 'bg-green-100 text-green-800';
+      case 5: return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
@@ -69,21 +99,32 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders, loading, error, onOpenD
                     {order.userName}
                   </td>
                   <td className="whitespace-nowrap px-4 py-4 text-center">
-                    {order.status === 0 ? 'Pending' : 'Completed'}
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(order.status)}`}>
+                      {getStatusLabel(order.status)}
+                    </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-4 text-center">
-                    <button
-                      onClick={() => onOpenDetails(order)}
-                      className="text-blue-500 hover:text-blue-700 mr-2"
-                    >
-                      Details
+                  <td className="whitespace-nowrap px-4 py-4 text-center relative">
+                    <button onClick={() => toggleExpandRow(order.orderId)} className="text-gray-500 hover:text-gray-700">
+                      ...
                     </button>
-                    <button
-                      onClick={() => onOpenDelete(order)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      Delete
-                    </button>
+                    {expandedRow === order.orderId && (
+                      <div className="absolute mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10">
+                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                          <button
+                            onClick={() => onOpenDetails(order)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full text-left"
+                          >
+                            Details
+                          </button>
+                          <button
+                            onClick={() => onOpenDelete(order)}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full text-left"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}

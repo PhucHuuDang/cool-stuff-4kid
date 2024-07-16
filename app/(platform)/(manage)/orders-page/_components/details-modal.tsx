@@ -18,6 +18,30 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
     return new Date(dateString).toLocaleString('vi-VN');
   };
 
+  const getStatusLabel = (status: number) => {
+    switch (status) {
+      case 0: return 'Chưa thanh toán';
+      case 1: return 'Đã thanh toán';
+      case 2: return 'Đang xử lý';
+      case 3: return 'Đang vận chuyển';
+      case 4: return 'Hoàn thành';
+      case 5: return 'Đã hủy';
+      default: return 'Không rõ';
+    }
+  };
+
+  const getStatusColor = (status: number) => {
+    switch (status) {
+      case 0: return 'bg-yellow-100 text-yellow-800';
+      case 1: return 'bg-blue-100 text-blue-800';
+      case 2: return 'bg-purple-100 text-purple-800';
+      case 3: return 'bg-indigo-100 text-indigo-800';
+      case 4: return 'bg-green-100 text-green-800';
+      case 5: return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full m-4 p-6">
@@ -41,8 +65,8 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
             <p className="mb-2"><span className="font-semibold">Tên khách hàng:</span> {order.userName}</p>
             <p className="mb-2">
               <span className="font-semibold">Trạng thái:</span>
-              <span className={`ml-2 px-2 py-1 rounded-full text-xs ${order.status === 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
-                {order.status === 0 ? 'Đang xử lý' : 'Hoàn thành'}
+              <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(order.status)}`}>
+                {getStatusLabel(order.status)}
               </span>
             </p>
           </div>

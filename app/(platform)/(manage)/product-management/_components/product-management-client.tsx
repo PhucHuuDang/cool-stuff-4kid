@@ -467,6 +467,7 @@ const ProductTable: React.FC<{
         currentSortField={sortField} 
         currentSortDirection={sortDirection} 
         onSort={handleSort} 
+        color="text-[#28a745]"
       />
       <TableHeader 
         text="Origin Price" 
@@ -475,6 +476,7 @@ const ProductTable: React.FC<{
         currentSortField={sortField} 
         currentSortDirection={sortDirection} 
         onSort={handleSort} 
+        color="text-[#dc3545]"
       />
       <TableHeader 
         text="Discount Price" 
@@ -483,6 +485,7 @@ const ProductTable: React.FC<{
         currentSortField={sortField} 
         currentSortDirection={sortDirection} 
         onSort={handleSort} 
+        color="text-[#007bff]"
       />
       <TableHeader 
         text="Discount Percent" 
@@ -491,6 +494,7 @@ const ProductTable: React.FC<{
         currentSortField={sortField} 
         currentSortDirection={sortDirection} 
         onSort={handleSort} 
+        color="text-[#fd7e14]"
       />
       <TableHeader text="Status" />
       <TableHeader text="Link" />
@@ -512,7 +516,7 @@ const ProductTable: React.FC<{
           <TableCell text={product.price.toString()} />
           <TableCell text={product.discountPrice !== null ? product.discountPrice.toString() : 'N/A'} />
           <TableCell text={product.discountPercent !== null && product.discountPercent !== 0 ? `${product.discountPercent}%` : 'N/A'} />
-          <TableCell text={product.status === 1 ? 'Active' : 'Inactive'} />
+          <StatusCell status={product.status} />
           <td className="whitespace-nowrap px-6 py-4 text-center text-sm text-blue-500">
             <a href="#" target="_blank" rel="noopener noreferrer">
               View
@@ -577,10 +581,11 @@ const TableHeader: React.FC<{
   currentSortField?: string | null;
   currentSortDirection?: 'asc' | 'desc';
   onSort?: (field: string) => void;
-}> = ({ text, sortable, field, currentSortField, currentSortDirection, onSort }) => (
+  color?: string;
+}> = ({ text, sortable, field, currentSortField, currentSortDirection, onSort, color }) => (
   <th
     scope="col"
-    className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500 ${
+    className={`px-6 py-3 text-center text-xs font-medium uppercase tracking-wider ${color || 'text-gray-500'} ${
       sortable ? 'cursor-pointer hover:bg-gray-100' : ''
     }`}
     onClick={() => sortable && field && onSort && onSort(field)}
@@ -639,5 +644,16 @@ const PaginationButton: React.FC<{
     {text}
   </button>
 );
+
+const StatusCell: React.FC<{ status: number }> = ({ status }) => {
+  const statusText = status === 1 ? 'Active' : 'Inactive';
+  const statusColor = status === 1 ? 'text-green-600' : 'text-red-600';
+  
+  return (
+    <td className={`whitespace-nowrap px-6 py-4 text-center text-sm ${statusColor}`}>
+      {statusText}
+    </td>
+  );
+};
 
 export default ProductManagementClient;
