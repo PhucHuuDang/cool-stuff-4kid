@@ -56,12 +56,14 @@ export const VoucherCarousel = ({
             align: "start",
             loop: loop,
           }}
-          plugins={[
-            Autoplay({
-              delay: delay,
-              stopOnInteraction: stopOnInteraction,
-            }),
-          ]}
+          plugins={
+            [
+              Autoplay({
+                delay: delay,
+                stopOnInteraction: stopOnInteraction,
+              }),
+            ] as any
+          }
         >
           <CarouselContent>
             {voucherItems.map((voucher) => {

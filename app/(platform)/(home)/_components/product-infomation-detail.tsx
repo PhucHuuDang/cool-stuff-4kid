@@ -133,7 +133,7 @@ export const ProductInformationDetail = ({
 
             <Card className="p-4">
               <div className="flex items-center gap-x-4">
-                <h1 className="text-2xl font-bold text-sky-400">
+                <h1 className="text-2xl font-bold text-[#ff6347]">
                   {formatCurrency(
                     productDetail.discountPrice > 0
                       ? productDetail.discountPrice
@@ -141,7 +141,7 @@ export const ProductInformationDetail = ({
                   )}
                 </h1>
                 {productDetail.discountPercent > 0 && (
-                  <span className="text-lg text-rose-400">
+                  <span className="text-lg text-[#ed9080]">
                     -{productDetail.discountPercent}%
                   </span>
                 )}
@@ -150,7 +150,7 @@ export const ProductInformationDetail = ({
 
             {productDetail.discountPrice > 0 && (
               <del className="text-xl font-bold text-[#ed9080]">
-                {formatCurrency(productDetail.price)}
+                {formatCurrency(productDetail.discountPrice)}
               </del>
             )}
 
@@ -175,7 +175,10 @@ export const ProductInformationDetail = ({
             {cartDetail?.quantityOrder! > 1 && (
               <div className="item-center flex gap-x-4">
                 <span className="text-lg font-semibold text-slate-600">
-                  Tạm tính: {formatCurrency(price)}
+                  Tạm tính:
+                  <span className="font-bold text-[#ff6347]">
+                    {formatCurrency(price)}
+                  </span>
                 </span>
               </div>
             )}
