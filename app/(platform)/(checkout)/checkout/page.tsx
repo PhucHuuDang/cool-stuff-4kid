@@ -4,6 +4,13 @@ import { NavbarCheckout } from "../_components/navbar-checkout";
 import { HeaderCheckout } from "../_components/header-checkout";
 import { CheckoutInformation } from "../_components/checkout-information";
 import { ClientMounted } from "@/hooks/client-mounted";
+import { informationDecoded } from "@/app/auth/information-decoded";
+import { getData } from "@/get-data-actions/get-data";
+import {
+  InformationDecoded,
+  UserInformationDetail,
+  UserInformationDetailProps,
+} from "@/interface";
 
 export async function generateMetadata() {
   return {
@@ -19,6 +26,16 @@ const CheckoutPage = async () => {
     return redirect("/");
   }
 
+  const information: any = await informationDecoded();
+
+  console.log({ information });
+
+  const userInformationDetail: UserInformationDetailProps = await getData(
+    `/Users/GetUserById/${information.nameid}`,
+  );
+
+  // console.log({ userInformationDetail });
+
   return (
     <div className="2xl:max-w-screen pt-20">
       <>
@@ -26,7 +43,9 @@ const CheckoutPage = async () => {
         <HeaderCheckout />
         <div className="mt-5 px-10">
           <ClientMounted>
-            <CheckoutInformation />
+            <CheckoutInformation
+              userInformationDetail={userInformationDetail}
+            />
           </ClientMounted>
         </div>
       </>

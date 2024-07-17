@@ -41,6 +41,8 @@ import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
 import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
 import { vouchers } from "@/db";
 import { toast } from "sonner";
+import { UserInformationDetail, UserInformationDetailProps } from "@/interface";
+import { FormSubmit } from "@/components/form/form-submit";
 
 const tabsProps = [
   {
@@ -53,7 +55,13 @@ const tabsProps = [
   },
 ];
 
-export const CheckoutInformation = () => {
+interface CheckoutInformationProps {
+  userInformationDetail: UserInformationDetailProps;
+}
+
+export const CheckoutInformation = ({
+  userInformationDetail,
+}: CheckoutInformationProps) => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
 
   let total = 0;
@@ -81,14 +89,17 @@ export const CheckoutInformation = () => {
 
   const handleMessage = (formData: FormData) => {
     const message = formData.get("message") as string;
+    // formData.
 
     console.log({ message });
     toast.success("Đã lưu lời nhắn");
   };
 
+  const handleOrder = (formData: FormData) => {};
+
   return (
-    <div className="px-10 pb-20">
-      <AddressReceiveOrder />
+    <form className="px-10 pb-20">
+      <AddressReceiveOrder userInformationDetail={userInformationDetail} />
 
       <Card className="my-4">
         <CardContent className="rounded-lg p-5">
@@ -106,6 +117,7 @@ export const CheckoutInformation = () => {
                 <TableHead>Thành tiền</TableHead>
               </TableRow>
             </TableHeader>
+
             <TableBody>
               {cart?.map((product) => (
                 <ProductCheckout key={product.productId} product={product} />
@@ -284,12 +296,16 @@ export const CheckoutInformation = () => {
               Để đảm bảo đơn hàng của bạn, bạn hãy kiểm tra lại đơn hàng của
               mình trước khi Đặt Hàng
             </div>
-            <Button className="w-64 text-right" variant="book">
+            <FormSubmit
+              disabled={false}
+              className="w-64 text-right"
+              variant="book"
+            >
               Đặt hàng
-            </Button>
+            </FormSubmit>
           </CardFooter>
         </CardContent>
       </Card>
-    </div>
+    </form>
   );
 };
