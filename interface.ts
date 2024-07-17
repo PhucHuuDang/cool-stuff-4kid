@@ -44,7 +44,7 @@ export interface ProductProps {
   categoryId: number;
   originId: number;
   locationId: number;
-  imagesCarousel?: string[];
+  imagesCarousel: string[];
 }
 
 export type ProductsInCategoryProps = {
