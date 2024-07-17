@@ -1,5 +1,3 @@
-// ProductDetailPopup.tsx (enhanced comment UI)
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Star } from "lucide-react";
@@ -90,6 +88,35 @@ const ProductDetailPopup: React.FC<Props> = ({ productId, onClose }) => {
     }
   };
 
+  // Function to render stars based on rating
+  const renderStars = (rating: number) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating - fullStars >= 0.5;
+
+    const starElements = [];
+
+    for (let i = 0; i < fullStars; i++) {
+      starElements.push(
+        <Star key={`star-full-${i}`} className="h-5 w-5 text-yellow-500" />,
+      );
+    }
+
+    if (hasHalfStar) {
+      starElements.push(
+        <Star key={`star-half`} className="h-5 w-5 text-yellow-500" />,
+      );
+    }
+
+    const remainingStars = 5 - starElements.length;
+    for (let i = 0; i < remainingStars; i++) {
+      starElements.push(
+        <Star key={`star-empty-${i}`} className="h-5 w-5 text-gray-300" />,
+      );
+    }
+
+    return starElements;
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="relative w-96 rounded-lg bg-white p-6 shadow-lg">
@@ -170,8 +197,7 @@ const ProductDetailPopup: React.FC<Props> = ({ productId, onClose }) => {
                       {comment.userName}
                     </p>
                     <div className="flex items-center">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <p className="ml-1 text-gray-600">{comment.rating}/5</p>
+                      {renderStars(comment.rating)}
                     </div>
                   </div>
                   <p className="text-gray-700">{comment.commentDetail}</p>

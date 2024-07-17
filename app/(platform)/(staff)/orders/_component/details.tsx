@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import ProductDetailsDialog from "./ProductDetailsDialog";
+import UpdateStatusDialog from "./UpdateStatusDialog";
 import { format } from "date-fns";
 
 type StatusType =
@@ -89,12 +90,12 @@ export const Details: React.FC = () => {
   const [data, setData] = useState<Order[]>([]);
   const [sortOrder, setSortOrder] = useState<string>("asc");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [filterStatus, setFilterStatus] = useState<StatusType>("All");
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null,
   );
-  const [filterStatus, setFilterStatus] = useState<StatusType>("All");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -149,11 +150,32 @@ export const Details: React.FC = () => {
 
   const handleViewClick = (orderId: number) => {
     setSelectedProductId(orderId);
-    console.log("Selected productId:", orderId); // Thêm console.log để kiểm tra giá trị của productId
   };
 
-  const handleCloseDialog = () => {
-    setSelectedProductId(null);
+  const handleUpdateStatus = async (orderId: number, newStatus: number) => {
+    try {
+      const response = await axios.put(
+        `https://milkapplicationapi.azurewebsites.net/api/Order/UpdateOrders/${orderId}`,
+        null,
+        {
+          params: {
+            orderId,
+            status: newStatus,
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        const updatedData = data.map((order) =>
+          order.orderId === orderId ? { ...order, status: newStatus } : order,
+        );
+        setData(updatedData);
+      } else {
+        console.error("Failed to update order status");
+      }
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   const formatOrderDate = (date: string) => {
@@ -172,10 +194,6 @@ export const Details: React.FC = () => {
       style: "currency",
       currency: "VND",
     }).format(price);
-  };
-
-  const truncateProductName = (name: string) => {
-    return name.length > 30 ? name.slice(0, 30) + "..." : name;
   };
 
   return (
@@ -216,109 +234,80 @@ export const Details: React.FC = () => {
               Delivered
             </option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-              />
-            </svg>
-          </div>
         </div>
       </div>
 
       {loading ? (
-        <div className="text-center">Loading...</div>
+        <div>Loading...</div>
       ) : error ? (
         <div>{error}</div>
       ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
-                <TableHead className="text-black">ID</TableHead>
-                <TableHead className="text-black">Username</TableHead>
-                <TableHead className="text-black">Product Name</TableHead>
-                <TableHead className="text-black">Voucher Code</TableHead>
-                <TableHead
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Order ID</TableHead>
+              <TableHead>Order Date</TableHead>
+              <TableHead>User Name</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="flex items-center">
+                Total Price{" "}
+                <button
+                  className="ml-2 flex items-center rounded-md border border-gray-300 p-2 shadow-sm"
                   onClick={() =>
                     handleSortOrderChange(sortOrder === "asc" ? "desc" : "asc")
                   }
-                  className="cursor-pointer text-black"
                 >
-                  Total Price
                   {sortOrder === "asc" ? (
-                    <ArrowDownWideNarrow className="ml-2 inline" />
+                    <ArrowUpNarrowWide className="h-4 w-4 text-gray-600" />
                   ) : (
-                    <ArrowUpNarrowWide className="ml-2 inline" />
+                    <ArrowDownWideNarrow className="h-4 w-4 text-gray-600" />
                   )}
-                </TableHead>
-                <TableHead className="text-black">Status</TableHead>
-                <TableHead className="text-black">Order Date</TableHead>
-                <TableHead className="text-black">View</TableHead>
-                <TableHead className="text-black">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedData.map((item, index) => (
-                <TableRow
-                  key={item.orderId}
-                  className="cursor-pointer text-black hover:bg-[#F3F2F2]"
-                  onClick={() => handleViewClick(item.orderId)}
-                >
-                  <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{item.userName}</TableCell>
-                  <TableCell>
-                    {truncateProductName(
-                      item.orderDetails[0].product.productName,
-                    )}
-                  </TableCell>
-                  <TableCell>{item.voucher?.code ?? "-"}</TableCell>
-                  <TableCell className="">
-                    {formatPrice(item.totalPrice)}
-                  </TableCell>
-                  <TableCell>
-                    <span
-                      className={`font-medium ${
-                        statusColors[statusMap[item.status]]
-                      }`}
-                    >
-                      {statusMap[item.status]}
-                    </span>
-                  </TableCell>
-                  <TableCell>{formatOrderDate(item.orderDate)}</TableCell>
-                  <TableCell>
+                </button>
+              </TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortedData.map((order) => (
+              <TableRow key={order.orderId}>
+                <TableCell>{order.orderId}</TableCell>
+                <TableCell>{formatOrderDate(order.orderDate)}</TableCell>
+                <TableCell>{order.userName}</TableCell>
+                <TableCell className={statusColors[statusMap[order.status]]}>
+                  {statusMap[order.status]}
+                </TableCell>
+                <TableCell>{formatPrice(order.totalPrice)}</TableCell>
+                <TableCell>
+                  <div className="flex items-center space-x-2">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewClick(item.orderDetails[0].product.productId);
-                      }}
-                      className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+                      className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                      onClick={() =>
+                        handleViewClick(order.orderDetails[0].product.productId)
+                      }
                     >
                       View
                     </button>
-                  </TableCell>
-                  <TableCell>Update</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <UpdateStatusDialog
+                      orderId={order.orderId}
+                      currentStatus={order.status}
+                      onUpdateStatus={handleUpdateStatus}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
-          {selectedProductId && (
-            <ProductDetailsDialog
-              productId={selectedProductId}
-              onClose={handleCloseDialog}
-            />
-          )}
-        </>
+      {selectedProductId && (
+        <ProductDetailsDialog
+          productId={selectedProductId}
+          onClose={() => setSelectedProductId(null)}
+        />
       )}
     </div>
   );
 };
+
+export default Details;

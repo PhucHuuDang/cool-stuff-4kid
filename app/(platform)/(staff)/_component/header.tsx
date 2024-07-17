@@ -35,7 +35,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             className="h-10 w-10 rounded-full"
           />
           <div className="ml-2">
-            <span className="block">M10-Warthog</span>
+            <span className="block">ngocphu</span>
             <span className="text-sm text-gray-500">Staff</span>
           </div>
         </div>

@@ -93,25 +93,13 @@ const Details = () => {
       <Table>
         <TableHeader>
           <TableRow className="bg-[#FCFBF4] hover:bg-[#FCFBF4]">
-            <TableHead className="text-base font-bold text-black">ID</TableHead>
-            <TableHead className="text-base font-bold text-black">
-              User Name
-            </TableHead>
-            <TableHead className="text-base font-bold text-black">
-              Product Name
-            </TableHead>
-            <TableHead className="text-base font-bold text-black">
-              Comments
-            </TableHead>
-            <TableHead className="w-[100px] text-base font-bold text-black">
-              Rate
-            </TableHead>
-            <TableHead className="text-center text-base font-bold text-black">
-              Date
-            </TableHead>
-            <TableHead className="text-center text-base font-bold text-black">
-              Action
-            </TableHead>
+            <TableHead className="text-black">ID</TableHead>
+            <TableHead className="text-black">User Name</TableHead>
+            <TableHead className="text-black">Product Name</TableHead>
+            <TableHead className="text-black">Comments</TableHead>
+            <TableHead className="w-[100px] text-black">Rate</TableHead>
+            <TableHead className="text-center text-black">Date</TableHead>
+            <TableHead className="text-center text-black">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
