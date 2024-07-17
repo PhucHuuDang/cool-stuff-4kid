@@ -77,15 +77,15 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
           ...prev,
           discountPercent: "Discount percent must be at least 1",
         }));
-      } else if (discountValue >= 50 && discountValue <= 80) {
-        setWarning((prev) => ({
-          ...prev,
-          discountPercent: "Discount percent is 50 or more. Please confirm",
-        }));
       } else if (discountValue > 80) {
         setWarning((prev) => ({
           ...prev,
           discountPercent: "Discount percent must not exceed 80",
+        }));
+      } else if (discountValue >= 50) {
+        setWarning((prev) => ({
+          ...prev,
+          discountPercent: "Discount percent should be less than 50",
         }));
       } else {
         setWarning((prev) => ({
@@ -94,7 +94,8 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
         }));
       }
     } else if (name === "quantity") {
-      if (parseInt(value, 10) < 1) {
+      const quantityValue = parseInt(value, 10);
+      if (quantityValue < 1) {
         setWarning((prev) => ({
           ...prev,
           quantity: "Quantity must be at least 1",
@@ -113,9 +114,12 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Check if there are any warnings before submitting
-    if (warning.code || warning.discountPercent || warning.quantity) {
-      setError("Please fix the fields with warnings before submitting.");
+    // Check if quantity is 0 before submitting
+    if (updatedVoucher.quantity === 0) {
+      setWarning((prev) => ({
+        ...prev,
+        quantity: "Quantity must be at least 1",
+      }));
       return;
     }
 
@@ -147,9 +151,9 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
         <DialogHeader>
           <DialogTitle>Update Voucher</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="mt-4">
-          <div className="">
-            <div className="mb-3">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <Label>Code</Label>
               <input
                 type="text"
@@ -164,52 +168,51 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
                 <p className="mt-1 text-yellow-500">{warning.code}</p>
               )}
             </div>
-            <div className="flex">
-              <div>
-                <Label>Discount Percent</Label>
-                <input
-                  type="number"
-                  name="discountPercent"
-                  value={updatedVoucher.discountPercent}
-                  onChange={handleChange}
-                  placeholder="Discount Percent"
-                  className="mt-2 rounded-md border border-gray-300 p-2"
-                  min="1" // Set min value to 1
-                  required
-                />
-                {warning.discountPercent && (
-                  <p className="mt-1 text-yellow-500">
-                    {warning.discountPercent}
-                  </p>
-                )}
-              </div>
-
-              <div>
-                <Label>Quantity</Label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={updatedVoucher.quantity}
-                  onChange={handleChange}
-                  placeholder="Quantity"
-                  className="mt-2 rounded-md border border-gray-300 p-2"
-                  required
-                />
-                {warning.quantity && (
-                  <p className="mt-1 text-yellow-500">{warning.quantity}</p>
-                )}
-              </div>
+            <div>
+              <Label>Discount Percent</Label>
+              <input
+                type="number"
+                name="discountPercent"
+                value={updatedVoucher.discountPercent}
+                onChange={handleChange}
+                placeholder="Discount Percent"
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
+                min="1"
+                max="80"
+                required
+              />
+              {warning.discountPercent && (
+                <p className="mt-1 text-yellow-500">
+                  {warning.discountPercent}
+                </p>
+              )}
             </div>
-            <div className="mt-3">
-              <div>
-                <Label>Status</Label>
-              </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>Quantity</Label>
+              <input
+                type="number"
+                name="quantity"
+                value={updatedVoucher.quantity}
+                onChange={handleChange}
+                placeholder="Quantity"
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
+                min="1"
+                required
+              />
+              {warning.quantity && (
+                <p className="mt-1 text-yellow-500">{warning.quantity}</p>
+              )}
+            </div>
+            <div>
+              <Label>Status</Label>
               <select
                 title="a"
                 name="vouchersStatus"
                 value={updatedVoucher.vouchersStatus}
                 onChange={handleChange}
-                className="mt-2 rounded-md border border-gray-300 p-2"
+                className="mt-2 w-full rounded-md border border-gray-300 p-2"
                 required
               >
                 <option value={1}>Active</option>
@@ -218,7 +221,7 @@ export const UpdateVoucherForm: React.FC<UpdateVoucherFormProps> = ({
             </div>
           </div>
           {error && <p className="mt-2 text-red-500">{error}</p>}
-          <DialogFooter className="mt-4">
+          <DialogFooter className="mt-4 flex justify-end">
             <button
               type="submit"
               className="mr-2 rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
