@@ -229,6 +229,21 @@ export type ProductDetailProps = {
   originId: number;
   locationId: number;
   quantityOrder?: number;
+  comment: CommentInProductDetail[];
+};
+
+interface User {
+  fullName: string;
+  id: string;
+  image: string | null;
+}
+
+export type CommentInProductDetail = {
+  user: User[];
+  commentId: number;
+  commentDetail: string;
+  rating: number;
+  date: Date;
 };
 
 export type CardCarouselPropsPicked = Pick<
@@ -283,4 +298,3 @@ export type Vouchers = {
   dateTo: Date;
   vouchersStatus: number;
 };
-

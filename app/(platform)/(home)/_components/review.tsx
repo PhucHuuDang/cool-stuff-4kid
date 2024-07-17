@@ -12,12 +12,16 @@ import { Rating } from "react-simple-star-rating";
 import { useEventListener } from "usehooks-ts";
 import { ReviewDialog } from "../[...productDetail]/_components/review-dialog";
 import { ProductDetailProps } from "@/interface";
+import { useQuery } from "@tanstack/react-query";
+import { findUserPaidOrders } from "@/get-data-actions/get-data";
+import { PaymentDetailByUserID } from "@/types/payment-detail";
 
-export const Review = ({
-  productDetail,
-}: {
+interface ReviewProps {
   productDetail: ProductDetailProps;
-}) => {
+  information: any;
+}
+
+export const Review = ({ productDetail, information }: ReviewProps) => {
   const inputRef = useRef<ElementRef<"input">>(null);
   const formRef = useRef<ElementRef<"form">>(null);
   const { pending } = useFormStatus();
@@ -28,6 +32,11 @@ export const Review = ({
     console.log({ question });
   };
 
+  const { data, isLoading, error, isError } = useQuery({
+    queryKey: ["review"],
+    queryFn: () => findUserPaidOrders(`/Payment/Payment/${information.nameid}`),
+  });
+
   const handleKeydown = (e: KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       formRef.current?.requestSubmit();
@@ -37,6 +46,18 @@ export const Review = ({
       }
     }
   };
+
+  const userBoughtProduct = data?.flatMap((payment: PaymentDetailByUserID) =>
+    payment.order.orderDetails.map((detail) => detail.productId),
+  );
+
+  console.log({ userBoughtProduct });
+
+  const hasUserBoughtProduct = userBoughtProduct?.includes(
+    productDetail.productId,
+  );
+
+  console.log({ hasUserBoughtProduct });
 
   const tooltipArray = [
     "Rất tệ 🙁",
@@ -54,7 +75,8 @@ export const Review = ({
         <CardTitle>Hỏi đáp & Đánh giá sản phẩm</CardTitle>
       </CardHeader>
       <CardContent className="rounded-lg p-5">
-        <ReviewDialog productDetail={productDetail} />
+        {/* {information.nameid === } */}
+        {hasUserBoughtProduct && <ReviewDialog productDetail={productDetail} />}
 
         <div className="my-4 flex gap-x-2">
           <Avatar className="size-12">
