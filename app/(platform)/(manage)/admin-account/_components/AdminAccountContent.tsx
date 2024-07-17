@@ -19,6 +19,16 @@ interface Product {
   id: string;
 }
 
+interface User {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+  status: number;
+  addresses: any[];
+}
+
 interface Activity {
   action: string;
   timestamp: string;
@@ -30,21 +40,31 @@ async function fetchProducts(): Promise<Product[]> {
   return data;
 }
 
+async function fetchUsers(): Promise<User[]> {
+  const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/GetAllUsers');
+  const data = await response.json();
+  return data.data;
+}
+
 const AdminAccountContent: React.FC = () => {
   const [activities, setActivities] = useState<Activity[]>([]);
 
   useEffect(() => {
     async function loadActivities() {
       try {
-        const products = await fetchProducts();
+        const [products, users] = await Promise.all([fetchProducts(), fetchUsers()]);
+        
+        const userMap = new Map(users.map(user => [user.id, user.fullName]));
+        
         const lastFiveProducts = products.slice(-5).reverse();
         const newActivities = lastFiveProducts.map(product => ({
-          action: `'${product.id}' add new a '${product.productName}'`,
+          action: `${userMap.get(product.id) || 'Unknown User'} add new a product '${product.productName}'`,
           timestamp: new Date().toLocaleString()
         }));
+        
         setActivities(newActivities);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching data:", error);
       }
     }
   

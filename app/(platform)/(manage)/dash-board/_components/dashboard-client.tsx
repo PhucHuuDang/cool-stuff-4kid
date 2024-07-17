@@ -37,10 +37,26 @@ interface Product {
   id: string;
 }
 
+interface User {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+  status: number;
+  addresses: any[];
+}
+
 interface Notification {
   id: number;
   message: string;
   time: string;
+}
+
+async function fetchUsers(): Promise<User[]> {
+  const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/GetAllUsers');
+  const data = await response.json();
+  return data.data;
 }
 
 const DashboardClient: React.FC = () => {
@@ -53,10 +69,11 @@ const DashboardClient: React.FC = () => {
   const [totalStaff, setTotalStaff] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  const createNotifications = (products: Product[]) => {
+  const createNotifications = (products: Product[], users: User[]) => {
+    const userMap = new Map(users.map(user => [user.id, user.fullName]));
     return products.slice(-3).reverse().map((product, index) => ({
       id: index + 1,
-      message: `'${product.id}' đã thêm mới sản phẩm '${product.productName}'`,
+      message: `${userMap.get(product.id) || 'Unknown User'} đã thêm mới sản phẩm '${product.productName}'`,
       time: "Vừa xong"
     }));
   };
@@ -87,6 +104,8 @@ const DashboardClient: React.FC = () => {
         const productsResponse = await fetch('https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts');
         const products = await productsResponse.json();
 
+        const users = await fetchUsers();
+
         setProductCount(products.length);
         setTotalQuantity(products.reduce((sum: number, product: any) => sum + (product.quantity || 0), 0));
 
@@ -108,7 +127,7 @@ const DashboardClient: React.FC = () => {
 
         setCategoryData(chartData);
 
-        const newNotifications = createNotifications(products);
+        const newNotifications = createNotifications(products, users);
         setNotifications(newNotifications);
       } catch (error) {
         console.error('Error fetching category and product data:', error);
