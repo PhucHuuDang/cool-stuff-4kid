@@ -55,6 +55,7 @@ import {
 } from "@/handle-transform/format-date-fns";
 import { useAddress } from "@/hooks/use-address";
 import { useRouter } from "next/navigation";
+import { calculateDiscountedPrice } from "@/handle-transform/handle-discount";
 
 const tabsProps = [
   {
@@ -77,7 +78,13 @@ export const CheckoutInformation = ({
   information,
 }: CheckoutInformationProps) => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
-  const [voucherCode, setVoucherCode] = useState<string>("");
+  const [voucherCode, setVoucherCode] = useState<
+    Record<string, any> | Vouchers
+  >();
+  const [isOpenVoucherDialog, setIsOpenVoucherDialog] =
+    useState<boolean>(false);
+
+  console.log({ voucherCode });
 
   const formRefSubmitOrder = useRef<ElementRef<"form">>(null);
   const warningRefLackOfAddress = useRef<ElementRef<"div">>(null);
@@ -119,7 +126,7 @@ export const CheckoutInformation = ({
     const message = formData.get("message-form") as string;
     const info = formData.get("informationUserOrder") as string;
 
-    console.log({ cart });
+    // console.log({ cart });
 
     let orderDetails;
 
@@ -150,6 +157,11 @@ export const CheckoutInformation = ({
     toast.success("Đặt hàng thành công");
     // toast.
   };
+
+  // final price
+
+  const { formattedDiscountAmount, formattedFinalTotal, discountPercent } =
+    calculateDiscountedPrice(total, voucherCode?.discountPercent);
 
   return (
     <form
@@ -190,7 +202,10 @@ export const CheckoutInformation = ({
                 <TableCell colSpan={3}>Voucher của shop</TableCell>
                 <TableCell className="text-right">
                   {/* Todo: dialog to choose voucher in onClick button */}
-                  <Dialog>
+                  <Dialog
+                    open={isOpenVoucherDialog}
+                    onOpenChange={setIsOpenVoucherDialog}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="book">Chọn Voucher</Button>
                     </DialogTrigger>
@@ -216,11 +231,14 @@ export const CheckoutInformation = ({
                                 Cho tất cả sản phẩm trong giỏ hàng
                               </h4>
 
-                              <p className="my-2 text-wrap text-base font-bold">
+                              <p className="my-1 text-wrap text-base font-bold">
                                 Từ{" "}
                                 <span className="text-[#e58777]">
                                   {vietnameseDate(voucher.dateFrom)}
                                 </span>{" "}
+                              </p>
+
+                              <p className="my-1 text-wrap text-base font-bold">
                                 Đến{" "}
                                 <span className="text-[#e58777]">
                                   {" "}
@@ -230,12 +248,39 @@ export const CheckoutInformation = ({
                               {/* <p className="font-sm font-normal">
                                 {voucher.additionalInfo}
                               </p> */}
-                              <Button
+
+                              {voucherCode?.voucherId === voucher.voucherId ? (
+                                <Button
+                                  variant="book"
+                                  className="absolute right-3 top-1/2 z-30 flex justify-end"
+                                  disabled
+                                >
+                                  Đã lưu
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="book"
+                                  className="absolute right-3 top-1/2 flex justify-end"
+                                  onClick={() => {
+                                    setVoucherCode({ ...voucher });
+                                    setIsOpenVoucherDialog(
+                                      !isOpenVoucherDialog,
+                                    );
+                                  }}
+                                >
+                                  Lưu
+                                </Button>
+                              )}
+                              {/* <Button
                                 variant="book"
                                 className="absolute right-3 top-1/2 flex justify-end"
+                                onClick={() => {
+                                  setVoucherCode({ ...voucher });
+                                  setIsOpenVoucherDialog(!isOpenVoucherDialog);
+                                }}
                               >
                                 Lưu
-                              </Button>
+                              </Button> */}
                             </div>
                           );
                         })}
@@ -342,28 +387,32 @@ export const CheckoutInformation = ({
             <div className="flex flex-col space-y-4 rounded-lg p-4 duration-200 hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-lg font-medium">Tổng số tiền:</span>
-                <span className="text-lg font-medium">
-                  {currencyTransformed}
-                </span>
+                <span className="text-lg font-bold">{currencyTransformed}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-medium">Phí vận chuyển:</span>
-                <span className="rounded-md px-2 py-1 text-right text-lg font-medium">
-                  15.000
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-medium">
-                  Tổng cộng voucer giảm giá:
-                </span>
-                <span className="rounded-md px-2 py-1 text-right text-lg font-medium">
-                  -3.500
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
+              {voucherCode?.discountPercent && (
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium">
+                    Giảm giá với voucher của shop
+                  </span>
+                  <span className="rounded-md px-2 py-1 text-right text-lg font-medium text-sky-600">
+                    {discountPercent}%
+                  </span>
+                </div>
+              )}
+              {voucherCode?.voucherId && (
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium">
+                    Tổng cộng voucer giảm giá:
+                  </span>
+                  <span className="rounded-md px-2 py-1 text-right text-lg font-medium text-[#ed9080]">
+                    {formattedDiscountAmount}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-x-1">
                 <span className="text-lg font-medium">Tổng thanh toán:</span>
                 <h1 className="text-2xl font-bold text-[#ff6347]">
-                  {currencyTransformed}
+                  {formattedFinalTotal}
                 </h1>
               </div>
             </div>
