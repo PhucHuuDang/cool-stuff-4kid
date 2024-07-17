@@ -15,8 +15,23 @@ export interface Product {
   originId: number;
   locationId: number;
   quantityOrder?: number;
+  id: string;
 }
 
+export interface Voucher {
+  voucherId: number;
+  code: string;
+  discountPercent: number;
+  quantity: number;
+  dateFrom: string;
+  dateTo: string;
+  vouchersStatus: number;
+}
+
+export interface Activity {
+  action: string;
+  timestamp: string;
+}
 export interface ProductProps {
   id: number;
   title: string;
@@ -34,7 +49,7 @@ export interface ProductProps {
   categoryId: number;
   originId: number;
   locationId: number;
-  imagesCarousel?: string[];
+  imagesCarousel: string[];
 }
 
 export type ProductsInCategoryProps = {
@@ -81,6 +96,45 @@ export interface Order {
   orderDate: string;
   totalPrice: number;
   id: string;
+  userName: string;
+  status: number;
+  voucherId: number;
+  orderItems: OrderItem[];
+  voucher: any | null;
+  orderDetails: OrderDetail[];
+  fullName: string;
+  email: string;
+  staffName: string;
+}
+
+export interface OrderDetail {
+  orderDetailId: number;
+  quantity: number;
+  productId: number;
+  product: Product;
+}
+
+export interface UserDashBoard {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+  status: number;
+  addresses: any[];
+}
+
+export interface Notification {
+  id: number;
+  message: string;
+  time: string;
+}
+
+export interface OrderItem {
+  orderItemId: number;
+  quantity: number;
+  productId: number;
+  productName: string;
 }
 
 export interface State {
@@ -104,6 +158,23 @@ export interface State {
   categories: Category[];
   origins: Origin[];
   locations: Location[];
+}
+
+export interface ApiUser {
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+  id: string;
+  status: number;
+}
+
+export interface StaffMember {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  status: number;
 }
 
 export interface EditProductModalProps {
@@ -167,7 +238,9 @@ export type OrderManagementAction =
   | { type: "FETCH_FAILURE"; payload: string }
   | { type: "DELETE_ORDER"; payload: string }
   | { type: "SET_ORDER_TO_DELETE"; payload: Order }
-  | { type: "CLOSE_DELETE_MODAL" };
+  | { type: "CLOSE_DELETE_MODAL" }
+  | { type: "SET_ORDER_DETAILS"; payload: Order }
+  | { type: "CLOSE_DETAILS_MODAL" };
 
 export interface ProductTableProps {
   currentProducts: ProductProps[];
@@ -246,6 +319,18 @@ export type CommentInProductDetail = {
   date: Date;
 };
 
+export interface DecodedToken {
+  nameid: string;
+  email: string;
+  name: string;
+  unique_name: string;
+  role: string;
+  jti: string;
+  exp: number;
+  iss: string;
+  aud: string;
+}
+
 export type CardCarouselPropsPicked = Pick<
   ProductApiProps,
   | "productId"
@@ -289,6 +374,50 @@ export type UserInformationDetailProps = {
   data: UserInformationDetail;
 };
 
+export interface AddStaffModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddStaff: (newStaff: StaffMember) => void;
+}
+
+export interface BanStaffButtonProps {
+  userId: string;
+  userName: string;
+  onStatusChange: (userId: string, newStatus: number) => void;
+}
+
+export interface UnbanStaffButtonProps {
+  userId: string;
+  userName: string;
+  onStatusChange: (userId: string, newStatus: number) => void;
+}
+
+export interface OrderTableProps {
+  orders?: Order[];
+  loading: boolean;
+  error: string | null;
+  onOpenDelete: (order: Order) => void;
+  onOpenDetails: (order: Order) => void;
+}
+
+export interface DetailsModalProps {
+  isOpen: boolean;
+  order: Order | null;
+  onClose: () => void;
+}
+
+export interface OrderUpdate {
+  staffName: string;
+  status: number;
+  orderDate: string;
+}
+
+export interface DeleteModalProps {
+  isOpen: boolean;
+  order: Order | null;
+  onClose: () => void;
+  onDelete: (orderId: string) => void;
+}
 export type Vouchers = {
   voucherId: number;
   code: string;

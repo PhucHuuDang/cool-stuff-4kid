@@ -6,7 +6,8 @@ const routes = {
   revenue: '/revenue-page',
   adminAccount: '/admin-account',
   vouchers: '/vouchers-management',
-  home: '/'
+  home: '/',
+  404: '/404'
 };
 
 export { routes };
