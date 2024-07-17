@@ -20,6 +20,29 @@ interface StaffMember {
   status: number;
 }
 
+interface Product {
+  productId: number;
+  productName: string;
+  price: number;
+  discountPrice: number;
+  discountPercent: number;
+  productDescription: string;
+  image: string;
+  imagesCarousel: string[];
+  quantity: number;
+  status: number;
+  categoryId: number;
+  originId: number;
+  locationId: number;
+  id: string;
+}
+
+interface Notification {
+  id: number;
+  message: string;
+  time: string;
+}
+
 const DashboardClient: React.FC = () => {
   const [totalRevenue, setTotalRevenue] = useState(0);
   const [revenueChange, setRevenueChange] = useState(0);
@@ -28,6 +51,15 @@ const DashboardClient: React.FC = () => {
   const [totalQuantity, setTotalQuantity] = useState(0);
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
   const [totalStaff, setTotalStaff] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const createNotifications = (products: Product[]) => {
+    return products.slice(-3).reverse().map((product, index) => ({
+      id: index + 1,
+      message: `'${product.id}' đã thêm mới sản phẩm '${product.productName}'`,
+      time: "Vừa xong"
+    }));
+  };
 
   useEffect(() => {
     const fetchTotalRevenue = async () => {
@@ -75,6 +107,9 @@ const DashboardClient: React.FC = () => {
         }));
 
         setCategoryData(chartData);
+
+        const newNotifications = createNotifications(products);
+        setNotifications(newNotifications);
       } catch (error) {
         console.error('Error fetching category and product data:', error);
       }
@@ -140,12 +175,6 @@ const DashboardClient: React.FC = () => {
     change: stat.change !== undefined ? stat.change : calculatePercentChange(stat.current, stat.previous!),
   }));
 
-  const notifications = [
-    { id: 1, message: "Đơn hàng mới #1234 đã được tạo", time: "5 phút trước" },
-    { id: 2, message: "Nhân viên Nguyễn Văn A đã hoàn thành mục tiêu tháng", time: "1 giờ trước" },
-    { id: 3, message: "Cập nhật hệ thống sẽ diễn ra vào 22:00 tối nay", time: "3 giờ trước" },
-  ];
-
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex flex-grow">
@@ -185,7 +214,7 @@ const DashboardClient: React.FC = () => {
             </div>
 
             <div className="mb-4 rounded-lg bg-white p-6 shadow-md">
-              <h2 className="mb-4 text-xl font-bold">Thông báo mới nhất</h2>
+              <h2 className="mb-4 text-xl font-bold">Hoạt động mới nhất</h2>
               <ul>
                 {notifications.map((notification) => (
                   <li key={notification.id} className="mb-2 pb-2 border-b last:border-b-0">

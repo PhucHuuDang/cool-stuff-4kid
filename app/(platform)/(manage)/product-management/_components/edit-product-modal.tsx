@@ -85,18 +85,48 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
   
     if (!editedProduct.productName.trim()) {
       newErrors.productName = "Product name is required";
+    } else if (editedProduct.productName.length < 5) {
+      newErrors.productName = "Product Name must be at least 5 characters";
+    } else if (editedProduct.productName.length > 50) {
+      newErrors.productName = "Product Name cannot exceed 50 characters";
     }
   
     if (!editedProduct.price || editedProduct.price < 1) {
-      newErrors.price = "Price must be 1 or greater";
+      newErrors.price = "Price must be at least 1";
     }
   
     if (editedProduct.discountPercent !== null && editedProduct.discountPercent !== undefined) {
       if (editedProduct.discountPercent < 0) {
         newErrors.discountPercent = "Discount percent cannot be less than 0%";
       } else if (editedProduct.discountPercent > 80) {
-        newErrors.discountPercent = "Discount percent cannot be greater than 80%";
+        newErrors.discountPercent = "Discount percent cannot exceed 80%";
       }
+    }
+  
+    if (!editedProduct.productDescription.trim()) {
+      newErrors.productDescription = "Product description is required";
+    } else if (editedProduct.productDescription.length < 15) {
+      newErrors.productDescription = "Product description must be at least 15 characters";
+    } else if (editedProduct.productDescription.length > 1000) {
+      newErrors.productDescription = "Product description cannot exceed 1000 characters";
+    }
+  
+    if (!editedProduct.quantity || editedProduct.quantity < 1) {
+      newErrors.quantity = "Quantity must be greater than 0";
+    }
+  
+    if (!editedProduct.categoryId) {
+      newErrors.categoryId = "Please select a category";
+    }
+    if (!editedProduct.originId) {
+      newErrors.originId = "Please select an origin";
+    }
+    if (!editedProduct.locationId) {
+      newErrors.locationId = "Please select a location";
+    }
+  
+    if (!editedProduct.image.trim()) {
+      newErrors.image = "Please select an image for the product";
     }
   
     setErrors(newErrors);
@@ -116,8 +146,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
         parsedValue = Math.min(parseFloat(value), 80);
       }
       setShowDiscountWarning(parsedValue !== null && parsedValue > 50);
-    } else if (['price', 'discountPrice', 'quantity'].includes(name)) {
-      parsedValue = parseFloat(value);
+    } else if (['price', 'quantity'].includes(name)) {
+      parsedValue = Math.max(1, parseFloat(value));
     }
 
     setEditedProduct((prev) => ({
@@ -134,6 +164,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       ...prev,
       [name]: name === 'status' ? (value === '1' ? 1 : 0) : parseInt(value, 10),
     }));
+    setErrors(prev => ({ ...prev, [name]: '' }));
     console.log(`Select changed: ${name} = ${value}`);
   }, []);
 
@@ -253,91 +284,109 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
               </div>
               <div className="flex items-center space-x-4">
                 <LayoutGrid className="h-5 w-5 text-blue-600" />
-                <Input
-                  id="quantity"
-                  name="quantity"
-                  type="number"
-                  placeholder="Quantity"
-                  value={editedProduct.quantity}
-                  onChange={handleInputChange}
-                  className="flex-1"
-                />
+                <div className="flex-1">
+                  <Input
+                    id="quantity"
+                    name="quantity"
+                    type="number"
+                    placeholder="Quantity"
+                    value={editedProduct.quantity}
+                    onChange={handleInputChange}
+                    className={errors.quantity ? "border-red-500" : ""}
+                  />
+                  {errors.quantity && <p className="text-red-500 text-sm mt-1">{errors.quantity}</p>}
+                </div>
               </div>
               <div className="flex items-start space-x-4">
                 <FileText className="h-5 w-5 text-purple-600 mt-2" />
-                <Textarea
-                  id="productDescription"
-                  name="productDescription"
-                  placeholder="Product Description"
-                  value={editedProduct.productDescription}
-                  onChange={handleInputChange}
-                  className="flex-1 min-h-[100px]"
-                />
+                <div className="flex-1">
+                  <Textarea
+                    id="productDescription"
+                    name="productDescription"
+                    placeholder="Product Description"
+                    value={editedProduct.productDescription}
+                    onChange={handleInputChange}
+                    className={`min-h-[100px] ${errors.productDescription ? "border-red-500" : ""}`}
+                  />
+                  {errors.productDescription && <p className="text-red-500 text-sm mt-1">{errors.productDescription}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <ImageIcon className="h-5 w-5 text-pink-600" />
-                <Input
-                  id="image"
-                  name="image"
-                  placeholder="Image URL"
-                  value={editedProduct.image}
-                  onChange={handleInputChange}
-                  className="flex-1"
-                />
+                <div className="flex-1">
+                  <Input
+                    id="image"
+                    name="image"
+                    placeholder="Image URL"
+                    value={editedProduct.image}
+                    onChange={handleInputChange}
+                    className={errors.image ? "border-red-500" : ""}
+                  />
+                  {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <Folder className="h-5 w-5 text-blue-600" />
-                <Select 
-                  onValueChange={(value) => handleSelectChange('categoryId', value)}
-                  defaultValue={editedProduct.categoryId?.toString()}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.categoryId} value={category.categoryId.toString()}>
-                        {category.categoryName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1">
+                  <Select 
+                    onValueChange={(value) => handleSelectChange('categoryId', value)}
+                    defaultValue={editedProduct.categoryId?.toString()}
+                  >
+                    <SelectTrigger className={errors.categoryId ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((category) => (
+                        <SelectItem key={category.categoryId} value={category.categoryId.toString()}>
+                          {category.categoryName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.categoryId && <p className="text-red-500 text-sm mt-1">{errors.categoryId}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <MapPin className="h-5 w-5 text-green-600" />
-                <Select 
-                  onValueChange={(value) => handleSelectChange('locationId', value)}
-                  defaultValue={editedProduct.locationId?.toString()}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Select location" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations.map((location) => (
-                      <SelectItem key={location.locationId} value={location.locationId.toString()}>
-                        {location.locationName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1">
+                  <Select 
+                    onValueChange={(value) => handleSelectChange('locationId', value)}
+                    defaultValue={editedProduct.locationId?.toString()}
+                  >
+                    <SelectTrigger className={errors.locationId ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {locations.map((location) => (
+                        <SelectItem key={location.locationId} value={location.locationId.toString()}>
+                          {location.locationName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.locationId && <p className="text-red-500 text-sm mt-1">{errors.locationId}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <Globe className="h-5 w-5 text-yellow-600" />
-                <Select 
-                  onValueChange={(value) => handleSelectChange('originId', value)}
-                  defaultValue={editedProduct.originId?.toString()}
-                >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Select origin" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {origins.map((origin) => (
-                      <SelectItem key={origin.originId} value={origin.originId.toString()}>
-                        {origin.originName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex-1">
+                  <Select 
+                    onValueChange={(value) => handleSelectChange('originId', value)}
+                    defaultValue={editedProduct.originId?.toString()}
+                  >
+                    <SelectTrigger className={errors.originId ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Select origin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {origins.map((origin) => (
+                        <SelectItem key={origin.originId} value={origin.originId.toString()}>
+                          {origin.originName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.originId && <p className="text-red-500 text-sm mt-1">{errors.originId}</p>}
+                </div>
               </div>
               <div className="flex items-center space-x-4">
                 <ToggleLeft className="h-5 w-5 text-gray-600" />

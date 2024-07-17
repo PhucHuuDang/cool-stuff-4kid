@@ -66,7 +66,7 @@ const AdminAccountContent: React.FC = () => {
                   className="w-20 h-20 rounded-full border-4 border-white shadow-lg mr-4"
                 />
                 <div>
-                  <h1 className="text-xl font-bold mb-1">M10-Warthog</h1>
+                  <h1 className="text-xl font-bold mb-1">Vũ Minh Quân</h1>
                   <div className="text-gray-600">Gò Vấp, Hồ Chí Minh City, VN</div>
                   <div className="text-gray-600">Age: 22 | Gender: Male | Status: <span className="text-green-500">Active</span></div>
                 </div>
@@ -78,10 +78,10 @@ const AdminAccountContent: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <div className="mb-4">
-                  <strong>Role:</strong> <span className="ml-4">Super Admin</span>
+                  <strong>Role:</strong> <span className="ml-4">Admin</span>
                 </div>
                 <div className="mb-4">
-                  <strong>Email:</strong> <span className="ml-4">fox@gmail.com</span>
+                  <strong>Email:</strong> <span className="ml-4">vuminhquan@gmail.com</span>
                 </div>
                 <div className="mb-4">
                   <strong>Contact:</strong> <span className="ml-4">(+84) (78910) (JQKA)</span>
@@ -93,7 +93,7 @@ const AdminAccountContent: React.FC = () => {
             </div>
             <div className="flex mt-6">
               <div className="w-1/2 bg-white p-4 rounded shadow mr-6">
-                <h2 className="font-bold mb-4">Your Recent Activities</h2>
+                <h2 className="font-bold mb-4">Add Product Activity</h2>
                 {activities.map((activity, index) => (
                   <div key={index}>
                     <div className="text-sm text-gray-600 mb-2">{activity.action}</div>
@@ -102,7 +102,7 @@ const AdminAccountContent: React.FC = () => {
                 ))}
               </div>
               <div className="w-1/2 bg-white p-4 rounded shadow overflow-y-auto" style={{ maxHeight: '300px' }}>
-                <h2 className="font-bold mb-4">Recent Activities</h2>
+                <h2 className="font-bold mb-4">Add Voucher Activity</h2>
                 <div className="text-sm text-gray-600 mb-2">Fox 1 added a role 'Staff' at Go Vap branch</div>
                 <div className="text-xs text-gray-500 mb-4">11/02/2024 10:40:55 AM</div>
                 <div className="text-sm text-gray-600 mb-2">Fox 1 assigned task to a role 'Event-Staff'</div>
