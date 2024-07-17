@@ -273,3 +273,14 @@ export type Address = {
 export type UserInformationDetailProps = {
   data: UserInformationDetail;
 };
+
+export type Vouchers = {
+  voucherId: number;
+  code: string;
+  discountPercent: number;
+  quantity: number;
+  dateFrom: Date;
+  dateTo: Date;
+  vouchersStatus: number;
+};
+

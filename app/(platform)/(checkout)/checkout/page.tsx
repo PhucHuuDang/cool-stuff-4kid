@@ -22,11 +22,11 @@ export async function generateMetadata() {
 const CheckoutPage = async () => {
   // Todo: should move it to layout
   const checkAuth = await checkAuthenticate();
-  if (!checkAuth) {
+  const information: any = await informationDecoded();
+
+  if (!checkAuth || !information) {
     return redirect("/");
   }
-
-  const information: any = await informationDecoded();
 
   console.log({ information });
 
@@ -45,6 +45,7 @@ const CheckoutPage = async () => {
           <ClientMounted>
             <CheckoutInformation
               userInformationDetail={userInformationDetail}
+              information={information}
             />
           </ClientMounted>
         </div>

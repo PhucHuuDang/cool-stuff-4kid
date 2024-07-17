@@ -35,14 +35,26 @@ import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { PaymentMethodOnline } from "./_checkout-infor-components/payments-online";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { ElementRef, useRef, useState } from "react";
 import { AddressReceiveOrder } from "./_checkout-infor-components/address-receive-order";
 import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
 import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
-import { vouchers } from "@/db";
 import { toast } from "sonner";
-import { UserInformationDetail, UserInformationDetailProps } from "@/interface";
+import {
+  UserInformationDetail,
+  UserInformationDetailProps,
+  Vouchers,
+} from "@/interface";
 import { FormSubmit } from "@/components/form/form-submit";
+
+import { useQuery } from "@tanstack/react-query";
+import { getDataInClient } from "@/get-data-actions/get-data";
+import {
+  formatDateFns,
+  vietnameseDate,
+} from "@/handle-transform/format-date-fns";
+import { useAddress } from "@/hooks/use-address";
+import { useRouter } from "next/navigation";
 
 const tabsProps = [
   {
@@ -57,22 +69,25 @@ const tabsProps = [
 
 interface CheckoutInformationProps {
   userInformationDetail: UserInformationDetailProps;
+  information: any;
 }
 
 export const CheckoutInformation = ({
   userInformationDetail,
+  information,
 }: CheckoutInformationProps) => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
+  const [voucherCode, setVoucherCode] = useState<string>("");
+
+  const formRefSubmitOrder = useRef<ElementRef<"form">>(null);
+  const warningRefLackOfAddress = useRef<ElementRef<"div">>(null);
+
+  const address = useAddress();
+  const { address: addressValue } = address;
+
+  const router = useRouter();
 
   let total = 0;
-
-  // if (cart) {
-  //   total = cart.reduce(
-  //     (acc, product) =>
-  //       acc + product.discountPrice * (product.quantityOrder as number),
-  //     0,
-  //   );
-  // }
 
   if (cart) {
     total = cart.reduce(
@@ -85,21 +100,68 @@ export const CheckoutInformation = ({
     );
   }
 
+  const {
+    data: vouchers,
+    isError,
+    isFetching,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["voucher"],
+    queryFn: () => getDataInClient("/Vouchers/GetAllVouchers"),
+  });
+
+  // console.log({ vouchers });
+
   const currencyTransformed = formatCurrency(total);
 
-  const handleMessage = (formData: FormData) => {
-    const message = formData.get("message") as string;
-    // formData.
+  const handleSubmitOrder = async (formData: FormData) => {
+    const message = formData.get("message-form") as string;
+    const info = formData.get("informationUserOrder") as string;
 
-    console.log({ message });
-    toast.success("Đã lưu lời nhắn");
+    console.log({ cart });
+
+    let orderDetails;
+
+    if (cart) {
+      orderDetails = cart?.map((product) => {
+        return {
+          productId: product.productId,
+          quantity: product.quantityOrder,
+        };
+      });
+    }
+
+    const id = information.nameid as string;
+
+    if (!addressValue) {
+      warningRefLackOfAddress.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+
+      console.log("first");
+      toast.error("Vui lòng nhập địa chỉ nhận hàng");
+      return;
+    }
+    // formRefSubmitOrder.current?.s
+
+    console.log({ message, id, orderDetails });
+
+    toast.success("Đặt hàng thành công");
+    // toast.
   };
 
-  const handleOrder = (formData: FormData) => {};
-
   return (
-    <form className="px-10 pb-20">
-      <AddressReceiveOrder userInformationDetail={userInformationDetail} />
+    <form
+      className="px-10 pb-20"
+      action={handleSubmitOrder}
+      ref={formRefSubmitOrder}
+    >
+      <AddressReceiveOrder
+        userInformationDetail={userInformationDetail}
+        id="informationUserOrder"
+        ref={warningRefLackOfAddress}
+      />
 
       <Card className="my-4">
         <CardContent className="rounded-lg p-5">
@@ -135,25 +197,39 @@ export const CheckoutInformation = ({
                     <DialogContent className="h-[70%] overflow-y-auto">
                       {/* <div className="flex gap-x-3"> */}
                       <div>
-                        {vouchers.map((voucher) => {
+                        {vouchers?.map((voucher: Vouchers) => {
                           return (
                             <div
-                              key={voucher.product}
+                              key={voucher.voucherId}
                               className="relative my-4 w-full cursor-pointer rounded-lg border border-slate-400 p-8 shadow-md duration-200 hover:border-slate-600 hover:shadow-xl"
                             >
-                              <h2 className="text-lg font-bold text-[#ff6347]">
-                                Giảm {formatCurrency(voucher.price)}
+                              <div className="flex items-center gap-x-1 text-base font-bold text-slate-700">
+                                Mã giảm giá:
+                                <h1 className="text-sky-500">{voucher.code}</h1>
+                              </div>
+
+                              <h2 className="text-xl font-bold text-[#ff6347]">
+                                Giảm {voucher.discountPercent}%
                               </h2>
 
                               <h4 className="text-base font-semibold">
-                                {voucher.condition}
+                                Cho tất cả sản phẩm trong giỏ hàng
                               </h4>
-                              <p className="text-base font-medium">
-                                {voucher.product}
+
+                              <p className="my-2 text-wrap text-base font-bold">
+                                Từ{" "}
+                                <span className="text-[#e58777]">
+                                  {vietnameseDate(voucher.dateFrom)}
+                                </span>{" "}
+                                Đến{" "}
+                                <span className="text-[#e58777]">
+                                  {" "}
+                                  {vietnameseDate(voucher.dateTo)}
+                                </span>
                               </p>
-                              <p className="font-sm font-normal">
+                              {/* <p className="font-sm font-normal">
                                 {voucher.additionalInfo}
-                              </p>
+                              </p> */}
                               <Button
                                 variant="book"
                                 className="absolute right-3 top-1/2 flex justify-end"
@@ -177,15 +253,17 @@ export const CheckoutInformation = ({
           <div className="flex">
             <div className="flex w-[40%] flex-1 items-center gap-x-1">
               <h3 className="w-20 flex-1">Lời nhắn: </h3>
-              <form action={handleMessage}>
-                <FormInput
-                  id="message"
-                  placeholder="Lưu ý cho admin shop"
-                  disabled={false}
-                  className="h-12 w-[400px]"
-                  labelClassName="text-neutral-700"
-                />
-              </form>
+              {/* <form onSubmit={handleMessage}> */}
+              <FormInput
+                id="message-form"
+                placeholder="Lưu ý cho admin shop"
+                disabled={false}
+                className="h-12 w-[400px]"
+                labelClassName="text-neutral-700"
+              />
+              {/* </form> */}
+
+              {/* <MessageForm /> */}
             </div>
 
             <Table className="w-full flex-1">
@@ -195,7 +273,7 @@ export const CheckoutInformation = ({
                   <TableHead>Nhanh</TableHead>
                   <TableHead>
                     <Dialog>
-                      <DialogTrigger>
+                      <DialogTrigger asChild>
                         <Button variant="outline">Thay Đổi</Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -207,7 +285,7 @@ export const CheckoutInformation = ({
                       </DialogContent>
                     </Dialog>
                   </TableHead>
-                  <TableHead className="text-[#ff6347]">81.000</TableHead>
+                  {/* <TableHead className="text-[#ff6347]">81.000</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody className="w-full hover:bg-transparent">
