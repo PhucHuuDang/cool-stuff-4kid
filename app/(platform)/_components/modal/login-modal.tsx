@@ -77,7 +77,11 @@ export const LoginModal = () => {
 
   const bodyContent = (
     <form ref={formInputRef} action={onSubmit} className="flex flex-col gap-4">
-      <Heading title="Welcome back" subtitle="Login to your account!" center />
+      <Heading
+        title="Chào bạn"
+        subtitle="Hãy đăng nhập tài khoản của bạn!"
+        center
+      />
 
       <FormInput
         id="userName"
