@@ -59,6 +59,9 @@ import { calculateDiscountedPrice } from "@/handle-transform/handle-discount";
 import { ConfettiFireworks } from "@/confetti/confetti";
 import { useConfirmDialog } from "@/hooks/use-confirm-dialog";
 import { ConfirmDialog } from "./confirm-dialog";
+import { useAction } from "@/hooks/use-action";
+import { handlePaymentAction } from "@/actions/payment";
+import { useFormStatus } from "react-dom";
 
 const tabsProps = [
   {
@@ -76,6 +79,11 @@ interface CheckoutInformationProps {
   information: any;
 }
 
+type OrderDetailsTypes = {
+  productId: number;
+  quantity: number;
+};
+
 export const CheckoutInformation = ({
   userInformationDetail,
   information,
@@ -86,6 +94,8 @@ export const CheckoutInformation = ({
   >();
   const [isOpenVoucherDialog, setIsOpenVoucherDialog] =
     useState<boolean>(false);
+
+    const {pending} = useFormStatus()
 
   console.log({ voucherCode });
 
@@ -122,9 +132,27 @@ export const CheckoutInformation = ({
     queryFn: () => getDataInClient("/Vouchers/GetAllVouchers"),
   });
 
-  // console.log({ vouchers });
+  const {
+    execute,
+    data: paymentData,
+    error: paymentError,
+    isLoading: isPaymentLoading,
+    fieldErrors,
+  } = useAction(handlePaymentAction, {
+    onSuccess(data) {
+      toast.success("Vui lòng thanh toán đơn hàng của bạn!");
+      console.log({ data });
+      router.push(data.data.paymentUrl);
+    },
+    onError(error) {
+      toast.error(error);
+      console.log({ error });
+    },
+  });
 
-  const currencyTransformed = formatCurrency(total);
+  console.log({ fieldErrors, paymentData, paymentError, isPaymentLoading });
+
+  // console.log({ vouchers });
 
   const handleSubmitOrder = async (formData: FormData) => {
     const message = formData.get("message-form") as string;
@@ -133,13 +161,13 @@ export const CheckoutInformation = ({
 
     // console.log({ cart });
 
-    let orderDetails;
+    let orderDetails: any;
 
-    if (cart) {
-      orderDetails = cart?.map((product) => {
+    if (cart && cart.length > 0) {
+      orderDetails = cart.map((product) => {
         return {
-          productId: product.productId,
-          quantity: product.quantityOrder,
+          productId: Number(product.productId),
+          quantity: Number(product.quantityOrder),
         };
       });
     }
@@ -159,11 +187,13 @@ export const CheckoutInformation = ({
 
     console.log({ message, id, orderDetails, voucherId });
 
-    toast.success("Đặt hàng thành công");
-    // toast.
+    const addressShipping = addressValue;
+
+    execute({ id, orderDetails, voucherId, addressShipping });
   };
 
-  // final price
+  //* final price
+  const currencyTransformed = formatCurrency(total);
 
   const { formattedDiscountAmount, formattedFinalTotal, discountPercent } =
     calculateDiscountedPrice(total, voucherCode?.discountPercent);
@@ -429,7 +459,7 @@ export const CheckoutInformation = ({
               mình trước khi Đặt Hàng
             </div>
             <Button
-              // disabled={false}
+              disabled={pending}
               type="button"
               className="w-64 text-right"
               variant="book"

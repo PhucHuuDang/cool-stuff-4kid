@@ -2,54 +2,14 @@
 
 import { NavItem } from "@/components/nav-item";
 import { HoverCard, HoverCardContent } from "@/components/ui/hover-card";
-import { getDataInClient } from "@/get-data-actions/get-data";
+import { handleClickConfetti } from "@/confetti/handle-confetti-server";
+import { useConfetti } from "@/confetti/use-confetti";
+import { getDataInClient, postDataClient } from "@/get-data-actions/get-data";
 import { ProductsInCategoryProps } from "@/interface";
-import { useQuery } from "@tanstack/react-query";
-
-const NAV_ITEMS = [
-  {
-    label: "Milk",
-    href: "/milk",
-    children: [
-      {
-        label: "Vina Milk",
-        href: "/milk",
-      },
-      {
-        label: "Japan Milk",
-        href: "/milk",
-      },
-    ],
-  },
-  {
-    label: "Cheese",
-    href: "/cheese",
-    children: [
-      {
-        label: "Cheese 1",
-        href: "/cheese",
-      },
-      {
-        label: "Cheese 2",
-        href: "/cheese",
-      },
-    ],
-  },
-  {
-    label: "Toys",
-    href: "/toys",
-    children: [
-      {
-        label: "Toys 1",
-        href: "/toys",
-      },
-      {
-        label: "Toys 2",
-        href: "/toys",
-      },
-    ],
-  },
-];
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const Sidebar = () => {
   const {
@@ -62,6 +22,41 @@ const Sidebar = () => {
     queryKey: ["sidebar"],
     queryFn: () => getDataInClient("/Category/GetProductInCategory"),
   });
+
+  const [data, setData] = useState();
+
+  // const { data, mutate, isPending } = useMutation({
+  //   mutationFn: postDataClient,
+  // });
+
+  console.log({ data });
+
+  const searchParams = useSearchParams();
+  // const confetti = useConfetti();
+
+  useEffect(() => {
+    if (searchParams.get("code") === "00") {
+      // confetti();
+      handleClickConfetti();
+    }
+    if (searchParams.get("id")) {
+      console.log(searchParams.get("id"));
+      const res = async () => {
+        const data = await postDataClient("/Payment/confirm-payment", {
+          transactionId: searchParams.get("id"),
+        });
+
+        toast.success("Bạn đã thanh toán thành công");
+
+        console.log({ data });
+
+        setData(data);
+      };
+      res();
+    }
+  }, []);
+
+  console.log(searchParams.get("code"));
 
   return (
     <div className="w-64">
