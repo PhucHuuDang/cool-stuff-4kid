@@ -24,7 +24,7 @@ const SideBar: React.FC = () => {
         return key;
       }
     }
-    return "dashboard"; // default to dashboard if no match found
+    return "dashboard";
   };
 
   useEffect(() => {
