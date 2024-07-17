@@ -56,6 +56,9 @@ import {
 import { useAddress } from "@/hooks/use-address";
 import { useRouter } from "next/navigation";
 import { calculateDiscountedPrice } from "@/handle-transform/handle-discount";
+import { ConfettiFireworks } from "@/confetti/confetti";
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 
 const tabsProps = [
   {
@@ -91,6 +94,7 @@ export const CheckoutInformation = ({
 
   const address = useAddress();
   const { address: addressValue } = address;
+  const confirmDialog = useConfirmDialog();
 
   const router = useRouter();
 
@@ -125,6 +129,7 @@ export const CheckoutInformation = ({
   const handleSubmitOrder = async (formData: FormData) => {
     const message = formData.get("message-form") as string;
     const info = formData.get("informationUserOrder") as string;
+    const voucherId = voucherCode?.voucherId;
 
     // console.log({ cart });
 
@@ -152,7 +157,7 @@ export const CheckoutInformation = ({
     }
     // formRefSubmitOrder.current?.s
 
-    console.log({ message, id, orderDetails });
+    console.log({ message, id, orderDetails, voucherId });
 
     toast.success("Đặt hàng thành công");
     // toast.
@@ -423,16 +428,21 @@ export const CheckoutInformation = ({
               Để đảm bảo đơn hàng của bạn, bạn hãy kiểm tra lại đơn hàng của
               mình trước khi Đặt Hàng
             </div>
-            <FormSubmit
-              disabled={false}
+            <Button
+              // disabled={false}
+              type="button"
               className="w-64 text-right"
               variant="book"
+              onClick={() => confirmDialog.onOpen()}
             >
               Đặt hàng
-            </FormSubmit>
+            </Button>
           </CardFooter>
         </CardContent>
       </Card>
+      <ConfirmDialog
+        handleSubmitOrder={() => formRefSubmitOrder.current?.requestSubmit()}
+      />
     </form>
   );
 };

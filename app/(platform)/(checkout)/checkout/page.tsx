@@ -11,6 +11,7 @@ import {
   UserInformationDetail,
   UserInformationDetailProps,
 } from "@/interface";
+import { ConfirmDialog } from "../_components/confirm-dialog";
 
 export async function generateMetadata() {
   return {
