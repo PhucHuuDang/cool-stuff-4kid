@@ -3,12 +3,9 @@ import { UserX } from "lucide-react";
 import { toast } from 'react-hot-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { BanStaffButtonProps } from '@/interface';
 
-interface BanStaffButtonProps {
-  userId: string;
-  userName: string;
-  onStatusChange: (userId: string, newStatus: number) => void;
-}
+
 
 const BanStaffButton: React.FC<BanStaffButtonProps> = ({ userId, userName, onStatusChange }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);

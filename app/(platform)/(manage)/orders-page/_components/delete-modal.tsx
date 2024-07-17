@@ -1,12 +1,7 @@
 import React from 'react';
-import { Order } from '@/interface';
+import { DeleteModalProps, Order } from '@/interface';
 
-interface DeleteModalProps {
-  isOpen: boolean;
-  order: Order | null;
-  onClose: () => void;
-  onDelete: (orderId: string) => void;
-}
+
 
 const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, order, onClose, onDelete }) => {
   if (!isOpen || !order) return null;

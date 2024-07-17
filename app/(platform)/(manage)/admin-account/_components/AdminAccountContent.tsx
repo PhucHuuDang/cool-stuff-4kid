@@ -1,38 +1,8 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { Activity, Product, UserDashBoard } from '@/interface';
 
-interface Product {
-  productId: number;
-  productName: string;
-  price: number;
-  discountPrice: number;
-  discountPercent: number;
-  productDescription: string;
-  image: string;
-  imagesCarousel: string[];
-  quantity: number;
-  status: number;
-  categoryId: number;
-  originId: number;
-  locationId: number;
-  id: string;
-}
-
-interface User {
-  id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-  password: string | null;
-  status: number;
-  addresses: any[];
-}
-
-interface Activity {
-  action: string;
-  timestamp: string;
-}
 
 async function fetchProducts(): Promise<Product[]> {
   const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Product/GetAllProducts');
@@ -40,7 +10,7 @@ async function fetchProducts(): Promise<Product[]> {
   return data;
 }
 
-async function fetchUsers(): Promise<User[]> {
+async function fetchUsers(): Promise<UserDashBoard[]> {
   const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/GetAllUsers');
   const data = await response.json();
   return data.data;

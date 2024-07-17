@@ -5,20 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from 'react-hot-toast';
 import { User, Mail, Key, UserPlus } from 'lucide-react';
-
-interface StaffMember {
-  id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-  status: number;
-}
-
-interface AddStaffModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddStaff: (newStaff: StaffMember) => void;
-}
+import { AddStaffModalProps, StaffMember } from '@/interface';
 
 const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddStaff }) => {
   const [formData, setFormData] = useState({

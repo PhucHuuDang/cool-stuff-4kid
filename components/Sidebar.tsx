@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { routes } from "../routes/routes";
 import {
   Activity,
@@ -13,7 +14,22 @@ import {
 } from "lucide-react";
 
 const SideBar: React.FC = () => {
+  const pathname = usePathname();
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
+
+  const getPageFromPathname = (path: string): string => {
+    const routeEntries = Object.entries(routes);
+    for (const [key, value] of routeEntries) {
+      if (path === value) {
+        return key;
+      }
+    }
+    return "dashboard"; // default to dashboard if no match found
+  };
+
+  useEffect(() => {
+    setCurrentPage(getPageFromPathname(pathname));
+  }, [pathname]);
 
   const handlePageChange = (page: string) => {
     setCurrentPage(page);

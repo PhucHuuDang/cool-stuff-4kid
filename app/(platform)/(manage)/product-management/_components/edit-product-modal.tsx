@@ -120,8 +120,8 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
       newErrors.productName = "Product name is required";
     } else if (editedProduct.productName.length < 5) {
       newErrors.productName = "Product Name must be at least 5 characters";
-    } else if (editedProduct.productName.length > 50) {
-      newErrors.productName = "Product Name cannot exceed 50 characters";
+    } else if (editedProduct.productName.length > 100) {
+      newErrors.productName = "Product Name cannot exceed 100 characters";
     }
 
     if (!editedProduct.price || editedProduct.price < 1) {

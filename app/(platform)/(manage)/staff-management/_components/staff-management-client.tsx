@@ -7,22 +7,8 @@ import AddStaffModal from "./add-staff-modal";
 import BanStaffButton from "./ban-staff-modal";
 import UnbanStaffButton from "./unbanned-staff-modal";
 import { Toaster } from 'react-hot-toast';
+import { ApiUser, StaffMember } from "@/interface";
 
-interface ApiUser {
-  id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-  status: number;
-}
-
-interface StaffMember {
-  id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-  status: number;
-}
 
 const StaffManagementClient: React.FC = () => {
   const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);

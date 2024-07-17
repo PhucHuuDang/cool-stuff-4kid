@@ -1,18 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Order, OrderDetail } from '@/interface';
+import { DetailsModalProps, Order, OrderDetail, OrderUpdate } from '@/interface';
 
-interface DetailsModalProps {
-  isOpen: boolean;
-  order: Order | null;
-  onClose: () => void;
-}
 
-interface OrderUpdate {
-  staffName: string;
-  status: number;
-  orderDate: string;
-}
 
 const OrderUpdateTracker: React.FC<OrderUpdate> = ({ staffName, status, orderDate }) => {
   const getStatusLabel = (status: number) => {

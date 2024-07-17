@@ -387,8 +387,8 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                       message: "Product Name must be at least 5 characters",
                     },
                     {
-                      max: 50,
-                      message: "Product Name cannot exceed 50 characters",
+                      max: 100,
+                      message: "Product Name cannot exceed 100 characters",
                     },
                   ]}
                   label="Product Name"

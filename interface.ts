@@ -15,6 +15,7 @@ export interface Product {
   originId: number;
   locationId: number;
   quantityOrder?: number;
+  id: string;
 }
 
 export interface Voucher {
@@ -27,6 +28,10 @@ export interface Voucher {
   vouchersStatus: number;
 }
 
+export interface Activity {
+  action: string;
+  timestamp: string;
+}
 export interface ProductProps {
   id: number;
   title: string;
@@ -101,11 +106,28 @@ export interface Order {
   email: string;
   staffName: string;
 }
+
 export interface OrderDetail {
   orderDetailId: number;
   quantity: number;
   productId: number;
   product: Product;
+}
+
+export interface UserDashBoard {
+  id: string;
+  fullName: string;
+  userName: string;
+  email: string;
+  password: string | null;
+  status: number;
+  addresses: any[];
+}
+
+export interface Notification {
+  id: number;
+  message: string;
+  time: string;
 }
 
 export interface OrderItem {
@@ -143,6 +165,8 @@ export interface ApiUser {
   userName: string;
   email: string;
   password: string | null;
+  id: string;
+  status: number;
 }
 
 export interface StaffMember {
@@ -334,3 +358,48 @@ export type Address = {
 export type UserInformationDetailProps = {
   data: UserInformationDetail;
 };
+
+export interface AddStaffModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onAddStaff: (newStaff: StaffMember) => void;
+}
+
+export interface BanStaffButtonProps {
+  userId: string;
+  userName: string;
+  onStatusChange: (userId: string, newStatus: number) => void;
+}
+
+export interface UnbanStaffButtonProps {
+  userId: string;
+  userName: string;
+  onStatusChange: (userId: string, newStatus: number) => void;
+}
+
+export interface OrderTableProps {
+  orders?: Order[];
+  loading: boolean;
+  error: string | null;
+  onOpenDelete: (order: Order) => void;
+  onOpenDetails: (order: Order) => void;
+}
+
+export interface DetailsModalProps {
+  isOpen: boolean;
+  order: Order | null;
+  onClose: () => void;
+}
+
+export interface OrderUpdate {
+  staffName: string;
+  status: number;
+  orderDate: string;
+}
+
+export interface DeleteModalProps {
+  isOpen: boolean;
+  order: Order | null;
+  onClose: () => void;
+  onDelete: (orderId: string) => void;
+}

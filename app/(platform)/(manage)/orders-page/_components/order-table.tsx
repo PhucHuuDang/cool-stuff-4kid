@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
-import { Order } from '@/interface';
+import { Order, OrderTableProps } from '@/interface';
 
-interface OrderTableProps {
-  orders?: Order[];
-  loading: boolean;
-  error: string | null;
-  onOpenDelete: (order: Order) => void;
-  onOpenDetails: (order: Order) => void;
-}
+
 
 const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, onOpenDelete, onOpenDetails }) => {
   const [expandedRow, setExpandedRow] = useState<number | null>(null);
@@ -51,8 +45,8 @@ const OrderTable: React.FC<OrderTableProps> = ({ orders = [], loading, error, on
     }).format(date).replace(/\//g, '-');
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div className='text-center mt-60'>Loading...</div>;
+  if (error) return <div  className='text-center mt-60'>Error: {error}</div>;
 
   return (
     <div className="flex flex-grow">
