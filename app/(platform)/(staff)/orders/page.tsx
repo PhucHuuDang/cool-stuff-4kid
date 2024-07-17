@@ -1,12 +1,12 @@
 import { Header } from "../_component/Header";
+import Details from "./_component/details";
 import SideBar from "../_component/sidebar";
-import { Details } from "./_component/details";
 
 const Orders = () => {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="fixed z-50 w-full">
-        <Header title="Order" />
+        <Header title="Orders " />
       </div>
       <div className="mt-[100px] flex flex-grow">
         <div className="fixed h-full">
@@ -19,4 +19,5 @@ const Orders = () => {
     </div>
   );
 };
+
 export default Orders;

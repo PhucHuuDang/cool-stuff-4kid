@@ -11,8 +11,18 @@ import {
 } from "@/components/ui/table";
 import { ArrowDownWideNarrow, ArrowUpNarrowWide } from "lucide-react";
 import ProductDetailsDialog from "./ProductDetailsDialog";
-import UpdateStatusDialog from "./UpdateStatusDialog";
 import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 type StatusType =
   | "All"
@@ -47,12 +57,6 @@ interface Product {
   discountPercent: number;
   productDescription: string;
   image: string;
-  imagesCarousel: string[];
-  quantity: number;
-  status: number;
-  categoryId: number;
-  originId: number;
-  locationId: number;
 }
 
 interface OrderDetail {
@@ -62,16 +66,6 @@ interface OrderDetail {
   product: Product;
 }
 
-interface Voucher {
-  voucherId: number;
-  code: string;
-  discountPercent: number;
-  quantity: number;
-  dateFrom: string;
-  dateTo: string;
-  vouchersStatus: number;
-}
-
 interface Order {
   orderId: number;
   orderDate: string;
@@ -79,11 +73,9 @@ interface Order {
   totalPrice: number;
   id: string;
   userName: string;
-  voucherId: number | null;
   orderDetails: OrderDetail[];
   fullName: string;
-  email: string;
-  voucher: Voucher | null;
+  staffId: string;
 }
 
 export const Details: React.FC = () => {
@@ -96,6 +88,10 @@ export const Details: React.FC = () => {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null,
   );
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [updateOrderId, setUpdateOrderId] = useState<number | null>(null);
+  const [updateNewStatus, setUpdateNewStatus] = useState<number | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -105,7 +101,6 @@ export const Details: React.FC = () => {
         const response = await axios.get(
           "https://milkapplicationapi.azurewebsites.net/api/Order/GetAllOrder",
         );
-
         setData(response.data);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -148,34 +143,8 @@ export const Details: React.FC = () => {
     setFilterStatus(status);
   };
 
-  const handleViewClick = (orderId: number) => {
-    setSelectedProductId(orderId);
-  };
-
-  const handleUpdateStatus = async (orderId: number, newStatus: number) => {
-    try {
-      const response = await axios.put(
-        `https://milkapplicationapi.azurewebsites.net/api/Order/UpdateOrders/${orderId}`,
-        null,
-        {
-          params: {
-            orderId,
-            status: newStatus,
-          },
-        },
-      );
-
-      if (response.status === 200) {
-        const updatedData = data.map((order) =>
-          order.orderId === orderId ? { ...order, status: newStatus } : order,
-        );
-        setData(updatedData);
-      } else {
-        console.error("Failed to update order status");
-      }
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
+  const handleViewClick = (productId: number) => {
+    setSelectedProductId(productId);
   };
 
   const formatOrderDate = (date: string) => {
@@ -194,6 +163,66 @@ export const Details: React.FC = () => {
       style: "currency",
       currency: "VND",
     }).format(price);
+  };
+
+  const handleStatusUpdate = (orderId: number, currentStatus: number) => {
+    if (currentStatus < 1 || currentStatus >= 4) {
+      return;
+    }
+
+    const newStatus = currentStatus + 1;
+    setUpdateOrderId(orderId);
+    setUpdateNewStatus(newStatus);
+    setIsUpdateDialogOpen(true);
+  };
+
+  const confirmStatusUpdate = async () => {
+    if (updateOrderId === null || updateNewStatus === null) return;
+
+    console.log("Attempting to update order status...");
+    try {
+      const response = await axios.put(
+        "https://milkapplicationapi.azurewebsites.net/api/Order/UpdateOrder",
+        null,
+        {
+          params: {
+            orderId: updateOrderId,
+            status: updateNewStatus,
+            staffId: "29876198-d271-4a9e-b1cb-8266cb503a39",
+          },
+        },
+      );
+
+      console.log("Update response:", response);
+
+      if (response.status === 200) {
+        setData((prevData) =>
+          prevData.map((order) =>
+            order.orderId === updateOrderId
+              ? { ...order, status: updateNewStatus }
+              : order,
+          ),
+        );
+        console.log("Attempting to show toast...");
+        toast({
+          title: "Cập nhật thành công",
+          description: `Bạn đã cập nhật trạng thái ${statusMap[updateNewStatus]} thành công cho đơn hàng ${updateOrderId}`,
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "Cập nhật thất bại",
+        description: "Có lỗi xảy ra khi cập nhật trạng thái đơn hàng.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    } finally {
+      setIsUpdateDialogOpen(false);
+      setUpdateOrderId(null);
+      setUpdateNewStatus(null);
+    }
   };
 
   return (
@@ -238,7 +267,7 @@ export const Details: React.FC = () => {
       </div>
 
       {loading ? (
-        <div>Loading...</div>
+        <div className="text-center">Loading...</div>
       ) : error ? (
         <div>{error}</div>
       ) : (
@@ -264,7 +293,8 @@ export const Details: React.FC = () => {
                   )}
                 </button>
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead>View</TableHead>
+              <TableHead>Update Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -278,34 +308,62 @@ export const Details: React.FC = () => {
                 </TableCell>
                 <TableCell>{formatPrice(order.totalPrice)}</TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-2">
+                  <button
+                    className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
+                    onClick={() =>
+                      handleViewClick(order.orderDetails[0].product.productId)
+                    }
+                  >
+                    View
+                  </button>
+                </TableCell>
+                <TableCell>
+                  {order.status >= 1 && order.status < 4 ? (
                     <button
-                      className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600"
                       onClick={() =>
-                        handleViewClick(order.orderDetails[0].product.productId)
+                        handleStatusUpdate(order.orderId, order.status)
                       }
+                      className="rounded bg-green-500 px-2 py-1 text-white hover:bg-green-600"
                     >
-                      View
+                      Update to {statusMap[order.status + 1]}
                     </button>
-                    <UpdateStatusDialog
-                      orderId={order.orderId}
-                      currentStatus={order.status}
-                      onUpdateStatus={handleUpdateStatus}
-                    />
-                  </div>
+                  ) : (
+                    <span className="text-gray-500">
+                      {order.status === 0 ? "Chờ thanh toán" : "Đã hoàn thành"}
+                    </span>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
-
       {selectedProductId && (
         <ProductDetailsDialog
           productId={selectedProductId}
           onClose={() => setSelectedProductId(null)}
         />
       )}
+      <AlertDialog
+        open={isUpdateDialogOpen}
+        onOpenChange={setIsUpdateDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận cập nhật trạng thái</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc muốn cập nhật trạng thái đơn hàng thành{" "}
+              {updateNewStatus !== null ? statusMap[updateNewStatus] : ""}?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmStatusUpdate}>
+              Xác nhận
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

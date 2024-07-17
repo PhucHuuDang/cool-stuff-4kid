@@ -238,7 +238,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
       categoryId: values.categoryId,
       originId: values.originId,
       locationId: values.locationId,
-      id: "29876198-d271-4a9e-b1cb-8266cb503a39",
+      id: "34f40b90-f47e-446d-b2b7-18bb0c8465c6",
     };
 
     try {
@@ -384,7 +384,11 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                     { required: true, message: "Please input product name" },
                     {
                       min: 5,
-                      message: "Product name must be at least 5 characters",
+                      message: "Product Name must be at least 5 characters",
+                    },
+                    {
+                      max: 50,
+                      message: "Product Name cannot exceed 50 characters",
                     },
                   ]}
                   label="Product Name"
@@ -491,7 +495,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                   />
                 </Form.Item>
                 {discountWarning && (
-                  <div className="text-orange-300">{discountWarning}</div>
+                  <div style={{ color: "orange" }}>{discountWarning}</div>
                 )}
               </Col>
             </Row>
@@ -558,6 +562,14 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
               name="productDescription"
               rules={[
                 { required: true, message: "Please input product description" },
+                {
+                  min: 15,
+                  message: "Product description must be at least 15 characters",
+                },
+                {
+                  max: 400,
+                  message: "Product description cannot exceed 400 characters",
+                },
               ]}
               label="Product Description"
             >
