@@ -263,7 +263,10 @@ const DashboardClient: React.FC = () => {
                 >
                   <div className="text-2xl font-bold">
                     {stat.title === "Revenue"
-                      ? `VND ${(stat.current / 1000).toFixed(2)}`
+                      ? stat.current.toLocaleString("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        })
                       : stat.current}
                   </div>
                   <div
@@ -363,7 +366,12 @@ const DashboardClient: React.FC = () => {
                         <td>
                           {new Date(order.orderDate).toLocaleDateString()}
                         </td>
-                        <td>{order.totalPrice.toLocaleString()} VND</td>
+                        <td>
+                          {order.totalPrice.toLocaleString("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                        </td>
                         <td>
                           <span
                             className={`rounded-full px-2 py-1 text-xs font-semibold ${getStatusColor(order.status)}`}
@@ -390,8 +398,20 @@ const DashboardClient: React.FC = () => {
                 <div className="mb-4 flex items-center justify-between">
                   <h2 className="text-xl font-bold">Staff</h2>
                   <Link href={routes.staffManagement}>
-                    <button className="rounded-lg bg-pink-600 px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-pink-700">
+                    <button className="flex items-center rounded-lg bg-pink-600 px-4 py-2 text-white transition duration-300 ease-in-out hover:bg-pink-700">
                       See all
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="ml-2 h-5 w-5"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
                     </button>
                   </Link>
                 </div>
@@ -423,6 +443,16 @@ const DashboardClient: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+                {totalStaff > 5 && (
+                  <div className="mt-4 text-center">
+                    <p className="text-gray-600">
+                      Showing 5 of {totalStaff} staff members
+                    </p>
+                    <p className="mt-2 cursor-pointer text-pink-600 hover:text-pink-700">
+                      Click "See all" to view complete staff list
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </main>

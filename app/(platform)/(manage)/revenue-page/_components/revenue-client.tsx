@@ -36,6 +36,15 @@ const RevenueClient = () => {
     fetchTotalProducts();
   }, []);
 
+  const formatVietnameseCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <div className="flex flex-grow">
@@ -43,7 +52,7 @@ const RevenueClient = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-pink-600 p-4 shadow rounded-lg text-white">
               <h2 className="text-lg font-semibold">Total Revenue</h2>
-              <p className="text-2xl font-bold">${totalRevenue.toFixed(2)}</p>
+              <p className="text-2xl font-bold">{formatVietnameseCurrency(totalRevenue)}</p>
             </div>
             <div className="bg-white p-4 shadow rounded-lg">
               <h2 className="text-lg font-semibold text-gray-700">Total Expense</h2>
