@@ -359,6 +359,7 @@ export type UserInformationDetailProps = {
   data: UserInformationDetail;
 };
 
+<<<<<<< HEAD
 export interface AddStaffModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -403,3 +404,15 @@ export interface DeleteModalProps {
   onClose: () => void;
   onDelete: (orderId: string) => void;
 }
+=======
+export type Vouchers = {
+  voucherId: number;
+  code: string;
+  discountPercent: number;
+  quantity: number;
+  dateFrom: Date;
+  dateTo: Date;
+  vouchersStatus: number;
+};
+
+>>>>>>> d53ea5bd791e4f3774c6c62161f101b85d0fbcfc

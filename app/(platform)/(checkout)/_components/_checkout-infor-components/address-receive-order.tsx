@@ -15,6 +15,7 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAction } from "@/hooks/use-action";
@@ -25,24 +26,28 @@ import {
   UserInformationDetailProps,
 } from "@/interface";
 import { MapPin, MapPinned } from "lucide-react";
-import { ElementRef, useRef, useState } from "react";
+import { ElementRef, forwardRef, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { toast } from "sonner";
 
 interface AddressReceiveOrderProps {
   userInformationDetail: UserInformationDetailProps;
+  id: string;
 }
 
-export const AddressReceiveOrder = ({
-  userInformationDetail,
-}: AddressReceiveOrderProps) => {
+export const AddressReceiveOrder = forwardRef<
+  HTMLDivElement,
+  AddressReceiveOrderProps
+>(({ userInformationDetail, id }, ref) => {
   const { data: information } = userInformationDetail;
+
   const [addMoreAddress, setAddMoreAddress] = useState<boolean>(false);
   const [isOpenDialogAddress, setIsOpenDialogAddress] =
     useState<boolean>(false);
 
   const formRef = useRef<ElementRef<"form">>(null);
   const formRefChooseAddress = useRef<ElementRef<"form">>(null);
+
   const [selectedAddressId, setSelectedAddressId] = useState<
     string | null | EventTarget
   >(null);
@@ -51,10 +56,6 @@ export const AddressReceiveOrder = ({
   const { pending } = useFormStatus();
 
   const { address: addressValue, setAddress, removeAddress } = address;
-
-  console.log({ information });
-
-  // console.log({ selectedAddressId });
 
   const { execute, fieldErrors, error, data, isLoading } = useAction(
     addAddress,
@@ -107,17 +108,6 @@ export const AddressReceiveOrder = ({
     }
   };
 
-  // const handleCheckboxChange = (checked: boolean) => {
-  //   // setSelectedAddressId(checked);
-  //   console.log({ checked });
-
-  //   return checked
-  //     ? information.addresses.some(
-  //         (item) => item.addressId === parsedAddress.addressId,
-  //       )
-  //     : false;
-  // };
-
   const handleCheckboxChange = (addressId: string) => (checked: boolean) => {
     if (checked) {
       setSelectedAddressId(addressId);
@@ -126,12 +116,9 @@ export const AddressReceiveOrder = ({
     }
   };
 
-  // console.log({ userInformationDetail });
-  // console.log(userInformationDetail);
-
   const parsedAddress: Address = safeParseJSON(addressValue ?? "") ?? {};
 
-  console.log(parsedAddress);
+  // console.log(parsedAddress);
 
   return (
     <Card className="my-4 w-full">
@@ -152,6 +139,7 @@ export const AddressReceiveOrder = ({
           <div className="max-w-xl text-wrap 2xl:max-w-screen-2xl">
             {Object.keys(parsedAddress).length === 0 ? (
               <div
+                ref={ref}
                 className="cursor-pointer font-semibold text-slate-600 hover:text-slate-800"
                 onClick={() => {
                   setIsOpenDialogAddress(true);
@@ -161,7 +149,7 @@ export const AddressReceiveOrder = ({
                 Hãy thêm địa chỉ nhận hàng của bạn!
               </div>
             ) : (
-              <div className="font-bold">
+              <div id={id} className="font-bold outline-none">
                 {parsedAddress.addressName.concat(
                   ", ",
                   parsedAddress.street,
@@ -186,6 +174,7 @@ export const AddressReceiveOrder = ({
               <Button
                 variant="outline"
                 className="border-[2px] transition duration-150 hover:underline hover:shadow-lg"
+                onClick={() => setSelectedAddressId(parsedAddress.addressId)}
               >
                 Thay Đổi
               </Button>
@@ -239,15 +228,9 @@ export const AddressReceiveOrder = ({
                               name="address-shipping"
                               className="size-5"
                               value={valuesCheckbox}
-                              // checked={selectedAddressId === addressId}
-                              defaultChecked={
-                                parsedAddress.addressId === addressId
-                              }
-                              // checked={parsedAddress.addressId === addressId}
+                              defaultChecked={selectedAddressId === addressId}
                               checked={selectedAddressId === addressId}
                               onCheckedChange={handleCheckboxChange(addressId)}
-                              // onCheckedChange={handleCheckboxChange}
-                              // onChange={(e) => setSelectedAddressId(e.target)}
                             />
                             <Label
                               htmlFor={`address-${addressId}`}
@@ -400,4 +383,6 @@ export const AddressReceiveOrder = ({
       </CardContent>
     </Card>
   );
-};
+});
+
+AddressReceiveOrder.displayName = "AddressReceiveOrder";

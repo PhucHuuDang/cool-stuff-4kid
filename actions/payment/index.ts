@@ -5,51 +5,52 @@ import { InputType, ReturnType } from "./types";
 import axios from "axios";
 import { revalidatePath } from "next/cache";
 import { createSafeActions } from "@/lib/create-safe-actions";
-import { AddressSafeTypes } from "./schema";
+import { PaymentSafeTypes } from "./schema";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const auth = await checkAuthenticate();
-  const { addressName, street, city, phone, id } = data;
+  const { id, orderDetails, voucherId } = data;
 
   if (!auth) {
     return {
       errors: "You need to login first",
     };
   }
+  console.log(`${process.env.NEXT_PRIVATE_API_URL}/Order/CreateOrder`);
+  console.log({ data });
 
-  const country = "Việt Nam";
+  console.log(JSON.stringify(data));
 
-  // console.log({ data });
-
-  let address;
+  let payment;
 
   try {
+    console.log("run");
     const res = await axios.post(
-      `${process.env.NEXT_PRIVATE_API_URL}/Address/CreateAddress`,
+      `${process.env.NEXT_PRIVATE_API_URL}/Order/CreateOrder`,
       {
-        addressName,
-        street,
-        city,
-        phone,
         id,
-        country,
+        orderDetails,
+        voucherId,
       },
+      
     );
 
+    console.log({ res });
+
     if (res.status === 200) {
-      address = res.data;
+      payment = res.data;
     }
   } catch (error) {
     return {
-      errors: "Failed to Add more address",
+      errors: "Failed to Payment",
     };
   }
 
   revalidatePath("/checkout");
 
   return {
-    data: address,
+    data: payment,
   };
 };
 
-export const addAddress = createSafeActions(AddressSafeTypes, handler);
+export const handlePaymentAction = createSafeActions(PaymentSafeTypes, handler);
