@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Order, OrderDetail } from '@/interface';
 
 interface DetailsModalProps {
@@ -7,7 +8,78 @@ interface DetailsModalProps {
   onClose: () => void;
 }
 
+interface OrderUpdate {
+  staffName: string;
+  status: number;
+  orderDate: string;
+}
+
+const OrderUpdateTracker: React.FC<OrderUpdate> = ({ staffName, status, orderDate }) => {
+  const getStatusLabel = (status: number) => {
+    switch (status) {
+      case 0: return 'Chưa thanh toán';
+      case 1: return 'Đã thanh toán';
+      case 2: return 'Đang xử lý';
+      case 3: return 'Đang vận chuyển';
+      case 4: return 'Hoàn thành';
+      case 5: return 'Đã hủy';
+      default: return 'Không rõ';
+    }
+  };
+
+  const getStatusColor = (status: number) => {
+    switch (status) {
+      case 0: return 'bg-yellow-100 text-yellow-800';
+      case 1: return 'bg-blue-100 text-blue-800';
+      case 2: return 'bg-purple-100 text-purple-800';
+      case 3: return 'bg-indigo-100 text-indigo-800';
+      case 4: return 'bg-green-100 text-green-800';
+      case 5: return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear().toString()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+      <h3 className="text-lg font-semibold mb-2">Cập nhật trạng thái đơn hàng</h3>
+      <p className="mb-1"><span className="font-medium">Nhân viên:</span> {staffName}</p>
+      <p className="mb-1">
+        <span className="font-medium">Trạng thái mới:</span>
+        <span className={`ml-2 px-2 py-1 rounded-full text-xs ${getStatusColor(status)}`}>
+          {getStatusLabel(status)}
+        </span>
+      </p>
+      <p><span className="font-medium">Thời gian cập nhật:</span> {formatDate(orderDate)}</p>
+    </div>
+  );
+};
+
 const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) => {
+  const [orderUpdate, setOrderUpdate] = useState<OrderUpdate | null>(null);
+console.log("order", orderUpdate);
+
+  useEffect(() => {
+    setOrderUpdate(null)
+    if (isOpen && order) {
+      axios.get(`https://milkapplicationapi.azurewebsites.net/api/Order/${order.orderId}/response`)
+        .then(response => {
+          if (response.data.isSucceed) {
+            setOrderUpdate(response.data.data);
+            console.log("response", response.data.data);
+            
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching order update:', error);
+        });
+    }
+  }, [isOpen, order]);
+
   if (!isOpen || !order) return null;
 
   const formatCurrency = (amount: number) => {
@@ -55,6 +127,14 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
           </button>
         </div>
 
+        {orderUpdate && (
+          <OrderUpdateTracker
+            staffName={orderUpdate.staffName}
+            status={orderUpdate.status}
+            orderDate={orderUpdate.orderDate}
+          />
+        )}
+
         <div className="grid grid-cols-2 gap-6 text-gray-700 mb-8">
           <div className="col-span-2 sm:col-span-1">
             <p className="mb-2"><span className="font-semibold">Mã đơn hàng:</span> {order.orderId}</p>
@@ -90,7 +170,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ isOpen, order, onClose }) =
               </tr>
             </thead>
             <tbody>
-              {order.orderDetails.map((detail: OrderDetail) => (
+              {order.orderDetails.map(detail => (
                 <tr key={detail.orderDetailId} className="hover:bg-gray-50">
                   <td className="border p-3">{detail.product.productName}</td>
                   <td className="border p-3">{detail.quantity}</td>

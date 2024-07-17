@@ -99,6 +99,7 @@ export interface Order {
   orderDetails: OrderDetail[];
   fullName: string;
   email: string;
+  staffName: string;
 }
 export interface OrderDetail {
   orderDetailId: number;

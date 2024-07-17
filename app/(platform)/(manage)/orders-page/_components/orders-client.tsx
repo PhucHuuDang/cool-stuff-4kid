@@ -51,8 +51,6 @@ type State = {
     }
   };
 
-// ... (paste the State type, initialState, and reducer function here)
-
 const OrdersClient: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [searchQuery, setSearchQuery] = useState("");
