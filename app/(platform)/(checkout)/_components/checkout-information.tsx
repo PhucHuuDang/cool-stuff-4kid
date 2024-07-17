@@ -35,14 +35,30 @@ import { formatCurrency } from "@/handle-transform/formatCurrency";
 import { PaymentMethodOnline } from "./_checkout-infor-components/payments-online";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { ElementRef, useRef, useState } from "react";
 import { AddressReceiveOrder } from "./_checkout-infor-components/address-receive-order";
 import { CreditCardContent } from "./_tabscontent-checkout/credit-card-content";
 import { PaymentUponReceive } from "./_tabscontent-checkout/payment-upon-receive";
-import { vouchers } from "@/db";
 import { toast } from "sonner";
-import { UserInformationDetail, UserInformationDetailProps } from "@/interface";
+import {
+  UserInformationDetail,
+  UserInformationDetailProps,
+  Vouchers,
+} from "@/interface";
 import { FormSubmit } from "@/components/form/form-submit";
+
+import { useQuery } from "@tanstack/react-query";
+import { getDataInClient } from "@/get-data-actions/get-data";
+import {
+  formatDateFns,
+  vietnameseDate,
+} from "@/handle-transform/format-date-fns";
+import { useAddress } from "@/hooks/use-address";
+import { useRouter } from "next/navigation";
+import { calculateDiscountedPrice } from "@/handle-transform/handle-discount";
+import { ConfettiFireworks } from "@/confetti/confetti";
+import { useConfirmDialog } from "@/hooks/use-confirm-dialog";
+import { ConfirmDialog } from "./confirm-dialog";
 
 const tabsProps = [
   {
@@ -57,22 +73,32 @@ const tabsProps = [
 
 interface CheckoutInformationProps {
   userInformationDetail: UserInformationDetailProps;
+  information: any;
 }
 
 export const CheckoutInformation = ({
   userInformationDetail,
+  information,
 }: CheckoutInformationProps) => {
   const cart = useFromStore(useCartStore, (state) => state.cart);
+  const [voucherCode, setVoucherCode] = useState<
+    Record<string, any> | Vouchers
+  >();
+  const [isOpenVoucherDialog, setIsOpenVoucherDialog] =
+    useState<boolean>(false);
+
+  console.log({ voucherCode });
+
+  const formRefSubmitOrder = useRef<ElementRef<"form">>(null);
+  const warningRefLackOfAddress = useRef<ElementRef<"div">>(null);
+
+  const address = useAddress();
+  const { address: addressValue } = address;
+  const confirmDialog = useConfirmDialog();
+
+  const router = useRouter();
 
   let total = 0;
-
-  // if (cart) {
-  //   total = cart.reduce(
-  //     (acc, product) =>
-  //       acc + product.discountPrice * (product.quantityOrder as number),
-  //     0,
-  //   );
-  // }
 
   if (cart) {
     total = cart.reduce(
@@ -85,21 +111,74 @@ export const CheckoutInformation = ({
     );
   }
 
+  const {
+    data: vouchers,
+    isError,
+    isFetching,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["voucher"],
+    queryFn: () => getDataInClient("/Vouchers/GetAllVouchers"),
+  });
+
+  // console.log({ vouchers });
+
   const currencyTransformed = formatCurrency(total);
 
-  const handleMessage = (formData: FormData) => {
-    const message = formData.get("message") as string;
-    // formData.
+  const handleSubmitOrder = async (formData: FormData) => {
+    const message = formData.get("message-form") as string;
+    const info = formData.get("informationUserOrder") as string;
+    const voucherId = voucherCode?.voucherId;
 
-    console.log({ message });
-    toast.success("Đã lưu lời nhắn");
+    // console.log({ cart });
+
+    let orderDetails;
+
+    if (cart) {
+      orderDetails = cart?.map((product) => {
+        return {
+          productId: product.productId,
+          quantity: product.quantityOrder,
+        };
+      });
+    }
+
+    const id = information.nameid as string;
+
+    if (!addressValue) {
+      warningRefLackOfAddress.current?.scrollIntoView({
+        behavior: "smooth",
+      });
+
+      console.log("first");
+      toast.error("Vui lòng nhập địa chỉ nhận hàng");
+      return;
+    }
+    // formRefSubmitOrder.current?.s
+
+    console.log({ message, id, orderDetails, voucherId });
+
+    toast.success("Đặt hàng thành công");
+    // toast.
   };
 
-  const handleOrder = (formData: FormData) => {};
+  // final price
+
+  const { formattedDiscountAmount, formattedFinalTotal, discountPercent } =
+    calculateDiscountedPrice(total, voucherCode?.discountPercent);
 
   return (
-    <form className="px-10 pb-20">
-      <AddressReceiveOrder userInformationDetail={userInformationDetail} />
+    <form
+      className="px-10 pb-20"
+      action={handleSubmitOrder}
+      ref={formRefSubmitOrder}
+    >
+      <AddressReceiveOrder
+        userInformationDetail={userInformationDetail}
+        id="informationUserOrder"
+        ref={warningRefLackOfAddress}
+      />
 
       <Card className="my-4">
         <CardContent className="rounded-lg p-5">
@@ -128,38 +207,85 @@ export const CheckoutInformation = ({
                 <TableCell colSpan={3}>Voucher của shop</TableCell>
                 <TableCell className="text-right">
                   {/* Todo: dialog to choose voucher in onClick button */}
-                  <Dialog>
+                  <Dialog
+                    open={isOpenVoucherDialog}
+                    onOpenChange={setIsOpenVoucherDialog}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="book">Chọn Voucher</Button>
                     </DialogTrigger>
                     <DialogContent className="h-[70%] overflow-y-auto">
                       {/* <div className="flex gap-x-3"> */}
                       <div>
-                        {vouchers.map((voucher) => {
+                        {vouchers?.map((voucher: Vouchers) => {
                           return (
                             <div
-                              key={voucher.product}
+                              key={voucher.voucherId}
                               className="relative my-4 w-full cursor-pointer rounded-lg border border-slate-400 p-8 shadow-md duration-200 hover:border-slate-600 hover:shadow-xl"
                             >
-                              <h2 className="text-lg font-bold text-[#ff6347]">
-                                Giảm {formatCurrency(voucher.price)}
+                              <div className="flex items-center gap-x-1 text-base font-bold text-slate-700">
+                                Mã giảm giá:
+                                <h1 className="text-sky-500">{voucher.code}</h1>
+                              </div>
+
+                              <h2 className="text-xl font-bold text-[#ff6347]">
+                                Giảm {voucher.discountPercent}%
                               </h2>
 
                               <h4 className="text-base font-semibold">
-                                {voucher.condition}
+                                Cho tất cả sản phẩm trong giỏ hàng
                               </h4>
-                              <p className="text-base font-medium">
-                                {voucher.product}
+
+                              <p className="my-1 text-wrap text-base font-bold">
+                                Từ{" "}
+                                <span className="text-[#e58777]">
+                                  {vietnameseDate(voucher.dateFrom)}
+                                </span>{" "}
                               </p>
-                              <p className="font-sm font-normal">
+
+                              <p className="my-1 text-wrap text-base font-bold">
+                                Đến{" "}
+                                <span className="text-[#e58777]">
+                                  {" "}
+                                  {vietnameseDate(voucher.dateTo)}
+                                </span>
+                              </p>
+                              {/* <p className="font-sm font-normal">
                                 {voucher.additionalInfo}
-                              </p>
-                              <Button
+                              </p> */}
+
+                              {voucherCode?.voucherId === voucher.voucherId ? (
+                                <Button
+                                  variant="book"
+                                  className="absolute right-3 top-1/2 z-30 flex justify-end"
+                                  disabled
+                                >
+                                  Đã lưu
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="book"
+                                  className="absolute right-3 top-1/2 flex justify-end"
+                                  onClick={() => {
+                                    setVoucherCode({ ...voucher });
+                                    setIsOpenVoucherDialog(
+                                      !isOpenVoucherDialog,
+                                    );
+                                  }}
+                                >
+                                  Lưu
+                                </Button>
+                              )}
+                              {/* <Button
                                 variant="book"
                                 className="absolute right-3 top-1/2 flex justify-end"
+                                onClick={() => {
+                                  setVoucherCode({ ...voucher });
+                                  setIsOpenVoucherDialog(!isOpenVoucherDialog);
+                                }}
                               >
                                 Lưu
-                              </Button>
+                              </Button> */}
                             </div>
                           );
                         })}
@@ -177,15 +303,17 @@ export const CheckoutInformation = ({
           <div className="flex">
             <div className="flex w-[40%] flex-1 items-center gap-x-1">
               <h3 className="w-20 flex-1">Lời nhắn: </h3>
-              <form action={handleMessage}>
-                <FormInput
-                  id="message"
-                  placeholder="Lưu ý cho admin shop"
-                  disabled={false}
-                  className="h-12 w-[400px]"
-                  labelClassName="text-neutral-700"
-                />
-              </form>
+              {/* <form onSubmit={handleMessage}> */}
+              <FormInput
+                id="message-form"
+                placeholder="Lưu ý cho admin shop"
+                disabled={false}
+                className="h-12 w-[400px]"
+                labelClassName="text-neutral-700"
+              />
+              {/* </form> */}
+
+              {/* <MessageForm /> */}
             </div>
 
             <Table className="w-full flex-1">
@@ -195,7 +323,7 @@ export const CheckoutInformation = ({
                   <TableHead>Nhanh</TableHead>
                   <TableHead>
                     <Dialog>
-                      <DialogTrigger>
+                      <DialogTrigger asChild>
                         <Button variant="outline">Thay Đổi</Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -207,7 +335,7 @@ export const CheckoutInformation = ({
                       </DialogContent>
                     </Dialog>
                   </TableHead>
-                  <TableHead className="text-[#ff6347]">81.000</TableHead>
+                  {/* <TableHead className="text-[#ff6347]">81.000</TableHead> */}
                 </TableRow>
               </TableHeader>
               <TableBody className="w-full hover:bg-transparent">
@@ -264,28 +392,32 @@ export const CheckoutInformation = ({
             <div className="flex flex-col space-y-4 rounded-lg p-4 duration-200 hover:shadow-lg">
               <div className="flex items-center justify-between">
                 <span className="text-lg font-medium">Tổng số tiền:</span>
-                <span className="text-lg font-medium">
-                  {currencyTransformed}
-                </span>
+                <span className="text-lg font-bold">{currencyTransformed}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-medium">Phí vận chuyển:</span>
-                <span className="rounded-md px-2 py-1 text-right text-lg font-medium">
-                  15.000
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-lg font-medium">
-                  Tổng cộng voucer giảm giá:
-                </span>
-                <span className="rounded-md px-2 py-1 text-right text-lg font-medium">
-                  -3.500
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
+              {voucherCode?.discountPercent && (
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium">
+                    Giảm giá với voucher của shop
+                  </span>
+                  <span className="rounded-md px-2 py-1 text-right text-lg font-medium text-sky-600">
+                    {discountPercent}%
+                  </span>
+                </div>
+              )}
+              {voucherCode?.voucherId && (
+                <div className="flex items-center justify-between">
+                  <span className="text-lg font-medium">
+                    Tổng cộng voucer giảm giá:
+                  </span>
+                  <span className="rounded-md px-2 py-1 text-right text-lg font-medium text-[#ed9080]">
+                    {formattedDiscountAmount}
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center justify-between gap-x-1">
                 <span className="text-lg font-medium">Tổng thanh toán:</span>
                 <h1 className="text-2xl font-bold text-[#ff6347]">
-                  {currencyTransformed}
+                  {formattedFinalTotal}
                 </h1>
               </div>
             </div>
@@ -296,16 +428,21 @@ export const CheckoutInformation = ({
               Để đảm bảo đơn hàng của bạn, bạn hãy kiểm tra lại đơn hàng của
               mình trước khi Đặt Hàng
             </div>
-            <FormSubmit
-              disabled={false}
+            <Button
+              // disabled={false}
+              type="button"
               className="w-64 text-right"
               variant="book"
+              onClick={() => confirmDialog.onOpen()}
             >
               Đặt hàng
-            </FormSubmit>
+            </Button>
           </CardFooter>
         </CardContent>
       </Card>
+      <ConfirmDialog
+        handleSubmitOrder={() => formRefSubmitOrder.current?.requestSubmit()}
+      />
     </form>
   );
 };
