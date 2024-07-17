@@ -495,7 +495,7 @@ const AddProductModal: React.FC<AddModalProps & { activeTab: string }> = ({
                   />
                 </Form.Item>
                 {discountWarning && (
-                  <div style={{ color: "orange" }}>{discountWarning}</div>
+                  <div className="text-orange-600">{discountWarning}</div>
                 )}
               </Col>
             </Row>
