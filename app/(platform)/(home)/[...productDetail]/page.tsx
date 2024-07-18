@@ -28,6 +28,7 @@ const ProductDetailPage = async ({
   const getProductDetailInformation: ProductDetailProps = await getData(
     `/Product/GetProductsById/${idProduct}`,
   );
+
   const productsCarousel: CardCarouselPropsPicked[] = await getProducts();
 
   // console.log({ productsCarousel });
@@ -53,7 +54,7 @@ const ProductDetailPage = async ({
 
         <EvaluateProduct />
 
-        <Review productDetail={getProductDetailInformation} />
+        <Review />
       </div>
     </div>
   );
