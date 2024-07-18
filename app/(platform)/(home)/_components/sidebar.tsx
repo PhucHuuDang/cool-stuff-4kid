@@ -25,14 +25,9 @@ const Sidebar = () => {
 
   const [data, setData] = useState();
 
-  // const { data, mutate, isPending } = useMutation({
-  //   mutationFn: postDataClient,
-  // });
-
-  console.log({ data });
+ 
 
   const searchParams = useSearchParams();
-  // const confetti = useConfetti();
 
   useEffect(() => {
     if (searchParams.get("code") === "00") {
@@ -56,7 +51,6 @@ const Sidebar = () => {
     }
   }, []);
 
-  console.log(searchParams.get("code"));
 
   return (
     <div className="w-64">

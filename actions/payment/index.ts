@@ -16,6 +16,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       errors: "You need to login first",
     };
   }
+
   console.log(`${process.env.NEXT_PRIVATE_API_URL}/Order/CreateOrder`);
   console.log({ data });
 
@@ -32,7 +33,6 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         orderDetails,
         voucherId,
       },
-      
     );
 
     console.log({ res });

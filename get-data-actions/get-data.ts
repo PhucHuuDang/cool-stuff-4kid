@@ -46,3 +46,13 @@ export const postDataClient = async (url: string, transactionId: any) => {
 
   return response.data;
 };
+
+export const findUserPaidOrders = async (url: string) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) return [];
+  const data = await response.json();
+  return data;
+};

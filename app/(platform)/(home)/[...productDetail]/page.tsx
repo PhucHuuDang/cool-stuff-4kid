@@ -13,6 +13,7 @@ import {
 } from "@/interface";
 import { getData } from "@/get-data-actions/get-data";
 import { getProducts } from "@/get-data-actions/get-products";
+import { informationDecoded } from "@/app/auth/information-decoded";
 
 const ProductDetailPage = async ({
   params,
@@ -22,6 +23,7 @@ const ProductDetailPage = async ({
   const { productDetail } = params;
 
   // console.log({ productDetail });
+  const information: any = await informationDecoded();
 
   const idProduct = Number(productDetail.slice(1).toString());
 
@@ -51,9 +53,14 @@ const ProductDetailPage = async ({
           description={getProductDetailInformation.productDescription}
         />
 
-        <EvaluateProduct />
+        <EvaluateProduct
+          getProductDetailInformation={getProductDetailInformation}
+        />
 
-        <Review productDetail={getProductDetailInformation} />
+        <Review
+          information={information}
+          productDetail={getProductDetailInformation}
+        />
       </div>
     </div>
   );

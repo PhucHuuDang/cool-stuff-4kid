@@ -10,3 +10,8 @@ export type LoginProps = {
   refreshToken: string;
   role: string;
 };
+
+export type ReviewResponse = {
+  isSucceed: boolean;
+  message: string;
+};
