@@ -15,12 +15,12 @@ import {
 interface SideBarProps {
   decodedInfo: {
     role?: string;
-  }
+  };
 }
 
 const SideBar: React.FC<SideBarProps> = ({ decodedInfo }) => {
   const [currentPage, setCurrentPage] = useState<string>("dashboard");
-  const [role, setRole] = useState<string>('default');
+  const [role, setRole] = useState<string>("default");
 
   useEffect(() => {
     if (decodedInfo?.role) {

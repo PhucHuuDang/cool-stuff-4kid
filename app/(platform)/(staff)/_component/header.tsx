@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 interface HeaderProps {
   title: string;
@@ -8,13 +9,15 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   return (
     <header className="flex items-center justify-between bg-gradient-to-r from-white to-slate-200 p-4 shadow-lg duration-200 hover:shadow-xl">
       <div className="flex items-center">
-        <Image
-          src="/cool-stuff-for-kid.jpeg"
-          alt="logo"
-          height={100}
-          width={100}
-          className="mr-4"
-        />
+        <Link href="/dashboard">
+          <Image
+            src="/cool-stuff-for-kid.jpeg"
+            alt="logo"
+            height={100}
+            width={100}
+            className="mr-4"
+          />
+        </Link>
         <h1 className="text-2xl font-bold">{title}</h1>
       </div>
       <div className="flex items-center">
@@ -32,8 +35,8 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
             className="h-10 w-10 rounded-full"
           />
           <div className="ml-2">
-            <span className="block">M10-Warthog</span>
-            <span className="text-sm text-gray-500">Super Admin</span>
+            <span className="block">ngocphu</span>
+            <span className="text-sm text-gray-500">Staff</span>
           </div>
         </div>
       </div>
