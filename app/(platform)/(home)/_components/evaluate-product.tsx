@@ -74,7 +74,7 @@ export const EvaluateProduct = ({
                 id="rating"
               />
 
-              <Separator className="my-1" />
+              <Separator className="my-2" />
             </div>
           );
         })}

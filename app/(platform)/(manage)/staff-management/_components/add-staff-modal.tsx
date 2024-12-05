@@ -5,19 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from 'react-hot-toast';
 import { User, Mail, Key, UserPlus } from 'lucide-react';
-
-interface StaffMember {
-  id: string;
-  fullName: string;
-  userName: string;
-  email: string;
-}
-
-interface AddStaffModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddStaff: (newStaff: StaffMember) => void;
-}
+import { AddStaffModalProps, StaffMember } from '@/interface';
 
 const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddStaff }) => {
   const [formData, setFormData] = useState({
@@ -26,16 +14,65 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
     userName: '',
     email: '',
     password: '',
+    status: 1
   });
 
+  const [errors, setErrors] = useState({
+    id: '',
+    fullName: '',
+    userName: '',
+    email: '',
+    password: ''
+  });
+
+  const validateField = (name: string, value: string) => {
+    let error = '';
+    switch (name) {
+      case 'id':
+      case 'fullName':
+      case 'userName':
+      case 'email':
+        if (value.length < 5 || value.length > 50) {
+          error = `${name} phải có từ 5 đến 50 ký tự`;
+        }
+        break;
+      case 'password':
+        if (value.length < 6 || value.length > 50) {
+          error = 'Mật khẩu phải có từ 6 đến 50 ký tự';
+        }
+        break;
+    }
+    return error;
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: validateField(name, value) });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate all fields before submission
+    const newErrors = {
+      id: validateField('id', formData.id),
+      fullName: validateField('fullName', formData.fullName),
+      userName: validateField('userName', formData.userName),
+      email: validateField('email', formData.email),
+      password: validateField('password', formData.password)
+    };
+
+    setErrors(newErrors);
+
+    // Check if there are any errors
+    if (Object.values(newErrors).some(error => error !== '')) {
+      toast.error('Vui lòng kiểm tra lại thông tin nhập vào');
+      return;
+    }
+
     try {
-      const response = await fetch('https://milkapplication20240705013352.azurewebsites.net/api/Users/CreateStaff', {
+      const response = await fetch('https://milkapplicationapi.azurewebsites.net/api/Users/CreateStaff', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,6 +86,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
           fullName: formData.fullName,
           userName: formData.userName,
           email: formData.email,
+          status: formData.status
         };
         onAddStaff(newStaff);
         toast.success('Nhân viên mới đã được thêm thành công!');
@@ -85,6 +123,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
               required 
               className="pl-8"
             />
+            {errors.id && <p className="text-red-500 text-sm">{errors.id}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="fullName" className="flex items-center gap-2">
@@ -99,6 +138,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
               required 
               className="pl-8"
             />
+            {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="userName" className="flex items-center gap-2">
@@ -113,6 +153,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
               required 
               className="pl-8"
             />
+            {errors.userName && <p className="text-red-500 text-sm">{errors.userName}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email" className="flex items-center gap-2">
@@ -128,6 +169,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
               required 
               className="pl-8"
             />
+            {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password" className="flex items-center gap-2">
@@ -143,6 +185,7 @@ const AddStaffModal: React.FC<AddStaffModalProps> = ({ isOpen, onClose, onAddSta
               required 
               className="pl-8"
             />
+            {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
           </div>
           <DialogFooter>
             <Button type="submit" className="w-full flex items-center justify-center gap-2">
